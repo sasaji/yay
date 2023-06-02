@@ -98,6 +98,8 @@
                             </div>
                         </div>
                         @Html.HiddenFor(model => model.TreeJson)
+                        @Html.HiddenFor(model => model.SearchCriteria.SelectedNode)
+                        @Html.HiddenFor(model => model.SelectedNodeId)
                         @Html.HiddenFor(model => model.TabIndex)
                         @Html.HiddenFor(model => model.FirstPage)
                     </div>
@@ -165,7 +167,7 @@
                 expandIcon: 'fa fa-plus',
                 collapseIcon: 'fa fa-minus'
             });
-            
+            $('#tree').treeview('revealNode', @Model.SelectedNodeId);
             var tabName = $('#TabIndex').val() != '' ? $('#TabIndex').val() : 'tree-view';
             $('#tabs a[href="#' + tabName + '"]').tab('show');
             $('#FirstPage').val(false);
@@ -174,6 +176,14 @@
             });
             $('#search-button').click(function () {
                 $('#FirstPage').val(true);
+                $('#SearchCriteria_SelectedNode').val(null);
+            });
+            $('#tree').on('nodeSelected', function(event, data) {
+                //alert(data.yid);
+                //alert(data.nodeId);
+                $('#SearchCriteria_SelectedNode').val(data.yid);
+                $('#SelectedNodeId').val(data.nodeId);
+                $('#search-form').submit();
             });
         });
     </script>

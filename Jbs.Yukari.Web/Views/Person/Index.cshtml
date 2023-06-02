@@ -89,12 +89,13 @@
                         @await Html.PartialAsync("_Users", Model.Users)
                     </div>
                     <div id="group" class="tab-pane">
-                        <p>group</p>
+                        @await Html.PartialAsync("_Groups", Model.Groups)
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    @Html.HiddenFor(model => model.Phase)
     @Html.HiddenFor(model => model.TabIndex)
     @Html.HiddenFor(model => model.ObjectTabIndex)
 }

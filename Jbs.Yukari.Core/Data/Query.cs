@@ -42,20 +42,37 @@ FROM Edit_BasicInfo";
             var where = new List<string>();
             if (searchCriteria != null)
             {
-                if (!string.IsNullOrEmpty(searchCriteria.Id))
+                // ツリービューのノードを選択された場合
+                if (!string.IsNullOrWhiteSpace(searchCriteria.SelectedNode))
                 {
-                    where.Add($"identity_no LIKE @{nameof(searchCriteria.Id)}");
-                    parameters.Add(nameof(searchCriteria.Id), $"{searchCriteria.Id.Replace("_", "[_]")}%");
+                    where.Add($@"basicinfo_id = @{nameof(searchCriteria.SelectedNode)} OR
+basicinfo_id IN (
+    SELECT
+        basicinfo_id
+    FROM Edit_BasicInfo_Membership
+    WHERE
+        parent_basicinfo_id = @{nameof(searchCriteria.SelectedNode)}
+)");
+                    parameters.Add(nameof(searchCriteria.SelectedNode), searchCriteria.SelectedNode);
                 }
-                if (!string.IsNullOrEmpty(searchCriteria.Type))
+                // 条件検索された場合
+                else
                 {
-                    where.Add($"type_id = @{nameof(searchCriteria.Type)}");
-                    parameters.Add(nameof(searchCriteria.Type), searchCriteria.Type);
-                }
-                if (!string.IsNullOrEmpty(searchCriteria.Name))
-                {
-                    where.Add($"name LIKE @{nameof(searchCriteria.Name)}");
-                    parameters.Add(nameof(searchCriteria.Name), $"%{searchCriteria.Name.Replace("_", "[_]")}%");
+                    if (!string.IsNullOrWhiteSpace(searchCriteria.Id))
+                    {
+                        where.Add($"identity_no LIKE @{nameof(searchCriteria.Id)}");
+                        parameters.Add(nameof(searchCriteria.Id), $"{searchCriteria.Id.Replace("_", "[_]")}%");
+                    }
+                    if (!string.IsNullOrWhiteSpace(searchCriteria.Type))
+                    {
+                        where.Add($"type_id = @{nameof(searchCriteria.Type)}");
+                        parameters.Add(nameof(searchCriteria.Type), searchCriteria.Type);
+                    }
+                    if (!string.IsNullOrWhiteSpace(searchCriteria.Name))
+                    {
+                        where.Add($"name LIKE @{nameof(searchCriteria.Name)}");
+                        parameters.Add(nameof(searchCriteria.Name), $"%{searchCriteria.Name.Replace("_", "[_]")}%");
+                    }
                 }
             }
             var rowsSql = $"{rowsSelect}{(where.Any() ? " WHERE " + string.Join(" AND ", where) : null)} ORDER BY sort_no, identity_no";

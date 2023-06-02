@@ -1,6 +1,7 @@
 ﻿using System.Security.Cryptography;
 using Jbs.Yukari.Core.Data;
 using Jbs.Yukari.Core.Models;
+using Jbs.Yukari.Core.Services;
 using Jbs.Yukari.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,7 +9,7 @@ namespace Jbs.Yukari.Web.Controllers
 {
     public class OrganizationController : EditController<Organization>
     {
-        public OrganizationController(ILogger<OrganizationController> logger, IQuery query) : base(logger, query) { }
+        public OrganizationController(ILogger<OrganizationController> logger, IQuery query, IRomanizer romanizer) : base(logger, query, romanizer) { }
 
         public async Task<ActionResult> Index(string yid)
         {

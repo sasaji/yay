@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.Negotiate;
 using System.Reflection.Metadata;
 using Jbs.Yukari.Core.Data;
+using Jbs.Yukari.Core.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +21,7 @@ builder.Services.AddRazorPages();
 // プロジェクトのサービスを追加
 builder.Services.AddSingleton<IDatabase, Database>();
 builder.Services.AddScoped<IQuery, Query>();
+builder.Services.AddScoped<IRomanizer, Romanizer>();
 
 var app = builder.Build();
 

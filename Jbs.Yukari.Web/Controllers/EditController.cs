@@ -1,6 +1,8 @@
 ﻿using System.Reflection;
+using System.Runtime.CompilerServices;
 using Jbs.Yukari.Core.Data;
 using Jbs.Yukari.Core.Models;
+using Jbs.Yukari.Core.Services;
 using Jbs.Yukari.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,11 +12,13 @@ namespace Jbs.Yukari.Web.Controllers
     {
         protected readonly ILogger<EditController<T>> _logger;
         protected readonly IQuery _query;
+        protected readonly IRomanizer _romanizer;
 
-        public EditController(ILogger<EditController<T>> logger, IQuery query)
+        public EditController(ILogger<EditController<T>> logger, IQuery query, IRomanizer romanizer)
         {
             _logger = logger;
             _query = query;
+            _romanizer = romanizer;
         }
 
         public async Task<T> Get(string yid)
