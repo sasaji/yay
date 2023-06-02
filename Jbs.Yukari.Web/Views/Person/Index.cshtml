@@ -1,0 +1,100 @@
+﻿@using System.Xml.Linq
+@model Jbs.Yukari.Core.Models.Person
+@{
+    Layout = "_EditLayout";
+    ViewData["Phase"] = Model.Phase;
+}
+@section basic {
+    <div class="container">
+        <div class="row">
+            <label class="col-sm-2 col-form-label">ID</label>
+            <div class="col-sm-10">
+                <input class="form-control" asp-for="Id" />
+            </div>
+        </div>
+        <div class="row">
+            <label class="col-sm-2 col-form-label">漢字</label>
+            <div class="col-sm-10">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <input class="form-control" asp-for="Surname" />
+                        </div>
+                        <div class="col-sm-4">
+                            <input class="form-control" asp-for="GivenName" />
+                        </div>
+                        <div class="col-sm-4">
+                            <input class="form-control" asp-for="MiddleName" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <label class="col-sm-2 col-form-label">カナ</label>
+            <div class="col-sm-10">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <input class="form-control" asp-for="KanaSurname" />
+                        </div>
+                        <div class="col-sm-4">
+                            <input class="form-control" asp-for="KanaGivenName" />
+                        </div>
+                        <div class="col-sm-4">
+                            <input class="form-control" asp-for="KanaMiddleName" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <label class="col-sm-2 col-form-label">
+                <span>英字</span>
+                <button class="btn btn-secondary" asp-action="Translate">Translate</button>
+            </label>
+            <div class="col-sm-10">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <input class="form-control" asp-for="RomanSurname" />
+                        </div>
+                        <div class="col-sm-4">
+                            <input class="form-control" asp-for="RomanGivenName" />
+                        </div>
+                        <div class="col-sm-4">
+                            <input class="form-control" asp-for="RomanMiddleName" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@section objects {
+    <div class="container">
+        <button class="btn btn-secondary" asp-action="Policy">ポリシー適用</button>
+        <div class="row">
+            <div class="col col-sm-12">
+                <ul id="object-tabs" class="nav">
+                    <li class="nav-item">
+                        <a href="#user" class="nav-link" data-bs-toggle="tab">ユーザー</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#group" class="nav-link" data-bs-toggle="tab">グループ</a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div id="user" class="tab-pane active">
+                        @await Html.PartialAsync("_Users", Model.Users)
+                    </div>
+                    <div id="group" class="tab-pane">
+                        <p>group</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @Html.HiddenFor(model => model.TabIndex)
+    @Html.HiddenFor(model => model.ObjectTabIndex)
+}

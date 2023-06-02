@@ -1,0 +1,144 @@
+﻿@model Jbs.Yukari.Web.Models.HomeViewModel
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+@if (this.Model != null)
+{
+    <div class="result-area">
+        @if (Model.SearchResult.Items != null)
+        {
+            <table id="search-result" class="table">
+                <thead>
+                    <tr class="common-table-header result-list-header">
+                        <th><label asp-for="SearchResult.ListItemTemplate.Id" class="control-label"></label></th>
+                        <th><label asp-for="SearchResult.ListItemTemplate.Type" class="control-label"></label></th>
+                        <th><label asp-for="SearchResult.ListItemTemplate.Name" class="control-label"></label></th>
+                        <th><label asp-for="SearchResult.ListItemTemplate.Status" class="control-label"></label></th>
+                        <th><label asp-for="SearchResult.ListItemTemplate.WhenChanged" class="control-label"></label></th>
+                        <th><label asp-for="SearchResult.ListItemTemplate.Objects" class="control-label"></label></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var entity in this.Model.SearchResult.Items)
+                    {
+                        <tr class="row-data">
+                            <td class="text-left">@entity.Type</td>
+                            <td class="text-left">@entity.Id</td>
+                            @{
+                                var @url = string.Empty;
+                                switch (entity.Type)
+                                {
+                                    case "organization":
+                                        url = "/organization";
+                                        break;
+                                    case "person":
+                                        url = "/person";
+                                        break;
+                                }
+                            }
+                            <td class="text-left">
+                                @if (!string.IsNullOrEmpty(url))
+                                {
+                                    <a href="@url?yid=@entity.Yid" target="_blank">@entity.Name</a>
+                                }
+                                else
+                                {
+                                    <span>@entity.Name</span>
+                                }
+                            </td>
+                            <td class="text-left">@entity.Status</td>
+                            <td class="text-left">@entity.WhenChanged</td>
+                            <td class="text-left">@entity.Objects</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <div id="paging-area" class="paging-area-custom">
+                @{
+                    var prevDisabled = !Model.SearchResult.Items.HasPreviousPage ? "disabled" : "";
+                    var nextDisabled = !Model.SearchResult.Items.HasNextPage ? "disabled" : "";
+                }
+                <span>Page @Model.SearchResult.Items.PageIndex of @Model.SearchResult.Items.TotalPages</span>
+                <br />
+                <button asp-action="Index"
+                   asp-route-sortOrder="@ViewData["CurrentSort"]"
+                   asp-route-pageNumber="1"
+                   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+                   class="btn btn-secondary @prevDisabled">
+                    First
+                </button>
+                <button asp-action="Index"
+                   asp-route-sortOrder="@ViewData["CurrentSort"]"
+                   asp-route-pageNumber="@(Model.SearchResult.Items.PageIndex - 1)"
+                   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+                   class="btn btn-secondary @prevDisabled">
+                    Prev
+                </button>
+
+                @{
+                    if (Model.SearchResult.Items.TotalPages > 5)
+                    {
+                        if (Model.SearchResult.Items.PageIndex <= 3)
+                        {
+                            for (int i = 1; i <= 5; i++)
+                            {
+                                var disabled = (Model.SearchResult.Items.PageIndex == i) ? "disabled" : "";
+                                <button asp-action="Index"
+                                    asp-route-sortOrder="@ViewData["CurrentSort"]"
+                                    asp-route-pageNumber="@i"
+                                    asp-route-currentFilter="@ViewData["CurrentFilter"]"
+                                    class="btn btn-secondary @disabled">
+                                    @i
+                                </button>
+                            }
+                        }
+                        else if (Model.SearchResult.Items.PageIndex < (Model.SearchResult.Items.TotalPages - 2))
+                        {
+                            for (int i = Model.SearchResult.Items.PageIndex - 2; i <= Model.SearchResult.Items.PageIndex + 2; i++)
+                            {
+                                var disabled = (Model.SearchResult.Items.PageIndex == i) ? "disabled" : "";
+                                <button asp-action="Index"
+                                   asp-route-sortOrder="@ViewData["CurrentSort"]"
+                                   asp-route-pageNumber="@i"
+                                   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+                                   class="btn btn-secondary @disabled">
+                                    @i
+                                </button>
+                            }
+                        }
+                        else
+                        {
+                            for (int i = Model.SearchResult.Items.TotalPages - 4; i <= Model.SearchResult.Items.TotalPages; i++)
+                            {
+                                var disabled = (Model.SearchResult.Items.PageIndex == i) ? "disabled" : "";
+                                <button asp-action="Index"
+                                   asp-route-sortOrder="@ViewData["CurrentSort"]"
+                                   asp-route-pageNumber="@i"
+                                   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+                                   class="btn btn-secondary @disabled">
+                                    @i
+                                </button>
+                            }
+                        }
+                    }
+                }
+
+                <button asp-action="Index"
+                    asp-route-sortOrder="@ViewData["CurrentSort"]"
+                    asp-route-pageNumber="@(Model.SearchResult.Items.PageIndex + 1)"
+                    asp-route-currentFilter="@ViewData["CurrentFilter"]"
+                    class="btn btn-secondary @nextDisabled">
+                    Next
+                </button>
+                <button asp-action="Index"
+                   asp-route-sortOrder="@ViewData["CurrentSort"]"
+                    asp-route-pageNumber="@(Model.SearchResult.Items.TotalPages)"
+                   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+                  class="btn btn-secondary @nextDisabled">
+                    Last
+                </button>
+            </div>
+        }
+    </div>
+}
