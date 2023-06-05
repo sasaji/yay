@@ -9,12 +9,12 @@ using Newtonsoft.Json.Serialization;
 
 namespace Jbs.Yukari.Core.Data
 {
-    public class Query : IQuery
+    public class Sql : ISql
     {
         private readonly IDatabase _database;
         const int commandTimeout = 600;
 
-        public Query(IDatabase database)
+        public Sql(IDatabase database)
         {
             _database = database;
         }
@@ -27,6 +27,7 @@ namespace Jbs.Yukari.Core.Data
     type_id AS Type,
     name AS Name,
     status AS Status,
+    phase_flag AS Phase,
     update_date AS WhenChanged,
     STUFF((
         SELECT
@@ -91,6 +92,23 @@ basicinfo_id IN (
     basicinfo_data AS Properties
 FROM Edit_BasicInfo WHERE basicinfo_id = @yid";
             return await _database.Connection.QuerySingleAsync<T>(sql, new { yid }, null, commandTimeout);
+        }
+
+        public async Task<IEnumerable<Role>> GetLink(string yid, string type)
+        {
+            var sql = @"SELECT
+    m.sort_no AS Id,
+    m.parent_basicinfo_id AS OrganizationYid,
+    b.name AS OrganizationName
+FROM Edit_BasicInfo_Membership m
+INNER JOIN Edit_BasicInfo b ON m.parent_basicinfo_id = b.basicinfo_id
+WHERE
+    m.basicinfo_id = @yid AND
+    b.type_id = @type
+ORDER BY
+    m.sort_no
+";
+            return await _database.Connection.QueryAsync<Role>(sql, new {yid, type}, null, commandTimeout);
         }
 
         public async Task<IEnumerable<T>> GetObjects<T>(string yid, string type)
@@ -179,6 +197,61 @@ ORDER BY
                 ContractResolver = new CamelCasePropertyNamesContractResolver()
             };
             return $"[{JsonConvert.SerializeObject(root, settings)}]";
+        }
+
+        public async void Save(BasicInfo info)
+        {
+            using var transaction = _database.GetCurrentTransaction();
+            try
+            {
+                var sql = $@"UPDATE Edit_BasicInfo
+SET
+    identity_no = @{nameof(info.Id)},
+    name = @{nameof(info.Name)},
+    basicinfo_data = @{nameof(info.Properties)},
+    phase_flag = 2,
+    update_date = GETDATE(),
+    commit_date = GETDATE()
+WHERE
+    basicinfo_id = @{nameof(info.Yid)}
+";
+                var parameters = new DynamicParameters();
+                parameters.Add($"@{nameof(info.Id)}", info.Id);
+                parameters.Add($"@{nameof(info.Name)}", info.Name);
+                parameters.Add($"@{nameof(info.Properties)}", info.Properties);
+                parameters.Add($"@{nameof(info.Yid)}", info.Yid);
+                await _database.Connection.ExecuteAsync(sql, parameters, transaction);
+
+                sql = $@"UPDATE Edit_ObjectInfo
+";
+                var paramUser = new DynamicParameters();
+                foreach (var obj in info.Users)
+                {
+                }
+                var paramGroup = new DynamicParameters();
+                foreach (var obj in info.Groups)
+                {
+                }
+                await _database.Connection.ExecuteAsync(sql, new { paramUser, paramGroup }, transaction);
+                transaction.Commit();
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
+        }
+
+        public async void Publish(Guid yid)
+        {
+            var sql = $@"UPDATE Edit_BasicInfo SET
+phase_flag = 0,
+reflect_date = GETDATE()
+WHERE
+    basicinfo_id = @yid";
+            var parameters = new DynamicParameters();
+            parameters.Add($"@yid", yid);
+            await _database.Connection.ExecuteAsync(sql, parameters);
         }
     }
 }

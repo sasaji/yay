@@ -1,4 +1,5 @@
-﻿using System.Xml.Linq;
+﻿using System.Collections.Generic;
+using System.Xml.Linq;
 
 namespace Jbs.Yukari.Core.Models
 {
@@ -13,6 +14,7 @@ namespace Jbs.Yukari.Core.Models
         public string RomanSurname { get; set; }
         public string RomanGivenName { get; set; }
         public string RomanMiddleName { get; set; }
+        public string TelephoneNumber { get; set; }
 
         public override void DeserializeProperties()
         {
@@ -25,6 +27,7 @@ namespace Jbs.Yukari.Core.Models
             RomanSurname = GetPropertyValue("surname_roman");
             RomanGivenName = GetPropertyValue("given_name_roman");
             RomanMiddleName = GetPropertyValue("middle_name_roman");
+            TelephoneNumber = GetPropertyValue("phone_no");
         }
 
         public override void SerializeProperties()
@@ -39,7 +42,8 @@ namespace Jbs.Yukari.Core.Models
                     new XElement("middle_name_kana", KanaMiddleName),
                     new XElement("surname_roman", RomanSurname),
                     new XElement("given_name_roman", RomanGivenName),
-                    new XElement("middle_name_roman", RomanMiddleName)
+                    new XElement("middle_name_roman", RomanMiddleName),
+                    new XElement("phone_no", TelephoneNumber)
                 )
             );
         }

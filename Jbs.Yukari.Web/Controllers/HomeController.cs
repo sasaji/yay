@@ -9,9 +9,9 @@ namespace Jbs.Yukari.Web.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly IQuery _query;
+        private readonly ISql _query;
 
-        public HomeController(ILogger<HomeController> logger, IQuery query)
+        public HomeController(ILogger<HomeController> logger, ISql query)
         {
             _logger = logger;
             _query = query;

@@ -10,9 +10,9 @@ using System.Reflection;
 
 namespace Jbs.Yukari.Web.Controllers
 {
-    public class PersonController : EditController<Person>
+    public class PersonController : EditController<PersonViewModel>
     {
-        public PersonController(ILogger<PersonController> logger, IQuery query, IRomanizer romanizer) : base(logger, query, romanizer) { }
+        public PersonController(ILogger<PersonController> logger, ISql query, IRomanizer romanizer) : base(logger, query, romanizer) { }
 
         public async Task<ActionResult> Index(string yid)
         {
@@ -36,10 +36,15 @@ namespace Jbs.Yukari.Web.Controllers
             return View("Index", model);
         }
 
-        public override IActionResult Save(Person model)
+        public override IActionResult Save(PersonViewModel model)
         {
             model.SerializeProperties();
             return base.Save(model);
+        }
+
+        protected override string BuildName(PersonViewModel model)
+        {
+            return $"{model.Surname} {model.GivenName}";
         }
     }
 }

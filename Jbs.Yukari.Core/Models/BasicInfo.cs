@@ -15,10 +15,11 @@ namespace Jbs.Yukari.Core.Models
         public string Id { get; set; }
         public string Type { get; set; }
         public string Name { get; set; }
-        public int Phase { get; set; }
         public string Status { get; set; }
+        public int Phase { get; set; }
         public DateTime WhenChanged { get; set; }
         public XDocument Properties { get; set; }
+        public IEnumerable<Role> Roles { get; set; }
         public IEnumerable<User> Users { get; set; }
         public IEnumerable<Group> Groups { get; set; }
 

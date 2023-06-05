@@ -1,5 +1,5 @@
 ﻿@using System.Xml.Linq
-@model Jbs.Yukari.Core.Models.Person
+@model Jbs.Yukari.Web.Models.PersonViewModel
 @{
     Layout = "_EditLayout";
     ViewData["Phase"] = Model.Phase;
@@ -69,6 +69,19 @@
                 </div>
             </div>
         </div>
+        <div class="row">
+            <label class="col-sm-2 col-form-label">電話番号</label>
+            <div class="col-sm-10">
+                <input class="form-control" asp-for="TelephoneNumber" />
+            </div>
+        </div>
+        <div class="row">
+            <label class="col-sm-2 col-form-label">所属</label>
+            <div class="col-sm-10">
+                <select id="lstBox1" style="width:40%" multiple="multiple" class="form-control" size="4" asp-items=Model.SelectList>
+                </select>
+            </div>
+        </div>
     </div>
 }
 @section objects {
@@ -95,6 +108,7 @@
             </div>
         </div>
     </div>
+    @Html.HiddenFor(model => model.Yid)
     @Html.HiddenFor(model => model.Phase)
     @Html.HiddenFor(model => model.TabIndex)
     @Html.HiddenFor(model => model.ObjectTabIndex)

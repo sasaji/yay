@@ -15,6 +15,7 @@
                         <th><label asp-for="SearchResult.ListItemTemplate.Type" class="control-label"></label></th>
                         <th><label asp-for="SearchResult.ListItemTemplate.Name" class="control-label"></label></th>
                         <th><label asp-for="SearchResult.ListItemTemplate.Status" class="control-label"></label></th>
+                        <th><label asp-for="SearchResult.ListItemTemplate.Phase" class="control-label"></label></th>
                         <th><label asp-for="SearchResult.ListItemTemplate.WhenChanged" class="control-label"></label></th>
                         <th><label asp-for="SearchResult.ListItemTemplate.Objects" class="control-label"></label></th>
                     </tr>
@@ -48,6 +49,7 @@
                                 }
                             </td>
                             <td class="text-left">@entity.Status</td>
+                            <td class="text-left">@entity.Phase</td>
                             <td class="text-left">@entity.WhenChanged</td>
                             <td class="text-left">@entity.Objects</td>
                         </tr>
