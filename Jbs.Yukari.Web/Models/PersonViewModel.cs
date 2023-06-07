@@ -1,15 +1,13 @@
 ﻿using Jbs.Yukari.Core.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace Jbs.Yukari.Web.Models
 {
     public class PersonViewModel : Person
     {
-        public IEnumerable<SelectListItem> SelectList
-        {
-            get {
-                return Roles.Select(x => new SelectListItem { Text = x.OrganizationName, Value = x.OrganizationYid.ToString() });
-            }
-        }
+        public string SelectedRoles { get; set; } = string.Empty;
+        public List<SelectListItem> RoleList { get; set; } = new List<SelectListItem>();
     }
 }

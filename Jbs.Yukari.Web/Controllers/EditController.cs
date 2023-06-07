@@ -1,10 +1,14 @@
-﻿using System.Reflection;
+﻿using System.Data;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using Jbs.Yukari.Core.Data;
 using Jbs.Yukari.Core.Models;
 using Jbs.Yukari.Core.Services;
 using Jbs.Yukari.Web.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Newtonsoft.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace Jbs.Yukari.Web.Controllers
 {
@@ -13,6 +17,9 @@ namespace Jbs.Yukari.Web.Controllers
         protected readonly ILogger<EditController<T>> _logger;
         protected readonly ISql _sql;
         protected readonly IRomanizer _romanizer;
+        protected readonly JsonSerializerSettings jsonSettings = new JsonSerializerSettings {
+            ContractResolver = new CamelCasePropertyNamesContractResolver()
+        };
 
         public EditController(ILogger<EditController<T>> logger, ISql sql, IRomanizer romanizer)
         {
@@ -24,7 +31,7 @@ namespace Jbs.Yukari.Web.Controllers
         public async Task<T> Get(string yid)
         {
             var model = await _sql.Get<T>(yid);
-            model.Roles = await _sql.GetLink(yid, "organization");
+            model.Roles = await _sql.GetRole(yid);
             model.Users = await _sql.GetObjects<User>(yid, "user");
             model.Groups = await _sql.GetObjects<Group>(yid, "group");
             return model;

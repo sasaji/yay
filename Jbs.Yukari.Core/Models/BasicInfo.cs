@@ -19,7 +19,7 @@ namespace Jbs.Yukari.Core.Models
         public int Phase { get; set; }
         public DateTime WhenChanged { get; set; }
         public XDocument Properties { get; set; }
-        public IEnumerable<Role> Roles { get; set; }
+        public List<KeyValuePair<int, Dictionary<string, Role>>> Roles { get; set; }
         public IEnumerable<User> Users { get; set; }
         public IEnumerable<Group> Groups { get; set; }
 

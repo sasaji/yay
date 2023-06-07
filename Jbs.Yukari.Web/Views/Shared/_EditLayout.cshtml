@@ -131,7 +131,7 @@
     <script type="text/javascript">
         $(function () {
             // ポストバック後にタブの選択状態を復元するためのコード。
-            // TabIndex などのコントロールもレイアウト側に実装したかったけどモデルとの紐づけ方がわからないので各ページ側に実装。
+            // TabIndex などのコントロールもレイアウト側に実装したかったけどモデルとの紐づけ方がわからないので子ページ側に実装。
             var tabName = $('#TabIndex').val() != '' ? $('#TabIndex').val() : 'basic';
             $('#tabs a[href="#' + tabName + '"]').tab('show');
             $('#tabs a').click(function () {

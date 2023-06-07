@@ -94,21 +94,26 @@ FROM Edit_BasicInfo WHERE basicinfo_id = @yid";
             return await _database.Connection.QuerySingleAsync<T>(sql, new { yid }, null, commandTimeout);
         }
 
-        public async Task<IEnumerable<Role>> GetLink(string yid, string type)
+        public async Task<List<KeyValuePair<int, Dictionary<string, Role>>>> GetRole(string yid)
         {
             var sql = @"SELECT
-    m.sort_no AS Id,
-    m.parent_basicinfo_id AS OrganizationYid,
-    b.name AS OrganizationName
+    m.sort_no AS [Key],
+    m.parent_basicinfo_id AS Yid,
+    b.name AS Name,
+    b.type_id AS Type
 FROM Edit_BasicInfo_Membership m
 INNER JOIN Edit_BasicInfo b ON m.parent_basicinfo_id = b.basicinfo_id
 WHERE
     m.basicinfo_id = @yid AND
-    b.type_id = @type
+    b.type_id IN ('organization', 'title')
 ORDER BY
     m.sort_no
 ";
-            return await _database.Connection.QueryAsync<Role>(sql, new {yid, type}, null, commandTimeout);
+            var grp = (await _database.Connection.QueryAsync(sql, new { yid }, null, commandTimeout))
+                .GroupBy(x => x.Key)
+                .ToDictionary(x => (int)x.Key, y => y.ToDictionary(z => (string)z.Type, a => new Role { Yid = a.Yid, Name = a.Name }))
+                .ToList();
+            return grp;
         }
 
         public async Task<IEnumerable<T>> GetObjects<T>(string yid, string type)

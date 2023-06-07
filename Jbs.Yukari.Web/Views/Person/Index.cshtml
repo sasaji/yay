@@ -76,13 +76,46 @@
             </div>
         </div>
         <div class="row">
-            <label class="col-sm-2 col-form-label">所属</label>
-            <div class="col-sm-10">
-                <select id="lstBox1" style="width:40%" multiple="multiple" class="form-control" size="4" asp-items=Model.SelectList>
-                </select>
+            <label class="col-sm-2 col-form-label">所属 / 役職</label>
+            <div class="col-sm-6">
+                @Html.DropDownListFor(model => model.SelectedRoles, Model.RoleList, new { @class = "form-control", @size = 4})
+            </div>
+            <div class="col-sm-4">
+                <button id="addRole" class="btn btn-secondary" asp-action="AddRole">追加</button>
+                <button id="removeRole" class="btn btn-secondary" asp-action="RemoveRole" disabled>削除</button>
+                <button id="upRole" class="btn btn-secondary" asp-action="UpRole" disabled>↑</button>
+                <button id="downRole" class="btn btn-secondary" asp-action="DownRole" disabled>↓</button>
             </div>
         </div>
     </div>
+    <script>
+        // まだjqueryが読み込まれていないので$セレクターは使えない（しかしfunctionの中では使える）。
+        window.addEventListener('DOMContentLoaded', function () {
+            roleButtonSetup();
+            $('#SelectedRoles').on('change', function () {
+                roleButtonSetup();
+            });
+        });
+
+        function roleButtonSetup() {
+            var index = $("#SelectedRoles").prop("selectedIndex");
+            if (index >= 0) {
+                $('#removeRole').attr('disabled', false);
+                if (index == 0)
+                    $('#upRole').attr('disabled', true);
+                else
+                    $('#upRole').attr('disabled', false);
+                if (index == $('#SelectedRoles').children().length - 1)
+                    $('#downRole').attr('disabled', true);
+                else
+                    $('#downRole').attr('disabled', false);
+            } else {
+                $('#removeRole').attr('disabled', true);
+                $('#upRole').attr('disabled', true);
+                $('#downRole').attr('disabled', true);
+            }
+        }
+    </script>
 }
 @section objects {
     <div class="container">
@@ -110,6 +143,12 @@
     </div>
     @Html.HiddenFor(model => model.Yid)
     @Html.HiddenFor(model => model.Phase)
+    @for (int i = 0; i < Model.RoleList.Count; i++)
+    {
+        <input type="hidden" name="RoleList.Index" value="@i" />
+        <input type="hidden" name="RoleList[@i].Text" value="@Model.RoleList[i].Text" />
+        <input type="hidden" name="RoleList[@i].Value" value="@Model.RoleList[i].Value" />
+    }
     @Html.HiddenFor(model => model.TabIndex)
     @Html.HiddenFor(model => model.ObjectTabIndex)
 }
