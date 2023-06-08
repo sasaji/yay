@@ -13,7 +13,7 @@ namespace Jbs.Yukari.Web.Controllers
 
         public async Task<ActionResult> Index(string yid)
         {
-            var model = await Get(yid);
+            var model = await Get(Guid.Parse(yid));
             model.DeserializeProperties();
             return View(model);
         }

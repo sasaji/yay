@@ -9,9 +9,10 @@ namespace Jbs.Yukari.Core.Data
     public interface ISql
     {
         Task<IEnumerable<ListItem>> Search(SearchCriteria searchCriteria);
-        Task<T> Get<T>(string yid);
-        Task<IEnumerable<Dictionary<string, Role>>> GetRole(string yid);
-        Task<IEnumerable<T>> GetObjects<T>(string yid, string type);
+        Task<T> Get<T>(Guid yid);
+        Task<IEnumerable<Dictionary<string, Role>>> GetRole(Guid yid);
+        Task<IEnumerable<T>> GetObjects<T>(Guid yid, string type);
+        Task<IEnumerable<TreeNode>> GetHierarchy(string type);
         Task<string> GetTree(string type);
         void Save(BasicInfo model);
         void Publish(Guid yid);

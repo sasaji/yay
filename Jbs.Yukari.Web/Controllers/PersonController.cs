@@ -4,6 +4,7 @@ using Jbs.Yukari.Core.Models;
 using Jbs.Yukari.Core.Services;
 using Jbs.Yukari.Web.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
 
 namespace Jbs.Yukari.Web.Controllers
@@ -14,8 +15,19 @@ namespace Jbs.Yukari.Web.Controllers
 
         public async Task<ActionResult> Index(string yid)
         {
-            var model = await Get(yid);
+            var model = await Get(Guid.Parse(yid));
             model.RoleList = JsonConvert.SerializeObject(model.Roles, jsonSettings);
+            ViewBag.Organizations = (await _sql.GetHierarchy("organization"))
+                .Select(x => new SelectListItem { 
+                    Text = x.Text,
+                    Value = x.Yid.ToString()
+                });
+            ViewBag.Titles = (await _sql.GetHierarchy("title"))
+                .Select(x => new SelectListItem
+                {
+                    Text = x.Text,
+                    Value = x.Yid.ToString()
+                });
             model.DeserializeProperties();
             return View(model);
         }

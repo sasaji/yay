@@ -81,7 +81,7 @@ basicinfo_id IN (
             return await records;
         }
 
-        public async Task<T> Get<T>(string yid)
+        public async Task<T> Get<T>(Guid yid)
         {
             var sql = @"SELECT
     basicinfo_id AS Yid,
@@ -94,7 +94,7 @@ FROM Edit_BasicInfo WHERE basicinfo_id = @yid";
             return await _database.Connection.QuerySingleAsync<T>(sql, new { yid }, null, commandTimeout);
         }
 
-        public async Task<IEnumerable<Dictionary<string, Role>>> GetRole(string yid)
+        public async Task<IEnumerable<Dictionary<string, Role>>> GetRole(Guid yid)
         {
             var sql = @"SELECT
     m.sort_no AS [Key],
@@ -115,7 +115,7 @@ ORDER BY
             return grp;
         }
 
-        public async Task<IEnumerable<T>> GetObjects<T>(string yid, string type)
+        public async Task<IEnumerable<T>> GetObjects<T>(Guid yid, string type)
         {
             var sql = @"SELECT
     O.basicinfo_id AS Yid,
@@ -134,7 +134,7 @@ ORDER BY
             return await _database.Connection.QueryAsync<T>(sql, new { yid, type }, null, commandTimeout);
         }
 
-        public async Task<string> GetTree(string type)
+        public async Task<IEnumerable<TreeNode>> GetHierarchy(string type)
         {
             var sql = @"WITH organizations (yid, id, name, parentYid, sort) AS (
 SELECT
@@ -182,8 +182,13 @@ ORDER BY
 	sort,
     id,
     text";
-            TreeNode root = new TreeNode { Yid = Guid.NewGuid(), Text = type, ParentYid = Guid.Empty };
-            var list = await _database.Connection.QueryAsync<TreeNode>(sql, new { type }, null, commandTimeout);
+            return await _database.Connection.QueryAsync<TreeNode>(sql, new { type }, null, commandTimeout);
+        }
+
+        public async Task<string> GetTree(string type)
+        {
+            var list = await GetHierarchy(type);
+            TreeNode root = new TreeNode { Yid = Guid.NewGuid(), Text = type, ParentYid = Guid.Empty, Level = 0 };
             foreach (TreeNode node in list)
             {
                 if (node.ParentYid != Guid.Empty)

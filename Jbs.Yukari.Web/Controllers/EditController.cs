@@ -28,7 +28,7 @@ namespace Jbs.Yukari.Web.Controllers
             _romanizer = romanizer;
         }
 
-        public async Task<T> Get(string yid)
+        public async Task<T> Get(Guid yid)
         {
             var model = await _sql.Get<T>(yid);
             model.Roles = await _sql.GetRole(yid);

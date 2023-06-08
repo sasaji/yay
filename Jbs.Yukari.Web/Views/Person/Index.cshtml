@@ -81,7 +81,7 @@
                 <select id="SelectedRoles" class="form-control" size="4"></select>
             </div>
             <div class="col-sm-4">
-                <button id="addRole" type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#addRoleDialog">追加</button>
+                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#addRoleDialog">追加</button>
                 <button id="removeRole" type="button" class="btn btn-secondary">削除</button>
                 <button id="upRole" type="button" class="btn btn-secondary">↑</button>
                 <button id="downRole" type="button" class="btn btn-secondary">↓</button>
@@ -97,11 +97,12 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    ...
+                    @Html.DropDownList("organizations", (IEnumerable<SelectListItem>)ViewBag.Organizations)
+                    @Html.DropDownList("titles", (IEnumerable<SelectListItem>)ViewBag.Titles)
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary">OK</button>
+                    <button id="addRole" type="button" class="btn btn-primary">OK</button>
                 </div>
             </div>
         </div>
@@ -142,6 +143,26 @@
 
             $('#SelectedRoles').on('change', function () {
                 roleButtonSetup();
+            });
+
+            $('#addRole').on('click', function () {
+                console.log('addRole');
+                $('#addRoleDialog').modal('hide');
+                var value = {
+                    "organization": {
+                        "yid": $('#organizations option:selected').val(),
+                        "name": $('#organizations option:selected').text()
+                    }, "title": {
+                        "yid": $('#titles option:selected').val(),
+                        "name": $('#titles option:selected').text()
+                    }
+                };
+                var option = $('<option>')
+                    .val(JSON.stringify(value))
+                    .text($('#organizations option:selected').text() + ' / ' + $('#titles option:selected').text());
+                $('#SelectedRoles').append(option);
+                roleTextSetup();
+                roleListSetup();
             });
 
             $('#removeRole').on('click', function () {
