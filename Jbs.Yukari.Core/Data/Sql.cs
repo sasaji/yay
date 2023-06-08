@@ -229,12 +229,18 @@ WHERE
                 sql = $@"UPDATE Edit_ObjectInfo
 ";
                 var paramUser = new DynamicParameters();
-                foreach (var obj in info.Users)
+                if (info.Users != null)
                 {
+                    foreach (var obj in info.Users)
+                    {
+                    }
                 }
                 var paramGroup = new DynamicParameters();
-                foreach (var obj in info.Groups)
+                if (info.Groups != null)
                 {
+                    foreach (var obj in info.Groups)
+                    {
+                    }
                 }
                 await _database.Connection.ExecuteAsync(sql, new { paramUser, paramGroup }, transaction);
                 transaction.Commit();

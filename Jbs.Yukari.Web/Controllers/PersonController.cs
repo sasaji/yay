@@ -1,15 +1,10 @@
-﻿using System.Data;
-using System.Reflection;
-using Jbs.Yukari.Core;
+﻿using Jbs.Yukari.Core;
 using Jbs.Yukari.Core.Data;
 using Jbs.Yukari.Core.Models;
 using Jbs.Yukari.Core.Services;
 using Jbs.Yukari.Web.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-using static Dapper.SqlMapper;
 
 namespace Jbs.Yukari.Web.Controllers
 {
@@ -25,14 +20,18 @@ namespace Jbs.Yukari.Web.Controllers
             return View(model);
         }
 
-        public IActionResult Translate(PersonViewModel model)
+        public IActionResult Translate(string[] names)
         {
-            ModelState.Clear(); // これがないとローマ字氏名を上書きできない。
-            if (!string.IsNullOrWhiteSpace(model.KanaSurname) && !string.IsNullOrWhiteSpace(model.Surname))
-                model.RomanSurname = _romanizer.Romanize(model.KanaSurname, model.Surname).Capitalize();
-            if (!string.IsNullOrWhiteSpace(model.KanaGivenName) && !string.IsNullOrWhiteSpace(model.GivenName))
-                model.RomanGivenName = _romanizer.Romanize(model.KanaGivenName, model.GivenName).Capitalize();
-            return View("Index", model);
+            var romanSurname = string.Empty;
+            var romanGivenName = string.Empty;
+            var romanMiddleName = string.Empty;
+            if (!string.IsNullOrWhiteSpace(names[0]) && !string.IsNullOrWhiteSpace(names[1]))
+                romanSurname = _romanizer.Romanize(names[1], names[0]).Capitalize();
+            if (!string.IsNullOrWhiteSpace(names[2]) && !string.IsNullOrWhiteSpace(names[3]))
+                romanGivenName = _romanizer.Romanize(names[3], names[2]).Capitalize();
+            if (!string.IsNullOrWhiteSpace(names[4]) && !string.IsNullOrWhiteSpace(names[5]))
+                romanMiddleName = _romanizer.Romanize(names[5], names[4]).Capitalize();
+            return Json(new { romanSurname, romanGivenName, romanMiddleName });
         }
 
         public IActionResult Policy(PersonViewModel model)
@@ -42,27 +41,14 @@ namespace Jbs.Yukari.Web.Controllers
 
         public override IActionResult Save(PersonViewModel model)
         {
+            model.Roles = JsonConvert.DeserializeObject<List<Dictionary<string, Role>>>(model.RoleList);
             model.SerializeProperties();
             return base.Save(model);
-        }
-
-        public IActionResult AddRole(PersonViewModel model)
-        {
-            return View("Index", model);
         }
 
         protected override string BuildName(PersonViewModel model)
         {
             return $"{model.Surname} {model.GivenName}";
-        }
-
-        private List<SelectListItem> BuildRoleList(List<KeyValuePair<int, Dictionary<string, Role>>> roles)
-        {
-            return roles.Select((x, i) => new SelectListItem
-            {
-                Text = $"{x.Value["organization"].Name} / {x.Value["title"].Name}".Trim(),
-                Value = $"{JsonConvert.SerializeObject(x, jsonSettings)}"
-            }).ToList();
         }
     }
 }

@@ -51,7 +51,7 @@
         <div class="row">
             <label class="col-sm-2 col-form-label">
                 <span>英字</span>
-                <button class="btn btn-secondary" asp-action="Translate">Translate</button>
+                <button id="translate" class="btn btn-secondary" type="button">Translate</button>
             </label>
             <div class="col-sm-10">
                 <div class="container">
@@ -113,11 +113,33 @@
             //console.log(rolesJson);
             rolesJson.forEach(function (v) {
                 //console.log(v);
-                var option = $('<option>').val(v).text(`${v.organization.name} / ${v.title.name}`);
+                var option = $('<option>').val(JSON.stringify(v)).text(`${v.organization.name} / ${v.title.name}`);
                 $('#SelectedRoles').append(option);
             });
             roleButtonSetup();
             roleTextSetup();
+
+            $('#translate').on('click', function () {
+                console.log($('#Surname').val());
+                $.ajax('/person/translate', {
+                    type: 'POST',
+                    dataType: 'json',
+                    data: { "names" : [
+                        $('#Surname').val(),
+                        $('#KanaSurname').val(),
+                        $('#GivenName').val(),
+                        $('#KanaGivenName').val(),
+                        $('#MiddleName').val(),
+                        $('#KanaMiddleName').val()
+                    ]}
+                }).done(function (result) {
+                    console.log(result);
+                    $('#RomanSurname').val(result.romanSurname);
+                    $('#RomanGivenName').val(result.romanGivenName);
+                    $('#RomanMiddleName').val(result.romanMiddleName);
+                });
+            });
+
             $('#SelectedRoles').on('change', function () {
                 roleButtonSetup();
             });
@@ -126,6 +148,7 @@
                 $('#SelectedRoles option:selected').remove();
                 roleButtonSetup();
                 roleTextSetup();
+                roleListSetup();
             });
 
             $('#upRole').on('click', function () {
@@ -133,6 +156,7 @@
                 $op.first().prev().before($op);
                 roleButtonSetup();
                 roleTextSetup();
+                roleListSetup();
             });
 
             $('#downRole').on('click', function () {
@@ -140,6 +164,7 @@
                 $op.last().next().after($op);
                 roleButtonSetup();
                 roleTextSetup();
+                roleListSetup();
             });
         });
 
@@ -170,6 +195,18 @@
                 if (i > 0 && !this.text.startsWith('(兼) '))
                     this.text = '(兼) ' + this.text;
             });
+        }
+
+        function roleListSetup() {
+            var result = '[';
+            var comma = '';
+            $("#SelectedRoles option").each(function (i, v) {
+                result += comma + v.value;
+                comma = ',';
+            });
+            result += ']';
+            console.log(result);
+            $('#RoleList').val(result);
         }
     </script>
 }
