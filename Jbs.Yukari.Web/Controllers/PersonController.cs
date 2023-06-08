@@ -20,7 +20,7 @@ namespace Jbs.Yukari.Web.Controllers
         public async Task<ActionResult> Index(string yid)
         {
             var model = await Get(yid);
-            model.RoleList = BuildRoleList(model.Roles);
+            model.RoleList = JsonConvert.SerializeObject(model.Roles, jsonSettings);
             model.DeserializeProperties();
             return View(model);
         }
@@ -46,20 +46,9 @@ namespace Jbs.Yukari.Web.Controllers
             return base.Save(model);
         }
 
-        public IActionResult RemoveRole(PersonViewModel model)
+        public IActionResult AddRole(PersonViewModel model)
         {
-            model.RoleList.RemoveAll(x => x.Value == model.SelectedRoles);
             return View("Index", model);
-        }
-
-        public IActionResult UpRole(PersonViewModel model)
-        {
-            return MoveRole(model, -1);
-        }
-
-        public IActionResult DownRole(PersonViewModel model)
-        {
-            return MoveRole(model, 1);
         }
 
         protected override string BuildName(PersonViewModel model)
@@ -71,22 +60,9 @@ namespace Jbs.Yukari.Web.Controllers
         {
             return roles.Select((x, i) => new SelectListItem
             {
-                Text = $"{(i != 0 ? "(兼) " : string.Empty)}{x.Value["organization"].Name} / {x.Value["title"].Name}".Trim(),
+                Text = $"{x.Value["organization"].Name} / {x.Value["title"].Name}".Trim(),
                 Value = $"{JsonConvert.SerializeObject(x, jsonSettings)}"
             }).ToList();
-        }
-
-        private IActionResult MoveRole(PersonViewModel model, int i)
-        {
-            var roles = model.RoleList
-                .Select(x => JsonConvert.DeserializeObject<KeyValuePair<int, Dictionary<string, Role>>>(x.Value))
-                .ToList();
-            var selectedRole = JsonConvert.DeserializeObject<KeyValuePair<int, Dictionary<string, Role>>>(model.SelectedRoles);
-            int pos = roles.Select((v, i) => new { item = v, index = i }).First(x => x.item.Key == selectedRole.Key).index;
-            roles.RemoveAt(pos);
-            roles.Insert(pos + i, selectedRole);
-            model.RoleList = BuildRoleList(roles);
-            return View("Index", model);
         }
     }
 }

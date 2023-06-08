@@ -94,7 +94,7 @@ FROM Edit_BasicInfo WHERE basicinfo_id = @yid";
             return await _database.Connection.QuerySingleAsync<T>(sql, new { yid }, null, commandTimeout);
         }
 
-        public async Task<List<KeyValuePair<int, Dictionary<string, Role>>>> GetRole(string yid)
+        public async Task<IEnumerable<Dictionary<string, Role>>> GetRole(string yid)
         {
             var sql = @"SELECT
     m.sort_no AS [Key],
@@ -111,8 +111,7 @@ ORDER BY
 ";
             var grp = (await _database.Connection.QueryAsync(sql, new { yid }, null, commandTimeout))
                 .GroupBy(x => x.Key)
-                .ToDictionary(x => (int)x.Key, y => y.ToDictionary(z => (string)z.Type, a => new Role { Yid = a.Yid, Name = a.Name }))
-                .ToList();
+                .Select(y => y.ToDictionary(z => (string)z.Type, a => new Role { Yid = a.Yid, Name = a.Name }));
             return grp;
         }
 

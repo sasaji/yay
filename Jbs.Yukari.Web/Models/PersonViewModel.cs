@@ -8,6 +8,6 @@ namespace Jbs.Yukari.Web.Models
     public class PersonViewModel : Person
     {
         public string SelectedRoles { get; set; } = string.Empty;
-        public List<SelectListItem> RoleList { get; set; } = new List<SelectListItem>();
+        public string RoleList { get; set; } = string.Empty;
     }
 }

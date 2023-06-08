@@ -78,22 +78,68 @@
         <div class="row">
             <label class="col-sm-2 col-form-label">所属 / 役職</label>
             <div class="col-sm-6">
-                @Html.DropDownListFor(model => model.SelectedRoles, Model.RoleList, new { @class = "form-control", @size = 4})
+                <select id="SelectedRoles" class="form-control" size="4"></select>
             </div>
             <div class="col-sm-4">
-                <button id="addRole" class="btn btn-secondary" asp-action="AddRole">追加</button>
-                <button id="removeRole" class="btn btn-secondary" asp-action="RemoveRole" disabled>削除</button>
-                <button id="upRole" class="btn btn-secondary" asp-action="UpRole" disabled>↑</button>
-                <button id="downRole" class="btn btn-secondary" asp-action="DownRole" disabled>↓</button>
+                <button id="addRole" type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#addRoleDialog">追加</button>
+                <button id="removeRole" type="button" class="btn btn-secondary">削除</button>
+                <button id="upRole" type="button" class="btn btn-secondary">↑</button>
+                <button id="downRole" type="button" class="btn btn-secondary">↓</button>
+            </div>
+        </div>
+    </div>
+    <!-- Modal -->
+    <div class="modal fade" id="addRoleDialog" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addRoleLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addRoleLabel">Modal title</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    ...
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary">OK</button>
+                </div>
             </div>
         </div>
     </div>
     <script>
         // まだjqueryが読み込まれていないので$セレクターは使えない（しかしfunctionの中では使える）。
         window.addEventListener('DOMContentLoaded', function () {
+            var rolesJson = JSON.parse($('#RoleList').val());
+            //console.log(rolesJson);
+            rolesJson.forEach(function (v) {
+                //console.log(v);
+                var option = $('<option>').val(v).text(`${v.organization.name} / ${v.title.name}`);
+                $('#SelectedRoles').append(option);
+            });
             roleButtonSetup();
+            roleTextSetup();
             $('#SelectedRoles').on('change', function () {
                 roleButtonSetup();
+            });
+
+            $('#removeRole').on('click', function () {
+                $('#SelectedRoles option:selected').remove();
+                roleButtonSetup();
+                roleTextSetup();
+            });
+
+            $('#upRole').on('click', function () {
+                $op = $('#SelectedRoles option:selected');
+                $op.first().prev().before($op);
+                roleButtonSetup();
+                roleTextSetup();
+            });
+
+            $('#downRole').on('click', function () {
+                $op = $('#SelectedRoles option:selected');
+                $op.last().next().after($op);
+                roleButtonSetup();
+                roleTextSetup();
             });
         });
 
@@ -114,6 +160,16 @@
                 $('#upRole').attr('disabled', true);
                 $('#downRole').attr('disabled', true);
             }
+        }
+
+        function roleTextSetup() {
+            $("#SelectedRoles option").each(function (i) {
+                //console.log(this.text);
+                if (i == 0 && this.text.startsWith('(兼) '))
+                    this.text = this.text.slice(4);
+                if (i > 0 && !this.text.startsWith('(兼) '))
+                    this.text = '(兼) ' + this.text;
+            });
         }
     </script>
 }
@@ -143,12 +199,7 @@
     </div>
     @Html.HiddenFor(model => model.Yid)
     @Html.HiddenFor(model => model.Phase)
-    @for (int i = 0; i < Model.RoleList.Count; i++)
-    {
-        <input type="hidden" name="RoleList.Index" value="@i" />
-        <input type="hidden" name="RoleList[@i].Text" value="@Model.RoleList[i].Text" />
-        <input type="hidden" name="RoleList[@i].Value" value="@Model.RoleList[i].Value" />
-    }
+    @Html.HiddenFor(model => model.RoleList)
     @Html.HiddenFor(model => model.TabIndex)
     @Html.HiddenFor(model => model.ObjectTabIndex)
 }
