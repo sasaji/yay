@@ -34,7 +34,7 @@ namespace Jbs.Yukari.Web.Controllers
         public async Task<ActionResult> Index(HomeViewModel model)
         {
             var entities = await _query.Search(model.SearchCriteria);
-            model.SearchResult.Items = PaginatedList<ListItem>.Create(entities, model.FirstPage ? 1 : model.PageNumber, model.PageSize);
+            model.SearchResult.Items = PaginatedList<BasicInfoOutline>.Create(entities, model.FirstPage ? 1 : model.PageNumber, model.PageSize);
             model.FirstPage = false;
             return View(model);
         }

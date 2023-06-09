@@ -19,7 +19,7 @@ namespace Jbs.Yukari.Core.Data
             _database = database;
         }
 
-        public async Task<IEnumerable<ListItem>> Search(SearchCriteria searchCriteria)
+        public async Task<IEnumerable<BasicInfoOutline>> Search(SearchCriteria searchCriteria)
         {
             var rowsSelect = @"SELECT 
     basicinfo_id AS Yid,
@@ -77,11 +77,11 @@ basicinfo_id IN (
                 }
             }
             var rowsSql = $"{rowsSelect}{(where.Any() ? " WHERE " + string.Join(" AND ", where) : null)} ORDER BY sort_no, identity_no";
-            var records = _database.Connection.QueryAsync<ListItem>(rowsSql, parameters, null, commandTimeout);
+            var records = _database.Connection.QueryAsync<BasicInfoOutline>(rowsSql, parameters, null, commandTimeout);
             return await records;
         }
 
-        public async Task<T> Get<T>(Guid yid)
+        public async Task<T> GetData<T>(Guid yid)
         {
             var sql = @"SELECT
     basicinfo_id AS Yid,
@@ -94,7 +94,7 @@ FROM Edit_BasicInfo WHERE basicinfo_id = @yid";
             return await _database.Connection.QuerySingleAsync<T>(sql, new { yid }, null, commandTimeout);
         }
 
-        public async Task<IEnumerable<Dictionary<string, Role>>> GetRole(Guid yid)
+        public async Task<IEnumerable<Dictionary<string, Role>>> GetRoles(Guid yid)
         {
             var sql = @"SELECT
     m.sort_no AS [Key],
@@ -210,7 +210,8 @@ ORDER BY
 
         public async void Save(BasicInfo info)
         {
-            using var transaction = _database.GetCurrentTransaction();
+            _database.BeginTransaction();
+            var transaction = _database.GetCurrentTransaction();
             try
             {
                 var sql = $@"UPDATE Edit_BasicInfo
@@ -231,6 +232,28 @@ WHERE
                 parameters.Add($"@{nameof(info.Yid)}", info.Yid);
                 await _database.Connection.ExecuteAsync(sql, parameters, transaction);
 
+                if (info.Roles != null && info.Roles.Count() > 0)
+                {
+                    sql = @"DELETE FROM Edit_BasicInfo_Membership WHERE basicinfo_id = @yid";
+                    await _database.Connection.ExecuteAsync(sql, new { info.Yid }, transaction);
+                    int index = 0;
+                    foreach (var role in info.Roles)
+                    {
+                        sql = @"INSERT INTO Edit_BasicInfo_Membership
+    (basicinfo_id, parent_basicinfo_id, sort_no, add_date)
+VALUES
+    (@yid, @parentYid, @sort, GETDATE())";
+                        var paramMember = new DynamicParameters();
+                        paramMember.Add("@yid", info.Yid);
+                        paramMember.Add("@parentYid", role["organization"].Yid);
+                        paramMember.Add("@sort", index);
+                        await _database.Connection.ExecuteAsync(sql, paramMember, transaction);
+                        paramMember.Add("@parentYid", role["title"].Yid);
+                        await _database.Connection.ExecuteAsync(sql, paramMember, transaction);
+                        index++;
+                    }
+                }
+
                 sql = $@"UPDATE Edit_ObjectInfo
 ";
                 var paramUser = new DynamicParameters();
@@ -247,7 +270,7 @@ WHERE
                     {
                     }
                 }
-                await _database.Connection.ExecuteAsync(sql, new { paramUser, paramGroup }, transaction);
+                //await _database.Connection.ExecuteAsync(sql, new { paramUser, paramGroup }, transaction);
                 transaction.Commit();
             }
             catch

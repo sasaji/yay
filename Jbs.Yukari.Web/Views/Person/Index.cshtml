@@ -97,8 +97,8 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    @Html.DropDownList("organizations", (IEnumerable<SelectListItem>)ViewBag.Organizations)
-                    @Html.DropDownList("titles", (IEnumerable<SelectListItem>)ViewBag.Titles)
+                    <select id="organizations"></select>
+                    <select id="titles"></select>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -119,6 +119,17 @@
             });
             roleButtonSetup();
             roleTextSetup();
+            var organizationsJson = JSON.parse($('#OrganizationList').val());
+            //console.log(organizationsJson);
+            organizationsJson.forEach(function (v) {
+                var option = $('<option>').val(v.key).text(v.value);
+                $('#organizations').append(option);
+            });
+            var titlesJson = JSON.parse($('#TitleList').val());
+            titlesJson.forEach(function (v) {
+                var option = $('<option>').val(v.key).text(v.value);
+                $('#titles').append(option);
+            });
 
             $('#translate').on('click', function () {
                 console.log($('#Surname').val());
@@ -258,6 +269,8 @@
     @Html.HiddenFor(model => model.Yid)
     @Html.HiddenFor(model => model.Phase)
     @Html.HiddenFor(model => model.RoleList)
+    @Html.HiddenFor(model => model.OrganizationList)
+    @Html.HiddenFor(model => model.TitleList)
     @Html.HiddenFor(model => model.TabIndex)
     @Html.HiddenFor(model => model.ObjectTabIndex)
 }

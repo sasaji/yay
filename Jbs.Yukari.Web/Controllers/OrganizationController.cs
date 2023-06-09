@@ -15,7 +15,7 @@ namespace Jbs.Yukari.Web.Controllers
         {
             var model = await Get(Guid.Parse(yid));
             model.DeserializeProperties();
-            return View(model);
+            return View("Index", model);
         }
 
         public IActionResult Policy(Organization model)
@@ -23,9 +23,8 @@ namespace Jbs.Yukari.Web.Controllers
             return View("Index", model);
         }
 
-        public override IActionResult Save(Organization model)
+        public override ActionResult Save(Organization model)
         {
-            model.SerializeProperties();
             return base.Save(model);
         }
     }

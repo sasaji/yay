@@ -1,23 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Xml;
 using System.Xml.Linq;
 
 namespace Jbs.Yukari.Core.Models
 {
-    public abstract class BasicInfo
+    public abstract class BasicInfo : BasicInfoOutline
     {
-        public Guid Yid { get; set; }
-        public string Id { get; set; }
-        public string Type { get; set; }
-        public string Name { get; set; }
-        public string Status { get; set; }
-        public int Phase { get; set; }
-        public DateTime WhenChanged { get; set; }
         public XDocument Properties { get; set; }
         public IEnumerable<Dictionary<string, Role>> Roles { get; set; }
         public IEnumerable<User> Users { get; set; }
@@ -35,7 +23,7 @@ namespace Jbs.Yukari.Core.Models
             return Properties.Root.Elements().FirstOrDefault(el => el.Name == key).Value;
         }
 
-        public virtual void SerializeProperties() { }
-        public virtual void DeserializeProperties() { }
+        public abstract void SerializeProperties();
+        public abstract void DeserializeProperties();
     }
 }

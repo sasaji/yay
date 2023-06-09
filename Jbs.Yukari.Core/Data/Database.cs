@@ -24,6 +24,12 @@ namespace Jbs.Yukari.Core.Data
             });
         }
 
+        public void BeginTransaction()
+        {
+            if (_transaction == null)
+                _transaction = _connection.Value.BeginTransaction();
+        }
+
         public IDbTransaction GetCurrentTransaction()
         {
             return _transaction;

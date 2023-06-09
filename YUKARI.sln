@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jbs.Yukari.Domain", "Jbs.Yu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jbs.Yukari.Web", "Jbs.Yukari.Web\Jbs.Yukari.Web.csproj", "{F94AD30E-C088-4A72-BF31-CB3CBC233690}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jbs.Yukari.CoreTest", "Jbs.Yukari.CoreTest\Jbs.Yukari.CoreTest.csproj", "{C80895D6-6A80-4D58-93B0-46C2B87B50B3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{F94AD30E-C088-4A72-BF31-CB3CBC233690}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F94AD30E-C088-4A72-BF31-CB3CBC233690}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F94AD30E-C088-4A72-BF31-CB3CBC233690}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C80895D6-6A80-4D58-93B0-46C2B87B50B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C80895D6-6A80-4D58-93B0-46C2B87B50B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C80895D6-6A80-4D58-93B0-46C2B87B50B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C80895D6-6A80-4D58-93B0-46C2B87B50B3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

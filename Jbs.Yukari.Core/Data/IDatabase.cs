@@ -8,6 +8,7 @@ namespace Jbs.Yukari.Core.Data
     public interface IDatabase
     {
         IDbConnection Connection { get; }
+        void BeginTransaction();
         IDbTransaction GetCurrentTransaction();
     }
 }

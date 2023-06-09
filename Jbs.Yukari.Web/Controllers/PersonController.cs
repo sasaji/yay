@@ -17,19 +17,14 @@ namespace Jbs.Yukari.Web.Controllers
         {
             var model = await Get(Guid.Parse(yid));
             model.RoleList = JsonConvert.SerializeObject(model.Roles, jsonSettings);
-            ViewBag.Organizations = (await _sql.GetHierarchy("organization"))
-                .Select(x => new SelectListItem { 
-                    Text = x.Text,
-                    Value = x.Yid.ToString()
-                });
-            ViewBag.Titles = (await _sql.GetHierarchy("title"))
-                .Select(x => new SelectListItem
-                {
-                    Text = x.Text,
-                    Value = x.Yid.ToString()
-                });
+            model.OrganizationList = JsonConvert.SerializeObject(
+                (await _sql.GetHierarchy("organization"))
+                    .Select(x => new KeyValuePair<string, string>(x.Yid.ToString(), x.Text)), jsonSettings);
+            model.TitleList = JsonConvert.SerializeObject(
+                (await _sql.GetHierarchy("title"))
+                    .Select(x => new KeyValuePair<string, string>(x.Yid.ToString(), x.Text)), jsonSettings);
             model.DeserializeProperties();
-            return View(model);
+            return View("Index", model);
         }
 
         public IActionResult Translate(string[] names)
@@ -51,10 +46,9 @@ namespace Jbs.Yukari.Web.Controllers
             return View("Index", model);
         }
 
-        public override IActionResult Save(PersonViewModel model)
+        public override ActionResult Save(PersonViewModel model)
         {
             model.Roles = JsonConvert.DeserializeObject<List<Dictionary<string, Role>>>(model.RoleList);
-            model.SerializeProperties();
             return base.Save(model);
         }
 

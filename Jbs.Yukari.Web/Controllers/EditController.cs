@@ -1,14 +1,9 @@
-﻿using System.Data;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using Jbs.Yukari.Core.Data;
+﻿using Jbs.Yukari.Core.Data;
 using Jbs.Yukari.Core.Models;
 using Jbs.Yukari.Core.Services;
-using Jbs.Yukari.Web.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace Jbs.Yukari.Web.Controllers
 {
@@ -28,20 +23,12 @@ namespace Jbs.Yukari.Web.Controllers
             _romanizer = romanizer;
         }
 
-        public async Task<T> Get(Guid yid)
-        {
-            var model = await _sql.Get<T>(yid);
-            model.Roles = await _sql.GetRole(yid);
-            model.Users = await _sql.GetObjects<User>(yid, "user");
-            model.Groups = await _sql.GetObjects<Group>(yid, "group");
-            return model;
-        }
-
-        public virtual IActionResult Save(T model)
+        public virtual ActionResult Save(T model)
         {
             try
             {
                 model.Name = BuildName(model);
+                model.SerializeProperties();
                 _sql.Save(model);
                 model.Phase = 2;
                 ViewData["Result"] = "0";
@@ -54,7 +41,7 @@ namespace Jbs.Yukari.Web.Controllers
             return View("Index", model);
         }
 
-        public virtual IActionResult Publish(T model)
+        public virtual ActionResult Publish(T model)
         {
             try
             {
@@ -68,6 +55,15 @@ namespace Jbs.Yukari.Web.Controllers
                 ViewData["ErrorMessage"] = ex.Message;
             }
             return View("Index", model);
+        }
+
+        protected async Task<T> Get(Guid yid)
+        {
+            var model = await _sql.GetData<T>(yid);
+            model.Roles = await _sql.GetRoles(yid);
+            model.Users = await _sql.GetObjects<User>(yid, "user");
+            model.Groups = await _sql.GetObjects<Group>(yid, "group");
+            return model;
         }
 
         protected virtual string BuildName(T model)
