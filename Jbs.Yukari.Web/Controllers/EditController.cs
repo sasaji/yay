@@ -2,8 +2,6 @@
 using Jbs.Yukari.Core.Models;
 using Jbs.Yukari.Core.Services;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 
 namespace Jbs.Yukari.Web.Controllers
 {
@@ -12,15 +10,14 @@ namespace Jbs.Yukari.Web.Controllers
         protected readonly ILogger<EditController<T>> _logger;
         protected readonly ISql _sql;
         protected readonly IRomanizer _romanizer;
-        protected readonly JsonSerializerSettings jsonSettings = new JsonSerializerSettings {
-            ContractResolver = new CamelCasePropertyNamesContractResolver()
-        };
+        protected readonly IJsonSerializer _jsonSerializer;
 
-        public EditController(ILogger<EditController<T>> logger, ISql sql, IRomanizer romanizer)
+        public EditController(ILogger<EditController<T>> logger, ISql sql, IRomanizer romanizer, IJsonSerializer jsonSerializer)
         {
             _logger = logger;
             _sql = sql;
             _romanizer = romanizer;
+            _jsonSerializer = jsonSerializer;
         }
 
         public virtual ActionResult Save(T model)

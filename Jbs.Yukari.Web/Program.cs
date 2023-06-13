@@ -22,6 +22,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddSingleton<IDatabase, Database>();
 builder.Services.AddScoped<ISql, Sql>();
 builder.Services.AddScoped<IRomanizer, Romanizer>();
+builder.Services.AddScoped<IJsonSerializer, JsonSerializer>();
 
 var app = builder.Build();
 

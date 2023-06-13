@@ -1,8 +1,9 @@
 ﻿using System.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
-using Jbs.Yukari.Web.Models;
 using Jbs.Yukari.Core.Data;
 using Jbs.Yukari.Core.Models;
+using Jbs.Yukari.Core.Services;
+using Jbs.Yukari.Web.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Jbs.Yukari.Web.Controllers
 {
@@ -10,18 +11,22 @@ namespace Jbs.Yukari.Web.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly ISql _query;
+        private readonly IJsonSerializer _jsonSerializer;
 
-        public HomeController(ILogger<HomeController> logger, ISql query)
+        public HomeController(ILogger<HomeController> logger, ISql query, IJsonSerializer jsonSerializer)
         {
             _logger = logger;
             _query = query;
+            _jsonSerializer = jsonSerializer;
         }
 
         [HttpGet]
         public async Task<ActionResult> Index()
         {
-            var model = new HomeViewModel();
-            model.TreeJson = await _query.GetTree("organization");
+            var model = new HomeViewModel
+            {
+                TreeJson = $"[{_jsonSerializer.Serialize(await _query.GetTree("organization"))}]"
+            };
             return View(model);
         }
 

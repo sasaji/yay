@@ -7,6 +7,7 @@ using Jbs.Yukari.Core.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
+
 namespace Jbs.Yukari.Core.Data
 {
     public class Sql : ISql
@@ -185,7 +186,7 @@ ORDER BY
             return await _database.Connection.QueryAsync<TreeNode>(sql, new { type }, null, commandTimeout);
         }
 
-        public async Task<string> GetTree(string type)
+        public async Task<TreeNode> GetTree(string type)
         {
             var list = await GetHierarchy(type);
             TreeNode root = new TreeNode { Yid = Guid.NewGuid(), Text = type, ParentYid = Guid.Empty, Level = 0 };
@@ -201,11 +202,7 @@ ORDER BY
                     root.Nodes.Add(node);
                 }
             }
-            JsonSerializerSettings settings = new JsonSerializerSettings
-            {
-                ContractResolver = new CamelCasePropertyNamesContractResolver()
-            };
-            return $"[{JsonConvert.SerializeObject(root, settings)}]";
+            return root;
         }
 
         public async void Save(BasicInfo info)

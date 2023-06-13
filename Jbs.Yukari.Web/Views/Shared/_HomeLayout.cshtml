@@ -128,62 +128,40 @@
         $(function () {
             var data = '@Model.TreeJson';
             var tree = JSON.parse(data.replace(/&quot;/g, '"'));
-            //console.log(tree);
-            /*var tree = [
-                {
-                    text: "Parent 1",
-                    nodes: [
-                        {
-                            text: "Child 1",
-                            nodes: [
-                                {
-                                    text: "Grandchild 1"
-                                },
-                                {
-                                    text: "Grandchild 2"
-                                }
-                            ]
-                        },
-                        {
-                            text: "Child 2",
-                        }
-                    ]
-                },
-                {
-                    text: "Parent 2"
-                },
-                {
-                    text: "Parent 3"
-                },
-                {
-                    text: "Parent 4"
-                },
-                {
-                    text: "Parent 5"
-                }
-            ];*/
+            // bootstrap-treeviewによるツリー表示。
+            // ほかにjstree、jqTreeを試したがこれが一番とっつきやすかった。
             $('#tree').treeview({
                 data: tree,
                 expandIcon: 'fa fa-plus',
                 collapseIcon: 'fa fa-minus'
             });
+            // ポストバック前に選択していたノードを復元。
             $('#tree').treeview('revealNode', @Model.SelectedNodeId);
+
+            // ポストバック前に選択されていたタブを復元。
             var tabName = $('#TabIndex').val() != '' ? $('#TabIndex').val() : 'tree-view';
             $('#tabs a[href="#' + tabName + '"]').tab('show');
+
+            // 検索ボタン押下時に1ページ目からの表示にさせるための変数を初期化。
             $('#FirstPage').val(false);
+
             $('#tabs a').click(function () {
                 $('#TabIndex').val($(this).attr('href').replace('#', ''));
             });
-            $('#search-button').click(function () {
-                $('#FirstPage').val(true);
-                $('#SearchCriteria_SelectedNode').val(null);
-            });
-            $('#tree').on('nodeSelected', function(event, data) {
+
+            $('#tree').on('nodeSelected', function (event, data) {
                 //alert(data.yid);
                 //alert(data.nodeId);
                 $('#SearchCriteria_SelectedNode').val(data.yid);
                 $('#SelectedNodeId').val(data.nodeId);
                 $('#search-form').submit();
+            });
+
+            $('#search-button').click(function () {
+                // 検索ボタン押下時は1ページ目からの表示にしたいので以下の変数にtrueをセットする。
+                $('#FirstPage').val(true);
+                // 検索ボタン押下時はツリーノードが選択されていない状態にする。
+                $('#SearchCriteria_SelectedNode').val(null);
             });
         });
     </script>
