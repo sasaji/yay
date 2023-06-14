@@ -40,9 +40,9 @@
 
     <main>
         <form id="search-form" method="post">
-            <div class="container">
+            <div id="main" class="container">
                 <div class="row">
-                    <div class="col col-3">
+                    <div class="col col-4">
                         <ul id="tabs" class="nav">
                             <li class="nav-item">
                                 <a href="#tree-view" class="nav-link" data-bs-toggle="tab">ツリービュー</a>
@@ -103,7 +103,7 @@
                         @Html.HiddenFor(model => model.TabIndex)
                         @Html.HiddenFor(model => model.FirstPage)
                     </div>
-                    <div class="col col-9">
+                    <div class="col col-8">
                         <main role="main" class="pb-3">
                             @RenderBody()
                         </main>

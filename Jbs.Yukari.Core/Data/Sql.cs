@@ -4,9 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using Jbs.Yukari.Core.Models;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-
 
 namespace Jbs.Yukari.Core.Data
 {
@@ -137,7 +134,7 @@ ORDER BY
 
         public async Task<IEnumerable<TreeNode>> GetHierarchy(string type)
         {
-            var sql = @"WITH organizations (yid, id, name, parentYid, sort) AS (
+            var sql = @"WITH hierarchy (yid, id, name, parentYid, sort) AS (
 SELECT
 	B.basicinfo_id,
     B.identity_no,
@@ -160,7 +157,7 @@ AS (
         cast(name as nvarchar(max)),
 		parentYid,
 		sort
-    FROM organizations
+    FROM hierarchy
     WHERE parentYid is null 
     UNION ALL
     SELECT 
@@ -171,7 +168,7 @@ AS (
         cast(OC.name as nvarchar(max)),
 		OC.parentYid,
 		OC.sort
-    FROM organizations OC
+    FROM hierarchy OC
     INNER JOIN CTE ON OC.parentYid = CTE.yid
 )
 SELECT 
@@ -205,10 +202,9 @@ ORDER BY
             return root;
         }
 
-        public async void Save(BasicInfo info)
+        public void Save(BasicInfo info)
         {
-            _database.BeginTransaction();
-            var transaction = _database.GetCurrentTransaction();
+            _database.GetOrBeginTransaction();
             try
             {
                 var sql = $@"UPDATE Edit_BasicInfo
@@ -227,12 +223,12 @@ WHERE
                 parameters.Add($"@{nameof(info.Name)}", info.Name);
                 parameters.Add($"@{nameof(info.Properties)}", info.Properties);
                 parameters.Add($"@{nameof(info.Yid)}", info.Yid);
-                await _database.Connection.ExecuteAsync(sql, parameters, transaction);
+                _database.ExecuteInTransaction(sql, parameters);
 
                 if (info.Roles != null && info.Roles.Count() > 0)
                 {
                     sql = @"DELETE FROM Edit_BasicInfo_Membership WHERE basicinfo_id = @yid";
-                    await _database.Connection.ExecuteAsync(sql, new { info.Yid }, transaction);
+                    _database.ExecuteInTransaction(sql, new { info.Yid });
                     int index = 0;
                     foreach (var role in info.Roles)
                     {
@@ -240,14 +236,21 @@ WHERE
     (basicinfo_id, parent_basicinfo_id, sort_no, add_date)
 VALUES
     (@yid, @parentYid, @sort, GETDATE())";
-                        var paramMember = new DynamicParameters();
-                        paramMember.Add("@yid", info.Yid);
-                        paramMember.Add("@parentYid", role["organization"].Yid);
-                        paramMember.Add("@sort", index);
-                        await _database.Connection.ExecuteAsync(sql, paramMember, transaction);
-                        paramMember.Add("@parentYid", role["title"].Yid);
-                        await _database.Connection.ExecuteAsync(sql, paramMember, transaction);
-                        index++;
+                        bool inserted = false;
+                        foreach (var roleItem in role)
+                        {
+                            var paramMember = new DynamicParameters();
+                            if (roleItem.Value.Yid != Guid.Empty)
+                            {
+                                paramMember.Add("@yid", info.Yid);
+                                paramMember.Add("@parentYid", roleItem.Value.Yid);
+                                paramMember.Add("@sort", index);
+                                _database.ExecuteInTransaction(sql, paramMember);
+                                //await _database.Connection.ExecuteAsync(sql, paramMember, transaction);
+                                inserted = true;
+                            }
+                        }
+                        if (inserted) index++;
                     }
                 }
 
@@ -268,11 +271,11 @@ VALUES
                     }
                 }
                 //await _database.Connection.ExecuteAsync(sql, new { paramUser, paramGroup }, transaction);
-                transaction.Commit();
+                _database.Commit();
             }
             catch
             {
-                transaction.Rollback();
+                _database.Rollback();
                 throw;
             }
         }

@@ -110,22 +110,22 @@
     <script>
         // まだjqueryが読み込まれていないので$セレクターは使えない（しかしfunctionの中では使える）。
         window.addEventListener('DOMContentLoaded', function () {
-            var rolesJson = JSON.parse($('#RoleList').val());
-            //console.log(rolesJson);
+            var rolesJson = JSON.parse($('#RolesJson').val());
+            console.log(rolesJson);
             rolesJson.forEach(function (v) {
-                //console.log(v);
-                var option = $('<option>').val(JSON.stringify(v)).text(`${v.organization.name} / ${v.title.name}`);
+                console.log(v);
+                var option = $('<option>').val(JSON.stringify(v)).text(`${v.organization.name}${v.title ? `/ ${v.title.name}` : ``}`);
                 $('#SelectedRoles').append(option);
             });
             roleButtonSetup();
             roleTextSetup();
-            var organizationsJson = JSON.parse($('#OrganizationList').val());
+            var organizationsJson = JSON.parse($('#OrganizationsJson').val());
             //console.log(organizationsJson);
             organizationsJson.forEach(function (v) {
                 var option = $('<option>').val(v.key).text(v.value);
                 $('#organizations').append(option);
             });
-            var titlesJson = JSON.parse($('#TitleList').val());
+            var titlesJson = JSON.parse($('#TitlesJson').val());
             titlesJson.forEach(function (v) {
                 var option = $('<option>').val(v.key).text(v.value);
                 $('#titles').append(option);
@@ -238,7 +238,7 @@
             });
             result += ']';
             console.log(result);
-            $('#RoleList').val(result);
+            $('#RolesJson').val(result);
         }
     </script>
 }
@@ -268,9 +268,9 @@
     </div>
     @Html.HiddenFor(model => model.Yid)
     @Html.HiddenFor(model => model.Phase)
-    @Html.HiddenFor(model => model.RoleList)
-    @Html.HiddenFor(model => model.OrganizationList)
-    @Html.HiddenFor(model => model.TitleList)
+    @Html.HiddenFor(model => model.RolesJson)
+    @Html.HiddenFor(model => model.OrganizationsJson)
+    @Html.HiddenFor(model => model.TitlesJson)
     @Html.HiddenFor(model => model.TabIndex)
     @Html.HiddenFor(model => model.ObjectTabIndex)
 }

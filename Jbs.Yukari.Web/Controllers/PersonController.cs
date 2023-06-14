@@ -15,11 +15,11 @@ namespace Jbs.Yukari.Web.Controllers
         public async Task<ActionResult> Index(string yid)
         {
             var model = await Get(Guid.Parse(yid));
-            model.RoleList = _jsonSerializer.Serialize(model.Roles);
-            model.OrganizationList = _jsonSerializer.Serialize(
+            model.RolesJson = _jsonSerializer.Serialize(model.Roles);
+            model.OrganizationsJson = _jsonSerializer.Serialize(
                 (await _sql.GetHierarchy("organization"))
                     .Select(x => new KeyValuePair<string, string>(x.Yid.ToString(), x.Text)));
-            model.TitleList = _jsonSerializer.Serialize(
+            model.TitlesJson = _jsonSerializer.Serialize(
                 (await _sql.GetHierarchy("title"))
                     .Select(x => new KeyValuePair<string, string>(x.Yid.ToString(), x.Text)));
             model.DeserializeProperties();
@@ -47,7 +47,7 @@ namespace Jbs.Yukari.Web.Controllers
 
         public override ActionResult Save(PersonViewModel model)
         {
-            model.Roles = _jsonSerializer.Deserialize<List<Dictionary<string, Role>>>(model.RoleList);
+            model.Roles = _jsonSerializer.Deserialize<List<Dictionary<string, Role>>>(model.RolesJson);
             return base.Save(model);
         }
 
