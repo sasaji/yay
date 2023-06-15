@@ -51,7 +51,7 @@
         <div class="row">
             <label class="col-sm-2 col-form-label">
                 <span>英字</span>
-                <button id="translate" class="btn btn-secondary" type="button">Translate</button>
+                <button id="romanize" class="btn btn-secondary" type="button">Romanize</button>
             </label>
             <div class="col-sm-10">
                 <div class="container">
@@ -78,7 +78,7 @@
         <div class="row">
             <label class="col-sm-2 col-form-label">所属 / 役職</label>
             <div class="col-sm-6">
-                <select id="SelectedRoles" class="form-control" size="4"></select>
+                <select id="roles" class="form-control" size="4"></select>
             </div>
             <div class="col-sm-4">
                 <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#addRoleDialog">追加</button>
@@ -115,7 +115,7 @@
             rolesJson.forEach(function (v) {
                 console.log(v);
                 var option = $('<option>').val(JSON.stringify(v)).text(`${v.organization.name}${v.title ? `/ ${v.title.name}` : ``}`);
-                $('#SelectedRoles').append(option);
+                $('#roles').append(option);
             });
             roleButtonSetup();
             roleTextSetup();
@@ -131,9 +131,9 @@
                 $('#titles').append(option);
             });
 
-            $('#translate').on('click', function () {
-                console.log($('#Surname').val());
-                $.ajax('/person/translate', {
+            $('#romanize').on('click', function () {
+                //console.log($('#Surname').val());
+                $.ajax('/person/romanize', {
                     type: 'POST',
                     dataType: 'json',
                     data: { "names" : [
@@ -152,13 +152,12 @@
                 });
             });
 
-            $('#SelectedRoles').on('change', function () {
+            $('#roles').on('change', function () {
                 roleButtonSetup();
             });
 
             $('#addRole').on('click', function () {
-                console.log('addRole');
-                $('#addRoleDialog').modal('hide');
+                //console.log('addRole');
                 var value = {
                     "organization": {
                         "yid": $('#organizations option:selected').val(),
@@ -168,23 +167,29 @@
                         "name": $('#titles option:selected').text()
                     }
                 };
-                var option = $('<option>')
-                    .val(JSON.stringify(value))
-                    .text($('#organizations option:selected').text() + ' / ' + $('#titles option:selected').text());
-                $('#SelectedRoles').append(option);
-                roleTextSetup();
-                roleListSetup();
+                var roles = JSON.parse($('#RolesJson').val());
+                if (roles.some(r => r.organization.yid == value.organization.yid && r.title.yid == value.title.yid)) {
+                    alert('すでに追加されています。');
+                } else {
+                    $('#addRoleDialog').modal('hide');
+                    var option = $('<option>')
+                        .val(JSON.stringify(value))
+                        .text($('#organizations option:selected').text() + ' / ' + $('#titles option:selected').text());
+                    $('#roles').append(option);
+                    roleTextSetup();
+                    roleListSetup();
+                }
             });
 
             $('#removeRole').on('click', function () {
-                $('#SelectedRoles option:selected').remove();
+                $('#roles option:selected').remove();
                 roleButtonSetup();
                 roleTextSetup();
                 roleListSetup();
             });
 
             $('#upRole').on('click', function () {
-                $op = $('#SelectedRoles option:selected');
+                $op = $('#roles option:selected');
                 $op.first().prev().before($op);
                 roleButtonSetup();
                 roleTextSetup();
@@ -192,7 +197,7 @@
             });
 
             $('#downRole').on('click', function () {
-                $op = $('#SelectedRoles option:selected');
+                $op = $('#roles option:selected');
                 $op.last().next().after($op);
                 roleButtonSetup();
                 roleTextSetup();
@@ -201,14 +206,14 @@
         });
 
         function roleButtonSetup() {
-            var index = $("#SelectedRoles").prop("selectedIndex");
+            var index = $("#roles").prop("selectedIndex");
             if (index >= 0) {
                 $('#removeRole').attr('disabled', false);
                 if (index == 0)
                     $('#upRole').attr('disabled', true);
                 else
                     $('#upRole').attr('disabled', false);
-                if (index == $('#SelectedRoles').children().length - 1)
+                if (index == $('#roles').children().length - 1)
                     $('#downRole').attr('disabled', true);
                 else
                     $('#downRole').attr('disabled', false);
@@ -220,7 +225,7 @@
         }
 
         function roleTextSetup() {
-            $("#SelectedRoles option").each(function (i) {
+            $("#roles option").each(function (i) {
                 //console.log(this.text);
                 if (i == 0 && this.text.startsWith('(兼) '))
                     this.text = this.text.slice(4);
@@ -232,7 +237,7 @@
         function roleListSetup() {
             var result = '[';
             var comma = '';
-            $("#SelectedRoles option").each(function (i, v) {
+            $("#roles option").each(function (i, v) {
                 result += comma + v.value;
                 comma = ',';
             });

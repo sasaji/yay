@@ -26,7 +26,7 @@ namespace Jbs.Yukari.Web.Controllers
             return View("Index", model);
         }
 
-        public IActionResult Translate(string[] names)
+        public IActionResult Romanize(string[] names)
         {
             var romanSurname = string.Empty;
             var romanGivenName = string.Empty;
