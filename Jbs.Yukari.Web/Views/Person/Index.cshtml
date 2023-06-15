@@ -172,6 +172,8 @@
                     alert('すでに追加されています。');
                 } else {
                     $('#addRoleDialog').modal('hide');
+                    $('body').removeClass('modal-open');
+                    $('.modal-backdrop').remove();
                     var option = $('<option>')
                         .val(JSON.stringify(value))
                         .text($('#organizations option:selected').text() + ' / ' + $('#titles option:selected').text());

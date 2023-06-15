@@ -1,23 +1,11 @@
-﻿<html lang="ja">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - YUKARI</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/Jbs.Yukari.Web.styles.css" asp-append-version="true" />
-</head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <img id="logo" src="/images/logo.png" alt="YUKARI" />
-            </div>
-        </nav>
-    </header>
-
-    <main>
-        <div class="container">
+﻿@model Jbs.Yukari.Core.Models.BasicInfo
+@{
+    Layout = "_Layout";
+    ViewData["Phase"] = Model.Phase;
+}
+<main>
+   <form method="post">
+       <div class="container">
             @{
                 var result = ViewData["Result"]?.ToString();
                 if (result == "0")
@@ -43,106 +31,97 @@
                     <a href="#objects" class="nav-link" data-bs-toggle="tab">オブジェクト情報</a>
                 </li>
             </ul>
-            <form method="post">
-                <div class="tab-content">
-                    <div id="basic" class="tab-pane active">
-                        <div class="container">
-                            <div class="row">
-                                <div class="col col-12">
-                                    @RenderSection("basic")
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="objects" class="tab-pane">
-                        <div class="container">
-                            <div class="row">
-                                <div class="col col-12">
-                                    @RenderSection("objects")
-                                </div>
+            <div class="tab-content">
+                <div id="basic" class="tab-pane active">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col col-12">
+                                @RenderSection("basic")
                             </div>
                         </div>
                     </div>
                 </div>
-                @{
-                    var phase = ViewData["Phase"]?.ToString();
-                    if (phase == "0")
-                    {
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#save">保存</button>
-                    }
-                    else if (phase == "1")
-                    {
-                        <button type="submit" class="btn btn-primary" asp-action="Commit">承認</button>
-                    }
-                    else if (phase == "2")
-                    {
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#publish">即時反映</button>
-                        <button type="submit" class="btn btn-secondary" asp-action="PublishData">データのみ反映</button>
-                    }
+                <div id="objects" class="tab-pane">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col col-12">
+                                @RenderSection("objects")
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @{
+                var phase = ViewData["Phase"]?.ToString();
+                if (phase == "0")
+                {
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#save">保存</button>
                 }
-                <!-- Modal -->
-                <div class="modal fade" id="save" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="saveLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="saveLabel">Modal title</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                ...
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                <button type="submit" class="btn btn-primary" asp-action="Save">OK</button>
-                            </div>
+                else if (phase == "1")
+                {
+                    <button type="submit" class="btn btn-primary" asp-action="Commit">承認</button>
+                }
+                else if (phase == "2")
+                {
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#publish">即時反映</button>
+                    <button type="submit" class="btn btn-secondary" asp-action="PublishData">データのみ反映</button>
+                }
+            }
+            <!-- Modal -->
+            <div class="modal fade" id="save" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="saveLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="saveLabel">Modal title</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            ...
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary" asp-action="Save">OK</button>
                         </div>
                     </div>
                 </div>
-                <div class="modal fade" id="publish" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="publishLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="publishLabel">Modal title</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                ...
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                <button type="submit" class="btn btn-primary" asp-action="Publish">OK</button>
-                            </div>
+            </div>
+            <div class="modal fade" id="publish" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="publishLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="publishLabel">Modal title</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            ...
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary" asp-action="Publish">OK</button>
                         </div>
                     </div>
                 </div>
-            </form>
+            </div>
         </div>
-    </main>
+    </form>
+</main>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2023 - Jbs.Yukari.Web
-        </div>
-    </footer>
-
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    <script type="text/javascript">
-        $(function () {
-            // ポストバック後にタブの選択状態を復元するためのコード。
-            // TabIndex などのコントロールもレイアウト側に実装したかったけどモデルとの紐づけ方がわからないので子ページ側に実装。
-            var tabName = $('#TabIndex').val() != '' ? $('#TabIndex').val() : 'basic';
-            $('#tabs a[href="#' + tabName + '"]').tab('show');
-            $('#tabs a').click(function () {
-                $('#TabIndex').val($(this).attr('href').replace('#', ''));
-            });
-            var objectTabName = $('#ObjectTabIndex').val() != '' ? $('#ObjectTabIndex').val() : 'user';
-            $('#object-tabs a[href="#' + objectTabName + '"]').tab('show');
-            $('#object-tabs a').click(function () {
-                $('#ObjectTabIndex').val($(this).attr('href').replace('#', ''));
-            });
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
+<script type="text/javascript">
+    $(function () {
+        // ポストバック後にタブの選択状態を復元するためのコード。
+        // TabIndex などのコントロールもレイアウト側に実装したかったけどモデルとの紐づけ方がわからないので子ページ側に実装。
+        var tabName = $('#TabIndex').val() != '' ? $('#TabIndex').val() : 'basic';
+        $('#tabs a[href="#' + tabName + '"]').tab('show');
+        $('#tabs a').click(function () {
+            $('#TabIndex').val($(this).attr('href').replace('#', ''));
         });
-    </script>
-</body>
-</html>
+        var objectTabName = $('#ObjectTabIndex').val() != '' ? $('#ObjectTabIndex').val() : 'user';
+        $('#object-tabs a[href="#' + objectTabName + '"]').tab('show');
+        $('#object-tabs a').click(function () {
+            $('#ObjectTabIndex').val($(this).attr('href').replace('#', ''));
+        });
+    });
+</script>

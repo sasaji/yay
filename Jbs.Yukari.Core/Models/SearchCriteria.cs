@@ -16,5 +16,7 @@ namespace Jbs.Yukari.Core.Models
             new KeyValuePair<int?, string>(1,"編集中"),
             new KeyValuePair<int?, string>(2, "反映待ち")
         };
+        public string RegisterDateFrom { get; set; }
+        public string RegisterDateTo { get; set; }
     }
 }
