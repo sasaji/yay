@@ -72,6 +72,11 @@ basicinfo_id IN (
                         where.Add($"name LIKE @{nameof(searchCriteria.Name)}");
                         parameters.Add(nameof(searchCriteria.Name), $"%{searchCriteria.Name.Replace("_", "[_]")}%");
                     }
+                    if (searchCriteria.Phase != null)
+                    {
+                        where.Add($"phase_flag = @{nameof(searchCriteria.Phase)}");
+                        parameters.Add(nameof(searchCriteria.Phase), searchCriteria.Phase);
+                    }
                 }
             }
             var rowsSql = $"{rowsSelect}{(where.Any() ? " WHERE " + string.Join(" AND ", where) : null)} ORDER BY sort_no, identity_no";

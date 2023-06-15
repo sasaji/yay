@@ -110,7 +110,7 @@
     <script>
         // まだjqueryが読み込まれていないので$セレクターは使えない（しかしfunctionの中では使える）。
         window.addEventListener('DOMContentLoaded', function () {
-            var rolesJson = JSON.parse($('#RolesJson').val());
+            var rolesJson = JSON.parse($('#@nameof(Model.RolesJson)').val());
             console.log(rolesJson);
             rolesJson.forEach(function (v) {
                 console.log(v);
@@ -119,13 +119,13 @@
             });
             roleButtonSetup();
             roleTextSetup();
-            var organizationsJson = JSON.parse($('#OrganizationsJson').val());
+            var organizationsJson = JSON.parse($('#@nameof(Model.OrganizationsJson)').val());
             //console.log(organizationsJson);
             organizationsJson.forEach(function (v) {
                 var option = $('<option>').val(v.key).text(v.value);
                 $('#organizations').append(option);
             });
-            var titlesJson = JSON.parse($('#TitlesJson').val());
+            var titlesJson = JSON.parse($('#@nameof(Model.TitlesJson)').val());
             titlesJson.forEach(function (v) {
                 var option = $('<option>').val(v.key).text(v.value);
                 $('#titles').append(option);
@@ -137,18 +137,18 @@
                     type: 'POST',
                     dataType: 'json',
                     data: { "names" : [
-                        $('#Surname').val(),
-                        $('#KanaSurname').val(),
-                        $('#GivenName').val(),
-                        $('#KanaGivenName').val(),
-                        $('#MiddleName').val(),
-                        $('#KanaMiddleName').val()
+                        $('#@nameof(Model.Surname)').val(),
+                        $('#@nameof(Model.KanaSurname)').val(),
+                        $('#@nameof(Model.GivenName)').val(),
+                        $('#@nameof(Model.KanaGivenName)').val(),
+                        $('#@nameof(Model.MiddleName)').val(),
+                        $('#@nameof(Model.KanaMiddleName)').val()
                     ]}
                 }).done(function (result) {
                     console.log(result);
-                    $('#RomanSurname').val(result.romanSurname);
-                    $('#RomanGivenName').val(result.romanGivenName);
-                    $('#RomanMiddleName').val(result.romanMiddleName);
+                    $('#@nameof(Model.RomanSurname)').val(result.romanSurname);
+                    $('#@nameof(Model.RomanGivenName)').val(result.romanGivenName);
+                    $('#@nameof(Model.RomanMiddleName)').val(result.romanMiddleName);
                 });
             });
 
@@ -167,7 +167,7 @@
                         "name": $('#titles option:selected').text()
                     }
                 };
-                var roles = JSON.parse($('#RolesJson').val());
+                var roles = JSON.parse($('#@nameof(Model.RolesJson)').val());
                 if (roles.some(r => r.organization.yid == value.organization.yid && r.title.yid == value.title.yid)) {
                     alert('すでに追加されています。');
                 } else {
@@ -243,7 +243,7 @@
             });
             result += ']';
             console.log(result);
-            $('#RolesJson').val(result);
+            $('#@nameof(Model.RolesJson)').val(result);
         }
     </script>
 }

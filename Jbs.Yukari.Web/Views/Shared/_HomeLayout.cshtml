@@ -50,9 +50,6 @@
                             <li class="nav-item">
                                 <a href="#search" class="nav-link" data-bs-toggle="tab">検索</a>
                             </li>
-                            <li class="nav-item">
-                                <a href="#tasks" class="nav-link" data-bs-toggle="tab">タスク</a>
-                            </li>
                         </ul>
                         <div class="tab-content">
                             <div id="tree-view" class="tab-pane active">
@@ -88,13 +85,18 @@
                                             @Html.EditorFor(model => model.SearchCriteria.Name, new { htmlAttributes = new { @class = "form-control" } })
                                         </div>
                                     </div>
+                                    <div class="row">
+                                        <div class="col col-3">
+                                            @Html.LabelFor(model => model.SearchCriteria.Phase)
+                                        </div>
+                                        <div class="col col-9">
+                                            @Html.DropDownListFor(model => model.SearchCriteria.Phase, Model.SearchCriteria.PhaseList.Select(_ => new SelectListItem(_.Value.ToString(), _.Key?.ToString())), new { @class = "form-select" })
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="text-center">
                                     <input id="search-button" class="btn btn-primary" type="submit" value="検索" />
                                 </div>
-                            </div>
-                            <div id="tasks" class="tab-pane">
-                                <p>タスクのコンテンツ</p>
                             </div>
                         </div>
                         @Html.HiddenFor(model => model.TreeJson)

@@ -11,8 +11,8 @@
             <table id="search-result" class="table">
                 <thead>
                     <tr class="common-table-header result-list-header">
-                        <th><label asp-for="SearchResult.ListItemTemplate.Id" class="control-label"></label></th>
                         <th><label asp-for="SearchResult.ListItemTemplate.Type" class="control-label"></label></th>
+                        <th><label asp-for="SearchResult.ListItemTemplate.Id" class="control-label"></label></th>
                         <th><label asp-for="SearchResult.ListItemTemplate.Name" class="control-label"></label></th>
                         <th><label asp-for="SearchResult.ListItemTemplate.Status" class="control-label"></label></th>
                         <th><label asp-for="SearchResult.ListItemTemplate.Phase" class="control-label"></label></th>
@@ -61,7 +61,7 @@
                     var prevDisabled = !Model.SearchResult.Items.HasPreviousPage ? "disabled" : "";
                     var nextDisabled = !Model.SearchResult.Items.HasNextPage ? "disabled" : "";
                 }
-                <span>Page @Model.SearchResult.Items.PageIndex of @Model.SearchResult.Items.TotalPages</span>
+                <span>Page @Model.SearchResult.Items.PageIndex of @Model.SearchResult.Items.TotalPages, Total @Model.TotalCount Records</span>
                 <br />
                 <button asp-action="Index"
                    asp-route-sortOrder="@ViewData["CurrentSort"]"
