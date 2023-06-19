@@ -41,7 +41,7 @@
                         </div>
                     </div>
                 </div>
-                <input type="hidden" asp-for="@user.value.TypeName" />
+                <input class="form-control" name="Users[@user.index].TypeName" asp-for="@user.value.TypeName" />
             }
         </div>
     }

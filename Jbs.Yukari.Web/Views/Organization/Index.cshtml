@@ -1,8 +1,6 @@
-﻿@using System.Xml.Linq
-@model Jbs.Yukari.Core.Models.Organization
+﻿@model Jbs.Yukari.Core.Models.Organization
 @{
     Layout = "_EditLayout";
-    ViewData["Phase"] = Model.Phase;
 }
 @section basic {
     <div class="container">
@@ -44,8 +42,4 @@
             </div>
         </div>
     </div>
-    @Html.HiddenFor(model => model.Yid)
-    @Html.HiddenFor(model => model.Phase)
-    @Html.HiddenFor(model => model.TabIndex)
-    @Html.HiddenFor(model => model.ObjectTabIndex)
 }

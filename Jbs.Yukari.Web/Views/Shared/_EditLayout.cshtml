@@ -1,13 +1,14 @@
 ﻿@model Jbs.Yukari.Core.Models.BasicInfo
 @{
     Layout = "_Layout";
-    ViewData["Phase"] = Model.Phase;
 }
 <main>
    <form method="post">
        <div class="container">
             @{
                 var result = ViewData["Result"]?.ToString();
+                var tabSource = Model.TabIndex != "objects" ? "active" : string.Empty;
+                var tabObjects = Model.TabIndex == "objects" ? "active" : string.Empty;
                 if (result == "0")
                 {
                     <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -22,46 +23,43 @@
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 }
-            }
-            <ul id="tabs" class="nav">
-                <li class="nav-item">
-                    <a href="#basic" class="nav-link" data-bs-toggle="tab">基本情報</a>
-                </li>
-                <li class="nav-item">
-                    <a href="#objects" class="nav-link" data-bs-toggle="tab">オブジェクト情報</a>
-                </li>
-            </ul>
-            <div class="tab-content">
-                <div id="basic" class="tab-pane active">
-                    <div class="container">
-                        <div class="row">
-                            <div class="col col-12">
-                                @RenderSection("basic")
+                <ul id="tabs" class="nav">
+                    <li class="nav-item">
+                        <a href="#basic" class="nav-link @tabSource" data-bs-toggle="tab">基本情報</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#objects" class="nav-link @tabObjects" data-bs-toggle="tab">オブジェクト情報</a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div id="basic" class="tab-pane @tabSource">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col col-12">
+                                    @RenderSection("basic")
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="objects" class="tab-pane @tabObjects">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col col-12">
+                                    @RenderSection("objects")
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div id="objects" class="tab-pane">
-                    <div class="container">
-                        <div class="row">
-                            <div class="col col-12">
-                                @RenderSection("objects")
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            @{
-                var phase = ViewData["Phase"]?.ToString();
-                if (phase == "0")
+                if (Model.Phase == 0)
                 {
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#save">保存</button>
                 }
-                else if (phase == "1")
+                else if (Model.Phase == 1)
                 {
                     <button type="submit" class="btn btn-primary" asp-action="Commit">承認</button>
                 }
-                else if (phase == "2")
+                else if (Model.Phase == 2)
                 {
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#publish">即時反映</button>
                     <button type="submit" class="btn btn-secondary" asp-action="PublishData">データのみ反映</button>
@@ -103,6 +101,10 @@
                 </div>
             </div>
         </div>
+        @Html.HiddenFor(model => model.Yid)
+        @Html.HiddenFor(model => model.Phase)
+        @Html.HiddenFor(model => model.TabIndex)
+        @Html.HiddenFor(model => model.ObjectTabIndex)
     </form>
 </main>
 
@@ -111,17 +113,13 @@
 <script src="~/js/site.js" asp-append-version="true"></script>
 <script type="text/javascript">
     $(function () {
-        // ポストバック後にタブの選択状態を復元するためのコード。
-        // TabIndex などのコントロールもレイアウト側に実装したかったけどモデルとの紐づけ方がわからないので子ページ側に実装。
-        var tabName = $('#TabIndex').val() != '' ? $('#TabIndex').val() : 'basic';
-        $('#tabs a[href="#' + tabName + '"]').tab('show');
         $('#tabs a').click(function () {
             $('#TabIndex').val($(this).attr('href').replace('#', ''));
+            console.log($('#TabIndex').val());
         });
-        var objectTabName = $('#ObjectTabIndex').val() != '' ? $('#ObjectTabIndex').val() : 'user';
-        $('#object-tabs a[href="#' + objectTabName + '"]').tab('show');
         $('#object-tabs a').click(function () {
             $('#ObjectTabIndex').val($(this).attr('href').replace('#', ''));
         });
     });
 </script>
+@RenderSection("script")
