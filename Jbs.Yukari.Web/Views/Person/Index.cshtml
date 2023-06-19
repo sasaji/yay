@@ -134,7 +134,7 @@
     @Html.HiddenFor(model => model.OrganizationsJson)
     @Html.HiddenFor(model => model.TitlesJson)
 }
-@section script {
+@section Scripts {
     <script>
         $(function () {
             var rolesJson = JSON.parse($('#@nameof(Model.RolesJson)').val());
