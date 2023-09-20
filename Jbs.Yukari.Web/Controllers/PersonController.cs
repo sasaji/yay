@@ -9,12 +9,13 @@ namespace Jbs.Yukari.Web.Controllers
 {
     public class PersonController : EditController<PersonViewModel>
     {
-        public PersonController(ILogger<PersonController> logger, ISql query, IRomanizer romanizer, IJsonSerializer jsonSerializer)
-            : base(logger, query, romanizer, jsonSerializer) { }
+        public PersonController(ILogger<PersonController> logger, ISql sql, IRomanizer romanizer, IJsonSerializer jsonSerializer)
+            : base(logger, sql, romanizer, jsonSerializer) { }
 
         public async Task<ActionResult> Index(string yid)
         {
             var model = await Get(Guid.Parse(yid));
+            model.JobMode = await _sql.GetJobMode(Guid.Parse(yid));
             model.RolesJson = _jsonSerializer.Serialize(model.Roles);
             model.OrganizationsJson = _jsonSerializer.Serialize(
                 (await _sql.GetHierarchy("organization"))
@@ -22,6 +23,7 @@ namespace Jbs.Yukari.Web.Controllers
             model.TitlesJson = _jsonSerializer.Serialize(
                 (await _sql.GetHierarchy("title"))
                     .Select(x => new KeyValuePair<string, string>(x.Yid.ToString(), x.Text)));
+            model.JobModesJson = _jsonSerializer.Serialize(await _sql.GetJobModes());
             model.DeserializeProperties();
             return View("Index", model);
         }
@@ -53,7 +55,7 @@ namespace Jbs.Yukari.Web.Controllers
 
         protected override string BuildName(PersonViewModel model)
         {
-            return $"{model.Surname} {model.GivenName}";
+            return $"{model.Surname} {model.GivenName}".Trim();
         }
     }
 }

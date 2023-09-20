@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Xml.Linq;
+﻿using System.Xml.Linq;
 
 namespace Jbs.Yukari.Core.Models
 {
@@ -15,6 +14,7 @@ namespace Jbs.Yukari.Core.Models
         public string RomanGivenName { get; set; }
         public string RomanMiddleName { get; set; }
         public string TelephoneNumber { get; set; }
+        public Role JobMode { get; set; }
 
         public override void DeserializeProperties()
         {

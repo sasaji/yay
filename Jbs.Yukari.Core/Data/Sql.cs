@@ -118,6 +118,32 @@ ORDER BY
             return grp;
         }
 
+        public async Task<Role> GetJobMode(Guid yid)
+        {
+            var sql = @"SELECT
+    m.parent_basicinfo_id AS Yid,
+    b.name AS Name
+FROM Edit_BasicInfo_Membership m
+INNER JOIN Edit_BasicInfo b ON m.parent_basicinfo_id = b.basicinfo_id
+WHERE
+    m.basicinfo_id = @yid AND
+    b.type_id = 'jobmode'
+";
+            return (await _database.Connection.QueryAsync<Role>(sql, new { yid }, null, commandTimeout)).FirstOrDefault();
+        }
+
+        public async Task<IEnumerable<Role>> GetJobModes()
+        {
+            var sql = @"SELECT
+    basicinfo_id AS Yid,
+    name AS Name
+FROM Edit_BasicInfo
+WHERE
+    type_id = 'jobmode'
+";
+            return await _database.Connection.QueryAsync<Role>(sql, new { }, null, commandTimeout);
+        }
+
         public async Task<IEnumerable<T>> GetObjects<T>(Guid yid, string type)
         {
             var sql = @"SELECT

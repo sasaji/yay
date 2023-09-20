@@ -85,6 +85,14 @@
                 <button id="downRole" type="button" class="btn btn-secondary">↓</button>
             </div>
         </div>
+        <div class="row">
+            <label class="col-sm-2 col-form-label">雇用区分</label>
+            <div class="col-sm-10">
+                <select id="jobmodes" class="form-control">
+                    <option value=""></option>
+                </select>
+            </div>
+        </div>
     </div>
     <!-- Modal -->
     <div class="modal fade" id="addRoleDialog" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addRoleLabel" aria-hidden="true">
@@ -133,14 +141,15 @@
     @Html.HiddenFor(model => model.RolesJson)
     @Html.HiddenFor(model => model.OrganizationsJson)
     @Html.HiddenFor(model => model.TitlesJson)
+    @Html.HiddenFor(model => model.JobModesJson)
 }
 @section Scripts {
     <script>
         $(function () {
             var rolesJson = JSON.parse($('#@nameof(Model.RolesJson)').val());
-            console.log(rolesJson);
+            //console.log(rolesJson);
             rolesJson.forEach(function (v) {
-                console.log(v);
+                //console.log(v);
                 var option = $('<option>').val(JSON.stringify(v)).text(`${v.organization.name}${v.title ? `/ ${v.title.name}` : ``}`);
                 $('#roles').append(option);
             });
@@ -156,6 +165,14 @@
             titlesJson.forEach(function (v) {
                 var option = $('<option>').val(v.key).text(v.value);
                 $('#titles').append(option);
+            });
+            var jobmodesJson = JSON.parse($('#@nameof(Model.JobModesJson)').val());
+            jobmodesJson.forEach(function (v) {
+                var option = $('<option>').val(v.yid).text(v.name);
+                if (v.yid == '@Model.JobMode?.Yid') {
+                    option.prop('selected', true);
+                }
+                $('#jobmodes').append(option);
             });
 
             $('#romanize').on('click', function () {
