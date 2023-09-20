@@ -2,7 +2,7 @@
 @{
     Layout = "_Layout";
 }
-<form method="post">
+<form id="the-form" method="post">
     <div class="container">
         @{
             var result = ViewData["Result"]?.ToString();
@@ -115,7 +115,13 @@
             $('#object-tabs a').click(function () {
                 $('#ObjectTabIndex').val($(this).attr('href').replace('#', ''));
             });
-        });
+            @if (Model.Phase == 2)
+            {
+                @:$('#the-form input').attr('readonly', 'readonly');
+                @:$('#the-form select').attr('readonly', 'readonly');
+                @:$('.tab-content button').attr('disabled', true);
+        }
+                });
     </script>
     @await RenderSectionAsync("Scripts", required: false)
 }
