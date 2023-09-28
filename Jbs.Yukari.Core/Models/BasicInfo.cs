@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 
@@ -7,7 +8,8 @@ namespace Jbs.Yukari.Core.Models
     public abstract class BasicInfo : BasicInfoOutline
     {
         public XDocument Properties { get; set; }
-        public IEnumerable<Dictionary<string, Role>> Roles { get; set; }
+        public IEnumerable<Dictionary<string, Relation>> Roles { get; set; }
+        public Guid Enrollment { get; set; }
         public IEnumerable<User> Users { get; set; }
         public IEnumerable<Group> Groups { get; set; }
 

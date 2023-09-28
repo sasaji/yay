@@ -9,21 +9,20 @@ namespace Jbs.Yukari.Web.Controllers
 {
     public class PersonController : EditController<PersonViewModel>
     {
-        public PersonController(ILogger<PersonController> logger, ISql sql, IRomanizer romanizer, IJsonSerializer jsonSerializer)
-            : base(logger, sql, romanizer, jsonSerializer) { }
+        public PersonController(ILogger<PersonController> logger, IQuery query, IRomanizer romanizer, IJsonSerializer jsonSerializer)
+            : base(logger, query, romanizer, jsonSerializer) { }
 
         public async Task<ActionResult> Index(string yid)
         {
             var model = await Get(Guid.Parse(yid));
-            model.JobMode = await _sql.GetJobMode(Guid.Parse(yid));
             model.RolesJson = _jsonSerializer.Serialize(model.Roles);
             model.OrganizationsJson = _jsonSerializer.Serialize(
-                (await _sql.GetHierarchy("organization"))
+                (await _query.GetHierarchy("organization"))
                     .Select(x => new KeyValuePair<string, string>(x.Yid.ToString(), x.Text)));
             model.TitlesJson = _jsonSerializer.Serialize(
-                (await _sql.GetHierarchy("title"))
+                (await _query.GetHierarchy("title"))
                     .Select(x => new KeyValuePair<string, string>(x.Yid.ToString(), x.Text)));
-            model.JobModesJson = _jsonSerializer.Serialize(await _sql.GetJobModes());
+            model.Enrollments = (await _query.GetEnrollments()).ToList();
             model.DeserializeProperties();
             return View("Index", model);
         }
@@ -49,7 +48,7 @@ namespace Jbs.Yukari.Web.Controllers
 
         public override ActionResult Save(PersonViewModel model)
         {
-            model.Roles = _jsonSerializer.Deserialize<List<Dictionary<string, Role>>>(model.RolesJson);
+            model.Roles = _jsonSerializer.Deserialize<List<Dictionary<string, Relation>>>(model.RolesJson);
             return base.Save(model);
         }
 

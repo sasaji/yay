@@ -7,12 +7,12 @@ using Jbs.Yukari.Core.Models;
 
 namespace Jbs.Yukari.Core.Data
 {
-    public class Sql : ISql
+    public class Query : IQuery
     {
         private readonly IDatabase _database;
         const int commandTimeout = 600;
 
-        public Sql(IDatabase database)
+        public Query(IDatabase database)
         {
             _database = database;
         }
@@ -97,7 +97,7 @@ FROM Edit_BasicInfo WHERE basicinfo_id = @yid";
             return await _database.Connection.QuerySingleAsync<T>(sql, new { yid }, null, commandTimeout);
         }
 
-        public async Task<IEnumerable<Dictionary<string, Role>>> GetRoles(Guid yid)
+        public async Task<IEnumerable<Dictionary<string, Relation>>> GetRoles(Guid yid)
         {
             var sql = @"SELECT
     m.sort_no AS [Key],
@@ -114,25 +114,24 @@ ORDER BY
 ";
             var grp = (await _database.Connection.QueryAsync(sql, new { yid }, null, commandTimeout))
                 .GroupBy(x => x.Key)
-                .Select(y => y.ToDictionary(z => (string)z.Type, a => new Role { Yid = a.Yid, Name = a.Name }));
+                .Select(y => y.ToDictionary(z => (string)z.Type, a => new Relation { Yid = a.Yid, Name = a.Name }));
             return grp;
         }
 
-        public async Task<Role> GetJobMode(Guid yid)
+        public async Task<Guid> GetEnrollment(Guid yid)
         {
             var sql = @"SELECT
-    m.parent_basicinfo_id AS Yid,
-    b.name AS Name
+    m.parent_basicinfo_id AS Yid
 FROM Edit_BasicInfo_Membership m
 INNER JOIN Edit_BasicInfo b ON m.parent_basicinfo_id = b.basicinfo_id
 WHERE
     m.basicinfo_id = @yid AND
     b.type_id = 'jobmode'
 ";
-            return (await _database.Connection.QueryAsync<Role>(sql, new { yid }, null, commandTimeout)).FirstOrDefault();
+            return (await _database.Connection.QuerySingleOrDefaultAsync<Guid>(sql, new { yid }, null, commandTimeout));
         }
 
-        public async Task<IEnumerable<Role>> GetJobModes()
+        public async Task<IEnumerable<Relation>> GetEnrollments()
         {
             var sql = @"SELECT
     basicinfo_id AS Yid,
@@ -141,7 +140,9 @@ FROM Edit_BasicInfo
 WHERE
     type_id = 'jobmode'
 ";
-            return await _database.Connection.QueryAsync<Role>(sql, new { }, null, commandTimeout);
+            var roles = await _database.Connection.QueryAsync<Relation>(sql, new { }, null, commandTimeout);
+            roles = roles.Prepend(new Relation());
+            return roles;
         }
 
         public async Task<IEnumerable<T>> GetObjects<T>(Guid yid, string type)
@@ -256,17 +257,18 @@ WHERE
                 parameters.Add($"@{nameof(info.Yid)}", info.Yid);
                 _database.ExecuteInTransaction(sql, parameters);
 
+                sql = @"DELETE FROM Edit_BasicInfo_Membership WHERE basicinfo_id = @yid";
+                _database.ExecuteInTransaction(sql, new { info.Yid });
+
                 if (info.Roles != null && info.Roles.Count() > 0)
                 {
-                    sql = @"DELETE FROM Edit_BasicInfo_Membership WHERE basicinfo_id = @yid";
-                    _database.ExecuteInTransaction(sql, new { info.Yid });
                     int index = 0;
-                    foreach (var role in info.Roles)
-                    {
-                        sql = @"INSERT INTO Edit_BasicInfo_Membership
+                    sql = @"INSERT INTO Edit_BasicInfo_Membership
     (basicinfo_id, parent_basicinfo_id, sort_no, add_date)
 VALUES
     (@yid, @parentYid, @sort, GETDATE())";
+                    foreach (var role in info.Roles)
+                    {
                         bool inserted = false;
                         foreach (var roleItem in role)
                         {
@@ -282,6 +284,22 @@ VALUES
                             }
                         }
                         if (inserted) index++;
+                    }
+                }
+
+                if (info.Enrollment != null)
+                {
+                    sql = @"INSERT INTO Edit_BasicInfo_Membership
+    (basicinfo_id, parent_basicinfo_id, sort_no, add_date)
+VALUES
+    (@yid, @parentYid, @sort, GETDATE())";
+                    var paramMember = new DynamicParameters();
+                    if (info.Enrollment != Guid.Empty)
+                    {
+                        paramMember.Add("@yid", info.Yid);
+                        paramMember.Add("@parentYid", info.Enrollment);
+                        paramMember.Add("@sort", 0);
+                        _database.ExecuteInTransaction(sql, paramMember);
                     }
                 }
 

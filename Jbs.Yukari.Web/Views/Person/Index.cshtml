@@ -88,9 +88,7 @@
         <div class="row">
             <label class="col-sm-2 col-form-label">雇用区分</label>
             <div class="col-sm-10">
-                <select id="jobmodes" class="form-control">
-                    <option value=""></option>
-                </select>
+                <select class="form-control" asp-for="Enrollment" asp-items="Model.Enrollments.Select(e => new SelectListItem(e.Name, e.Yid.ToString()))"></select>
             </div>
         </div>
     </div>
@@ -141,7 +139,11 @@
     @Html.HiddenFor(model => model.RolesJson)
     @Html.HiddenFor(model => model.OrganizationsJson)
     @Html.HiddenFor(model => model.TitlesJson)
-    @Html.HiddenFor(model => model.JobModesJson)
+    @for (int i = 0; i < Model.Enrollments.Count(); i++ )
+    {
+        @Html.Hidden("Enrollments[" + i + "].Yid", Model.Enrollments[i].Yid)
+        @Html.Hidden("Enrollments[" + i + "].Name", Model.Enrollments[i].Name)
+    }
 }
 @section Scripts {
     <script>
@@ -165,14 +167,6 @@
             titlesJson.forEach(function (v) {
                 var option = $('<option>').val(v.key).text(v.value);
                 $('#titles').append(option);
-            });
-            var jobmodesJson = JSON.parse($('#@nameof(Model.JobModesJson)').val());
-            jobmodesJson.forEach(function (v) {
-                var option = $('<option>').val(v.yid).text(v.name);
-                if (v.yid == '@Model.JobMode?.Yid') {
-                    option.prop('selected', true);
-                }
-                $('#jobmodes').append(option);
             });
 
             $('#romanize').on('click', function () {

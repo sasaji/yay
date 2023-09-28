@@ -10,10 +10,10 @@ namespace Jbs.Yukari.Web.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly ISql _query;
+        private readonly IQuery _query;
         private readonly IJsonSerializer _jsonSerializer;
 
-        public HomeController(ILogger<HomeController> logger, ISql query, IJsonSerializer jsonSerializer)
+        public HomeController(ILogger<HomeController> logger, IQuery query, IJsonSerializer jsonSerializer)
         {
             _logger = logger;
             _query = query;

@@ -9,7 +9,7 @@ namespace Jbs.Yukari.CoreTest
         public void Test1()
         {
             var database = new Database();
-            var sql = new Sql(database);
+            var sql = new Query(database);
             var person = new Person
             {
                 Yid = Guid.Parse("BB8863C3-55A5-4D68-83C5-00254186ED6C"),
