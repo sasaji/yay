@@ -5,11 +5,11 @@ namespace NKakasi
 {
     class DelegateConverter : IConverter
     {
-        private Func<KakasiReader, TextWriter, bool> _convert;
+        private readonly Func<KakasiReader, TextWriter, bool> convert;
         public DelegateConverter(Func<KakasiReader, TextWriter, bool> convert)
         {
-            _convert = convert;
+            this.convert = convert;
         }
-        public bool Convert(KakasiReader i, TextWriter w) => _convert(i, w);
+        public bool Convert(KakasiReader i, TextWriter w) => convert(i, w);
     }
 }

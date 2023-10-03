@@ -35,7 +35,6 @@ namespace NKakasi
                     }
                     rest = new string(chars, 0, restLength);
                 }
-                Logger.Log("kanjiYomi: " + kanjiYomi.Kanji + "," + kanjiYomi.Yomi + "," + kanjiYomi.Okurigana + "," + kanjiYomi.Length + "," + restLength);
                 if (kanjiYomi.Length < resultLength) {
                     break;
                 }

@@ -1,5 +1,4 @@
 ﻿using Jbs.Yukari.Core.Models;
-using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Jbs.Yukari.Web.Models
 {

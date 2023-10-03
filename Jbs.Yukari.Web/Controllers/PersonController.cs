@@ -15,14 +15,14 @@ namespace Jbs.Yukari.Web.Controllers
         public async Task<ActionResult> Index(string yid)
         {
             var model = await Get(Guid.Parse(yid));
-            model.RolesJson = _jsonSerializer.Serialize(model.Roles);
-            model.OrganizationsJson = _jsonSerializer.Serialize(
-                (await _query.GetHierarchy("organization"))
+            model.RolesJson = jsonSerializer.Serialize(model.Roles);
+            model.OrganizationsJson = jsonSerializer.Serialize(
+                (await query.GetHierarchy("organization"))
                     .Select(x => new KeyValuePair<string, string>(x.Yid.ToString(), x.Text)));
-            model.TitlesJson = _jsonSerializer.Serialize(
-                (await _query.GetHierarchy("title"))
+            model.TitlesJson = jsonSerializer.Serialize(
+                (await query.GetHierarchy("title"))
                     .Select(x => new KeyValuePair<string, string>(x.Yid.ToString(), x.Text)));
-            model.Enrollments = (await _query.GetEnrollments()).ToList();
+            model.Enrollments = (await query.GetEnrollments()).ToList();
             model.DeserializeProperties();
             return View("Index", model);
         }
@@ -33,11 +33,11 @@ namespace Jbs.Yukari.Web.Controllers
             var romanGivenName = string.Empty;
             var romanMiddleName = string.Empty;
             if (!string.IsNullOrWhiteSpace(names[0]) && !string.IsNullOrWhiteSpace(names[1]))
-                romanSurname = _romanizer.Romanize(names[1], names[0]).Capitalize();
+                romanSurname = romanizer.Romanize(names[1], names[0]).Capitalize();
             if (!string.IsNullOrWhiteSpace(names[2]) && !string.IsNullOrWhiteSpace(names[3]))
-                romanGivenName = _romanizer.Romanize(names[3], names[2]).Capitalize();
+                romanGivenName = romanizer.Romanize(names[3], names[2]).Capitalize();
             if (!string.IsNullOrWhiteSpace(names[4]) && !string.IsNullOrWhiteSpace(names[5]))
-                romanMiddleName = _romanizer.Romanize(names[5], names[4]).Capitalize();
+                romanMiddleName = romanizer.Romanize(names[5], names[4]).Capitalize();
             return Json(new { romanSurname, romanGivenName, romanMiddleName });
         }
 
@@ -48,7 +48,7 @@ namespace Jbs.Yukari.Web.Controllers
 
         public override ActionResult Save(PersonViewModel model)
         {
-            model.Roles = _jsonSerializer.Deserialize<List<Dictionary<string, Relation>>>(model.RolesJson);
+            model.Roles = jsonSerializer.Deserialize<List<Dictionary<string, Relation>>>(model.RolesJson);
             return base.Save(model);
         }
 

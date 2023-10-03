@@ -7,85 +7,85 @@ namespace Jbs.Yukari.Core.Data
 {
     public class Database : IDatabase
     {
-        private Lazy<IDbConnection> _connection;
-        private IDbTransaction _transaction;
+        private readonly Lazy<IDbConnection> connection;
+        private IDbTransaction transaction;
 
-        public IDbConnection Connection => _connection.Value;
+        public IDbConnection Connection => connection.Value;
 
         public Database()
         {
-            _connection = new Lazy<IDbConnection>(() =>
+            connection = new Lazy<IDbConnection>(() =>
             {
                 // MultipleActiveResultSets=true前提
-                var connection = new SqlConnection("Data Source=localhost;Initial Catalog=Yukari;Integrated Security=True;MultipleActiveResultSets=True");
-                connection.Open();
-                return connection;
+                var conn = new SqlConnection("Data Source=localhost;Initial Catalog=Yukari;Integrated Security=True;MultipleActiveResultSets=True");
+                conn.Open();
+                return conn;
             });
         }
 
         public void BeginTransaction()
         {
-            if (_transaction != null)
+            if (transaction != null)
             {
                 throw new ApplicationException("トランザクションはすでに開始しています。");
             }
-            _transaction = _connection.Value.BeginTransaction();
+            transaction = connection.Value.BeginTransaction();
         }
 
         public IDbTransaction GetOrBeginTransaction()
         {
-            if (_transaction == null)
+            if (transaction == null)
             {
                 BeginTransaction();
             }
-            return _transaction;
+            return transaction;
         }
 
         public IDbTransaction GetCurrentTransaction()
         {
-            return _transaction;
+            return transaction;
         }
 
         public int ExecuteInTransaction(string sql, object model, CommandType commandType = CommandType.Text)
         {
-            var transaction = EnsureInAndGetTransaction();
+            var tran = EnsureInAndGetTransaction();
             return Connection.Execute(
                 sql,
                 param: model,
-                transaction: transaction,
+                transaction: tran,
                 commandType: commandType);
         }
 
         public void Commit()
         {
-            if (this.IsTransactiionActive())
+            if (IsTransactiionActive())
             {
-                _transaction.Commit();
-                _transaction.Dispose();
-                _transaction = null;
+                transaction.Commit();
+                transaction.Dispose();
+                transaction = null;
             }
         }
 
         public void Rollback()
         {
-            if (this.IsTransactiionActive())
+            if (IsTransactiionActive())
             {
-                _transaction.Rollback();
-                _transaction.Dispose();
-                _transaction = null;
+                transaction.Rollback();
+                transaction.Dispose();
+                transaction = null;
             }
         }
 
         private IDbTransaction EnsureInAndGetTransaction()
         {
-            var transaction = GetCurrentTransaction();
-            return transaction ?? throw new InvalidOperationException("トランザクションが開始されていません。先にトランザクションを開始してください。");
+            var tran = GetCurrentTransaction();
+            return tran ?? throw new InvalidOperationException("トランザクションが開始されていません。先にトランザクションを開始してください。");
         }
 
         private bool IsTransactiionActive()
         {
             // zombie-transactionの場合connectionがnullになることがある。
-            return _transaction?.Connection != null;
+            return transaction?.Connection != null;
         }
 
         #region IDisposable Support
@@ -97,16 +97,16 @@ namespace Jbs.Yukari.Core.Data
             {
                 if (disposing)
                 {
-                    if (this.IsTransactiionActive())
+                    if (IsTransactiionActive())
                     {
                         // WARN
-                        this.Rollback();
+                        Rollback();
                     }
 
-                    _transaction?.Dispose();
-                    if (_connection != null && _connection.IsValueCreated)
+                    transaction?.Dispose();
+                    if (connection != null && connection.IsValueCreated)
                     {
-                        var conn = _connection.Value;
+                        var conn = connection.Value;
                         conn.Close();
                         conn.Dispose();
                     }

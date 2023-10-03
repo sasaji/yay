@@ -10,58 +10,58 @@
             var tabObjects = Model.TabIndex == "objects" ? "active" : string.Empty;
             if (result == "0")
             {
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    Done.
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
+                                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                        Done.
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
             }
             else if (result == "1")
             {
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    @ViewData["ErrorMessage"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
+                                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                        @ViewData["ErrorMessage"]
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
             }
-            <ul id="tabs" class="nav">
-                <li class="nav-item">
-                    <a href="#basic" class="nav-link @tabSource" data-bs-toggle="tab">基本情報</a>
-                </li>
-                <li class="nav-item">
-                    <a href="#objects" class="nav-link @tabObjects" data-bs-toggle="tab">オブジェクト情報</a>
-                </li>
-            </ul>
-            <div class="tab-content">
-                <div id="basic" class="tab-pane @tabSource">
-                    <div class="container">
-                        <div class="row">
-                            <div class="col col-12">
-                                @RenderSection("basic")
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div id="objects" class="tab-pane @tabObjects">
-                    <div class="container">
-                        <div class="row">
-                            <div class="col col-12">
-                                @RenderSection("objects")
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                                <ul id="tabs" class="nav">
+                                    <li class="nav-item">
+                                        <a href="#basic" class="nav-link @tabSource" data-bs-toggle="tab">基本情報</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="#objects" class="nav-link @tabObjects" data-bs-toggle="tab">オブジェクト情報</a>
+                                    </li>
+                                </ul>
+                                <div class="tab-content">
+                                    <div id="basic" class="tab-pane @tabSource">
+                                        <div class="container">
+                                            <div class="row">
+                                                <div class="col col-12">
+                                                    @RenderSection("basic")
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="objects" class="tab-pane @tabObjects">
+                                        <div class="container">
+                                            <div class="row">
+                                                <div class="col col-12">
+                                                    @RenderSection("objects")
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
             if (Model.Phase == 0)
             {
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#save">保存</button>
+                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#save">保存</button>
             }
             else if (Model.Phase == 1)
             {
-                <button type="submit" class="btn btn-primary" asp-action="Commit">承認</button>
+                                    <button type="submit" class="btn btn-primary" asp-action="Commit">承認</button>
             }
             else if (Model.Phase == 2)
             {
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#publish">即時反映</button>
-                <button type="submit" class="btn btn-secondary" asp-action="PublishData">データのみ反映</button>
+                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#publish">即時反映</button>
+                                    <button type="submit" class="btn btn-secondary" asp-action="PublishData">データのみ反映</button>
             }
         }
         <!-- Modal -->
@@ -77,7 +77,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary" asp-action="Save">OK</button>
+                        <button id="save-submit-button" type="button" class="btn btn-primary" asp-action="Save">OK</button>
                     </div>
                 </div>
             </div>
@@ -115,13 +115,24 @@
             $('#object-tabs a').click(function () {
                 $('#ObjectTabIndex').val($(this).attr('href').replace('#', ''));
             });
+
+            $('#save-submit-button').click(function (event) {
+                $('#save').modal('hide');
+                if ($('#the-form').get(0).checkValidity() === true) {
+                    $('#the-form').get(0).action = $(event.target).attr('formaction');
+                    $('#the-form').submit();
+                } else {
+                    $('#the-form').addClass('was-validated');
+                }
+            });
+
             @if (Model.Phase == 2)
             {
                 @:$('#the-form input').attr('readonly', 'readonly');
                 @:$('#the-form select').attr('readonly', 'readonly');
                 @:$('.tab-content button').attr('disabled', true);
-        }
-                });
+            }
+        });
     </script>
     @await RenderSectionAsync("Scripts", required: false)
 }

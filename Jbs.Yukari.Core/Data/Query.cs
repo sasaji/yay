@@ -9,12 +9,12 @@ namespace Jbs.Yukari.Core.Data
 {
     public class Query : IQuery
     {
-        private readonly IDatabase _database;
+        private readonly IDatabase database;
         const int commandTimeout = 600;
 
         public Query(IDatabase database)
         {
-            _database = database;
+            this.database = database;
         }
 
         public async Task<IEnumerable<BasicInfoOutline>> Search(SearchCriteria searchCriteria)
@@ -80,7 +80,7 @@ basicinfo_id IN (
                 }
             }
             var rowsSql = $"{rowsSelect}{(where.Any() ? " WHERE " + string.Join(" AND ", where) : null)} ORDER BY sort_no, identity_no";
-            var records = _database.Connection.QueryAsync<BasicInfoOutline>(rowsSql, parameters, null, commandTimeout);
+            var records = database.Connection.QueryAsync<BasicInfoOutline>(rowsSql, parameters, null, commandTimeout);
             return await records;
         }
 
@@ -94,7 +94,7 @@ basicinfo_id IN (
     phase_flag AS Phase,
     basicinfo_data AS Properties
 FROM Edit_BasicInfo WHERE basicinfo_id = @yid";
-            return await _database.Connection.QuerySingleAsync<T>(sql, new { yid }, null, commandTimeout);
+            return await database.Connection.QuerySingleAsync<T>(sql, new { yid }, null, commandTimeout);
         }
 
         public async Task<IEnumerable<Dictionary<string, Relation>>> GetRoles(Guid yid)
@@ -112,7 +112,7 @@ WHERE
 ORDER BY
     m.sort_no
 ";
-            var grp = (await _database.Connection.QueryAsync(sql, new { yid }, null, commandTimeout))
+            var grp = (await database.Connection.QueryAsync(sql, new { yid }, null, commandTimeout))
                 .GroupBy(x => x.Key)
                 .Select(y => y.ToDictionary(z => (string)z.Type, a => new Relation { Yid = a.Yid, Name = a.Name }));
             return grp;
@@ -128,7 +128,7 @@ WHERE
     m.basicinfo_id = @yid AND
     b.type_id = 'jobmode'
 ";
-            return (await _database.Connection.QuerySingleOrDefaultAsync<Guid>(sql, new { yid }, null, commandTimeout));
+            return (await database.Connection.QuerySingleOrDefaultAsync<Guid>(sql, new { yid }, null, commandTimeout));
         }
 
         public async Task<IEnumerable<Relation>> GetEnrollments()
@@ -140,7 +140,7 @@ FROM Edit_BasicInfo
 WHERE
     type_id = 'jobmode'
 ";
-            var roles = await _database.Connection.QueryAsync<Relation>(sql, new { }, null, commandTimeout);
+            var roles = await database.Connection.QueryAsync<Relation>(sql, new { }, null, commandTimeout);
             roles = roles.Prepend(new Relation());
             return roles;
         }
@@ -161,7 +161,7 @@ WHERE
     M.object_class = @type
 ORDER BY
     O.object_type_id";
-            return await _database.Connection.QueryAsync<T>(sql, new { yid, type }, null, commandTimeout);
+            return await database.Connection.QueryAsync<T>(sql, new { yid, type }, null, commandTimeout);
         }
 
         public async Task<IEnumerable<TreeNode>> GetHierarchy(string type)
@@ -212,7 +212,7 @@ ORDER BY
 	sort,
     id,
     text";
-            return await _database.Connection.QueryAsync<TreeNode>(sql, new { type }, null, commandTimeout);
+            return await database.Connection.QueryAsync<TreeNode>(sql, new { type }, null, commandTimeout);
         }
 
         public async Task<TreeNode> GetTree(string type)
@@ -236,7 +236,7 @@ ORDER BY
 
         public void Save(BasicInfo info)
         {
-            _database.GetOrBeginTransaction();
+            database.GetOrBeginTransaction();
             try
             {
                 var sql = $@"UPDATE Edit_BasicInfo
@@ -255,10 +255,10 @@ WHERE
                 parameters.Add($"@{nameof(info.Name)}", info.Name);
                 parameters.Add($"@{nameof(info.Properties)}", info.Properties);
                 parameters.Add($"@{nameof(info.Yid)}", info.Yid);
-                _database.ExecuteInTransaction(sql, parameters);
+                database.ExecuteInTransaction(sql, parameters);
 
                 sql = @"DELETE FROM Edit_BasicInfo_Membership WHERE basicinfo_id = @yid";
-                _database.ExecuteInTransaction(sql, new { info.Yid });
+                database.ExecuteInTransaction(sql, new { info.Yid });
 
                 if (info.Roles != null && info.Roles.Count() > 0)
                 {
@@ -278,7 +278,7 @@ VALUES
                                 paramMember.Add("@yid", info.Yid);
                                 paramMember.Add("@parentYid", roleItem.Value.Yid);
                                 paramMember.Add("@sort", index);
-                                _database.ExecuteInTransaction(sql, paramMember);
+                                database.ExecuteInTransaction(sql, paramMember);
                                 //await _database.Connection.ExecuteAsync(sql, paramMember, transaction);
                                 inserted = true;
                             }
@@ -299,7 +299,7 @@ VALUES
                         paramMember.Add("@yid", info.Yid);
                         paramMember.Add("@parentYid", info.Enrollment);
                         paramMember.Add("@sort", 0);
-                        _database.ExecuteInTransaction(sql, paramMember);
+                        database.ExecuteInTransaction(sql, paramMember);
                     }
                 }
 
@@ -320,11 +320,11 @@ VALUES
                     }
                 }
                 //await _database.Connection.ExecuteAsync(sql, new { paramUser, paramGroup }, transaction);
-                _database.Commit();
+                database.Commit();
             }
             catch
             {
-                _database.Rollback();
+                database.Rollback();
                 throw;
             }
         }
@@ -338,7 +338,7 @@ WHERE
     basicinfo_id = @yid";
             var parameters = new DynamicParameters();
             parameters.Add($"@yid", yid);
-            await _database.Connection.ExecuteAsync(sql, parameters);
+            await database.Connection.ExecuteAsync(sql, parameters);
         }
     }
 }

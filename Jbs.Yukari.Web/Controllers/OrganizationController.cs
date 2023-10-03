@@ -1,8 +1,6 @@
-﻿using System.Security.Cryptography;
-using Jbs.Yukari.Core.Data;
+﻿using Jbs.Yukari.Core.Data;
 using Jbs.Yukari.Core.Models;
 using Jbs.Yukari.Core.Services;
-using Jbs.Yukari.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Jbs.Yukari.Web.Controllers

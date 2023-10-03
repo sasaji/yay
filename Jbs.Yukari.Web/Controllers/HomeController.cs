@@ -9,15 +9,15 @@ namespace Jbs.Yukari.Web.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-        private readonly IQuery _query;
-        private readonly IJsonSerializer _jsonSerializer;
+        private readonly ILogger<HomeController> logger;
+        private readonly IQuery query;
+        private readonly IJsonSerializer jsonSerializer;
 
         public HomeController(ILogger<HomeController> logger, IQuery query, IJsonSerializer jsonSerializer)
         {
-            _logger = logger;
-            _query = query;
-            _jsonSerializer = jsonSerializer;
+            this.logger = logger;
+            this.query = query;
+            this.jsonSerializer = jsonSerializer;
         }
 
         [HttpGet]
@@ -25,7 +25,7 @@ namespace Jbs.Yukari.Web.Controllers
         {
             var model = new HomeViewModel
             {
-                TreeJson = $"[{_jsonSerializer.Serialize(await _query.GetTree("organization"))}]"
+                TreeJson = $"[{jsonSerializer.Serialize(await query.GetTree("organization"))}]"
             };
             return View(model);
         }
@@ -38,7 +38,7 @@ namespace Jbs.Yukari.Web.Controllers
         [HttpPost]
         public async Task<ActionResult> Index(HomeViewModel model)
         {
-            var entities = await _query.Search(model.SearchCriteria);
+            var entities = await query.Search(model.SearchCriteria);
             model.TotalCount = entities.Count();
             model.SearchResult.Items = PaginatedList<BasicInfoOutline>.Create(entities, model.FirstPage ? 1 : model.PageNumber, model.PageSize);
             model.FirstPage = false;

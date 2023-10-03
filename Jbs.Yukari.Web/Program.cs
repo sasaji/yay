@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Authentication.Negotiate;
-using System.Reflection.Metadata;
 using Jbs.Yukari.Core.Data;
 using Jbs.Yukari.Core.Services;
 

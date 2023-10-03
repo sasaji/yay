@@ -7,17 +7,17 @@ namespace Jbs.Yukari.Web.Controllers
 {
     public abstract class EditController<T> : Controller where T : BasicInfo
     {
-        protected readonly ILogger<EditController<T>> _logger;
-        protected readonly IQuery _query;
-        protected readonly IRomanizer _romanizer;
-        protected readonly IJsonSerializer _jsonSerializer;
+        protected readonly ILogger<EditController<T>> logger;
+        protected readonly IQuery query;
+        protected readonly IRomanizer romanizer;
+        protected readonly IJsonSerializer jsonSerializer;
 
         public EditController(ILogger<EditController<T>> logger, IQuery query, IRomanizer romanizer, IJsonSerializer jsonSerializer)
         {
-            _logger = logger;
-            _query = query;
-            _romanizer = romanizer;
-            _jsonSerializer = jsonSerializer;
+            this.logger = logger;
+            this.query = query;
+            this.romanizer = romanizer;
+            this.jsonSerializer = jsonSerializer;
         }
 
         public virtual ActionResult Save(T model)
@@ -26,7 +26,7 @@ namespace Jbs.Yukari.Web.Controllers
             {
                 model.Name = BuildName(model);
                 model.SerializeProperties();
-                _query.Save(model);
+                query.Save(model);
                 model.Phase = 2;
                 ViewData["Result"] = "0";
             }
@@ -42,7 +42,7 @@ namespace Jbs.Yukari.Web.Controllers
         {
             try
             {
-                _query.Publish(model.Yid);
+                query.Publish(model.Yid);
                 model.Phase = 0;
                 ViewData["Result"] = "0";
             }
@@ -56,11 +56,11 @@ namespace Jbs.Yukari.Web.Controllers
 
         protected async Task<T> Get(Guid yid)
         {
-            var model = await _query.GetData<T>(yid);
-            model.Roles = await _query.GetRoles(yid);
-            model.Enrollment = await _query.GetEnrollment(yid);
-            model.Users = await _query.GetObjects<User>(yid, "user");
-            model.Groups = await _query.GetObjects<Group>(yid, "group");
+            var model = await query.GetData<T>(yid);
+            model.Roles = await query.GetRoles(yid);
+            model.Enrollment = await query.GetEnrollment(yid);
+            model.Users = await query.GetObjects<User>(yid, "user");
+            model.Groups = await query.GetObjects<Group>(yid, "group");
             return model;
         }
 
