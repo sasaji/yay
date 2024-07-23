@@ -2,5 +2,6 @@
 {
     public class User : ObjectInfo
     {
+        public string Sn { get; set; }
     }
 }

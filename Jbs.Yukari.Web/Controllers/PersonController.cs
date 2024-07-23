@@ -2,6 +2,7 @@
 using Jbs.Yukari.Core.Data;
 using Jbs.Yukari.Core.Models;
 using Jbs.Yukari.Core.Services;
+using Jbs.Yukari.Domain;
 using Jbs.Yukari.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,7 +13,7 @@ namespace Jbs.Yukari.Web.Controllers
         public PersonController(ILogger<PersonController> logger, IQuery query, IRomanizer romanizer, IJsonSerializer jsonSerializer)
             : base(logger, query, romanizer, jsonSerializer) { }
 
-        public async Task<ActionResult> Index(string yid)
+        public async Task<IActionResult> Index(string yid)
         {
             var model = await Get(Guid.Parse(yid));
             model.RolesJson = jsonSerializer.Serialize(model.Roles);
@@ -41,14 +42,19 @@ namespace Jbs.Yukari.Web.Controllers
             return Json(new { romanSurname, romanGivenName, romanMiddleName });
         }
 
+        [HttpPost]
         public IActionResult Policy(PersonViewModel model)
         {
+            var trans = new PersonTransformer();
+            var x = trans.Transform(model);
+            User u = (User)x[0];
             return View("Index", model);
         }
 
-        public override ActionResult Save(PersonViewModel model)
+        [HttpPost]
+        public override IActionResult Save(PersonViewModel model)
         {
-            model.Roles = jsonSerializer.Deserialize<List<Dictionary<string, Relation>>>(model.RolesJson);
+           model.Roles = jsonSerializer.Deserialize<List<Dictionary<string, Relation>>>(model.RolesJson);
             return base.Save(model);
         }
 

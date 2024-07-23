@@ -9,7 +9,7 @@ namespace Jbs.Yukari.Web.Controllers
     {
         public OrganizationController(ILogger<OrganizationController> logger, IQuery query, IRomanizer romanizer, IJsonSerializer jsonSerializer) : base(logger, query, romanizer, jsonSerializer) { }
 
-        public async Task<ActionResult> Index(string yid)
+        public async Task<IActionResult> Index(string yid)
         {
             var model = await Get(Guid.Parse(yid));
             model.DeserializeProperties();
@@ -21,7 +21,7 @@ namespace Jbs.Yukari.Web.Controllers
             return View("Index", model);
         }
 
-        public override ActionResult Save(Organization model)
+        public override IActionResult Save(Organization model)
         {
             return base.Save(model);
         }

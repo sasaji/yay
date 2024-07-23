@@ -20,7 +20,7 @@ namespace Jbs.Yukari.Web.Controllers
             this.jsonSerializer = jsonSerializer;
         }
 
-        public virtual ActionResult Save(T model)
+        public virtual IActionResult Save(T model)
         {
             try
             {
@@ -38,7 +38,7 @@ namespace Jbs.Yukari.Web.Controllers
             return View("Index", model);
         }
 
-        public virtual ActionResult Publish(T model)
+        public virtual IActionResult Publish(T model)
         {
             try
             {
