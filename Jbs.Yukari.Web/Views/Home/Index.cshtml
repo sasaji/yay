@@ -21,19 +21,19 @@
                     </div>
                     <div id="search" class="tab-pane">
                         <div class="container">
-                            <div class="row">
+                            <div class="row search-row">
                                 <div class="col col-3">
-                                    種別
+                                    Type
                                 </div>
                                 <div class="col col-9">
                                     <select asp-for="SearchCriteria.Type" class="form-select">
-                                        <option value="">選択せず</option>
+                                        <option value=""></option>
                                         <option value="person">個人</option>
                                         <option value="organization">組織</option>
                                     </select>
                                 </div>
                             </div>
-                            <div class="row">
+                            <div class="row search-row">
                                 <div class="col col-3">
                                     @Html.LabelFor(model => model.SearchCriteria.Id)
                                 </div>
@@ -41,7 +41,7 @@
                                     @Html.EditorFor(model => model.SearchCriteria.Id, new { htmlAttributes = new { @class = "form-control" } })
                                 </div>
                             </div>
-                            <div class="row">
+                            <div class="row search-row">
                                 <div class="col col-3">
                                     @Html.LabelFor(model => model.SearchCriteria.Name)
                                 </div>
@@ -49,7 +49,7 @@
                                     @Html.EditorFor(model => model.SearchCriteria.Name, new { htmlAttributes = new { @class = "form-control" } })
                                 </div>
                             </div>
-                            <div class="row">
+                            <div class="row search-row">
                                 <div class="col col-3">
                                     @Html.LabelFor(model => model.SearchCriteria.Phase)
                                 </div>
@@ -57,7 +57,7 @@
                                     @Html.DropDownListFor(model => model.SearchCriteria.Phase, Model.SearchCriteria.PhaseList.Select(_ => new SelectListItem(_.Value.ToString(), _.Key?.ToString())), new { @class = "form-select" })
                                 </div>
                             </div>
-                            <div class="row">
+                            <div class="row search-row">
                                 <div class="col col-3">登録日</div>
                                 <div class="col col-9">
                                     <div class="row">
@@ -143,8 +143,9 @@
                                         var prevDisabled = !Model.SearchResult.Items.HasPreviousPage ? "disabled" : "";
                                         var nextDisabled = !Model.SearchResult.Items.HasNextPage ? "disabled" : "";
                                     }
-                                    <span>Page @Model.SearchResult.Items.PageIndex of @Model.SearchResult.Items.TotalPages, Total @Model.TotalCount Records</span>
-                                    <br />
+                                    <div id="paging-info">
+                                        <span>Page @Model.SearchResult.Items.PageIndex of @Model.SearchResult.Items.TotalPages, Total @Model.TotalCount Records</span>
+                                    </div>
                                     <button asp-action="Index"
                                         asp-route-sortOrder="@ViewData["CurrentSort"]"
                                         asp-route-pageNumber="1"
@@ -270,8 +271,8 @@
                 });
 
                 $('#tree').on('nodeSelected', function (event, data) {
-                    //alert(data.yid);
-                    //alert(data.nodeId);
+                    //console.log(data.yid);
+                    //console.log(data.nodeId);
                     $('#SearchCriteria_SelectedNode').val(data.yid);
                     $('#SelectedNodeId').val(data.nodeId);
                     $('#search-form').submit();

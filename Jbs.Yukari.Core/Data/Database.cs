@@ -17,7 +17,7 @@ namespace Jbs.Yukari.Core.Data
             connection = new Lazy<IDbConnection>(() =>
             {
                 // MultipleActiveResultSets=true前提
-                var conn = new SqlConnection("Data Source=localhost;Initial Catalog=Yukari;Integrated Security=True;MultipleActiveResultSets=True");
+                var conn = new SqlConnection("Data Source=localhost;Initial Catalog=YUKARI_MAL;Integrated Security=True;MultipleActiveResultSets=True");
                 conn.Open();
                 return conn;
             });

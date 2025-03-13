@@ -24,3 +24,16 @@ body {
 #main {
     margin: 0;
 }
+
+.list-group-item {
+    border: none;
+    padding: 0.2em;
+}
+
+.search-row {
+    padding-bottom: 0.5em;
+}
+
+#paging-info {
+    padding-bottom: 0.5em;
+}
