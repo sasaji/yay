@@ -38,7 +38,7 @@ namespace Jbs.Yukari.Web.Controllers
             return View("Index", model);
         }
 
-        public virtual IActionResult Publish(T model)
+        public virtual IActionResult PublishData(T model)
         {
             try
             {
@@ -52,6 +52,11 @@ namespace Jbs.Yukari.Web.Controllers
                 ViewData["ErrorMessage"] = ex.Message;
             }
             return View("Index", model);
+        }
+
+        public virtual IActionResult Publish(T model)
+        {
+            return PublishData(model);
         }
 
         protected async Task<T> Get(Guid yid)
