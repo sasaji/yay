@@ -8,14 +8,11 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Jbs.Yukari.Web.Controllers
 {
-    public class PersonController : EditController<PersonViewModel>
+    public class PersonController(ILogger<PersonController> logger, IQuery query, IRomanizer romanizer, IJsonSerializer jsonSerializer) : EditController<PersonViewModel>(logger, query, romanizer, jsonSerializer)
     {
-        public PersonController(ILogger<PersonController> logger, IQuery query, IRomanizer romanizer, IJsonSerializer jsonSerializer)
-            : base(logger, query, romanizer, jsonSerializer) { }
-
         public async Task<IActionResult> Index(string yid)
         {
-            var model = await Get(Guid.Parse(yid));
+            var model = !string.IsNullOrEmpty(yid) ? await Get(Guid.Parse(yid)) : new PersonViewModel();
             model.RolesJson = jsonSerializer.Serialize(model.Roles);
             model.OrganizationsJson = jsonSerializer.Serialize(
                 (await query.GetHierarchy("organization"))
@@ -23,7 +20,7 @@ namespace Jbs.Yukari.Web.Controllers
             model.TitlesJson = jsonSerializer.Serialize(
                 (await query.GetHierarchy("title"))
                     .Select(x => new KeyValuePair<string, string>(x.Yid.ToString(), x.Text)));
-            model.Enrollments = (await query.GetEnrollments()).ToList();
+            model.Enrollments = [.. (await query.GetEnrollments())];
             model.DeserializeProperties();
             return View("Index", model);
         }

@@ -1,39 +1,69 @@
-html {
-  font-size: 14px;
-}
-
 @media (min-width: 768px) {
   html {
     font-size: 14px;
   }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
+    font-size: 14px;
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
+}
+
+fieldset {
+    padding: 1rem;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+}
+
+legend {
+    float: initial;
+    width: initial;
+    font-size: inherit;
+    margin-bottom: initial;
 }
 
 #main {
     margin: 0;
 }
 
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
 .list-group-item {
     border: none;
-    padding: 0.2em;
+    padding: 0.2rem;
 }
 
 .search-row {
-    padding-bottom: 0.5em;
+    padding-bottom: 0.5rem;
 }
 
 #paging-info {
-    padding-bottom: 0.5em;
+    padding-bottom: 0.5rem;
+}
+
+.form-label {
+    margin-bottom: 0;
+}
+
+.form-control {
+    padding: 0.2rem;
+}
+
+.btn-sm-ex {
+    padding: 0.2rem 0.5rem;
+}
+
+.modal-header {
+    border: none;
+}
+
+.modal-footer {
+    border: none;
 }

@@ -244,7 +244,7 @@ SET
     identity_no = @{nameof(info.Id)},
     name = @{nameof(info.Name)},
     basicinfo_data = @{nameof(info.Properties)},
-    phase_flag = 2,
+    phase_flag = @{nameof(info.Phase)},
     update_date = GETDATE(),
     commit_date = GETDATE()
 WHERE
@@ -254,6 +254,7 @@ WHERE
                 parameters.Add($"@{nameof(info.Id)}", info.Id);
                 parameters.Add($"@{nameof(info.Name)}", info.Name);
                 parameters.Add($"@{nameof(info.Properties)}", info.Properties);
+                parameters.Add($"@{nameof(info.Phase)}", info.Phase);
                 parameters.Add($"@{nameof(info.Yid)}", info.Yid);
                 database.ExecuteInTransaction(sql, parameters);
 

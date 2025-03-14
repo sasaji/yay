@@ -5,29 +5,71 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Jbs.Yukari.Web.Controllers
 {
-    public abstract class EditController<T> : Controller where T : BasicInfo
+    public abstract class EditController<T>(ILogger<EditController<T>> logger, IQuery query, IRomanizer romanizer, IJsonSerializer jsonSerializer) : Controller where T : BasicInfo
     {
-        protected readonly ILogger<EditController<T>> logger;
-        protected readonly IQuery query;
-        protected readonly IRomanizer romanizer;
-        protected readonly IJsonSerializer jsonSerializer;
+        protected readonly ILogger<EditController<T>> logger = logger;
+        protected readonly IQuery query = query;
+        protected readonly IRomanizer romanizer = romanizer;
+        protected readonly IJsonSerializer jsonSerializer = jsonSerializer;
 
-        public EditController(ILogger<EditController<T>> logger, IQuery query, IRomanizer romanizer, IJsonSerializer jsonSerializer)
+        protected async Task<T> Get(Guid yid)
         {
-            this.logger = logger;
-            this.query = query;
-            this.romanizer = romanizer;
-            this.jsonSerializer = jsonSerializer;
+            var model = await query.GetData<T>(yid);
+            model.Roles = await query.GetRoles(yid);
+            model.Enrollment = await query.GetEnrollment(yid);
+            model.Users = await query.GetObjects<User>(yid, "user");
+            model.Groups = await query.GetObjects<Group>(yid, "group");
+            return model;
+        }
+
+        public virtual IActionResult CheckIn(T model)
+        {
+            DoSave(model, 2);
+            ViewData["Action"] = "チェックイン";
+            return View("Index", model);
         }
 
         public virtual IActionResult Save(T model)
+        {
+            DoSave(model, 1);
+            ViewData["Action"] = "一時保存";
+            return View("Index", model);
+        }
+
+        public virtual IActionResult Publish(T model)
+        {
+            DoPublish(model, false);
+            ViewData["Action"] = "反映";
+            return View("Index", model);
+        }
+
+        public virtual IActionResult PublishData(T model)
+        {
+            DoPublish(model, true);
+            ViewData["Action"] = "データのみ反映";
+            return View("Index", model);
+        }
+
+        protected virtual string BuildName(T model)
+        {
+            return model.Name;
+        }
+
+        public virtual IActionResult CheckOut(T model)
+        {
+            DoSave(model, 1);
+            ViewData["Action"] = "チェックアウト";
+            return View("Index", model);
+        }
+
+        private void DoSave(T model, int phase)
         {
             try
             {
                 model.Name = BuildName(model);
                 model.SerializeProperties();
+                model.Phase = phase;
                 query.Save(model);
-                model.Phase = 2;
                 ViewData["Result"] = "0";
             }
             catch (Exception ex)
@@ -35,10 +77,9 @@ namespace Jbs.Yukari.Web.Controllers
                 ViewData["Result"] = "1";
                 ViewData["ErrorMessage"] = ex.Message;
             }
-            return View("Index", model);
         }
 
-        public virtual IActionResult PublishData(T model)
+        private void DoPublish(T model, bool dbOnly)
         {
             try
             {
@@ -51,27 +92,6 @@ namespace Jbs.Yukari.Web.Controllers
                 ViewData["Result"] = "1";
                 ViewData["ErrorMessage"] = ex.Message;
             }
-            return View("Index", model);
-        }
-
-        public virtual IActionResult Publish(T model)
-        {
-            return PublishData(model);
-        }
-
-        protected async Task<T> Get(Guid yid)
-        {
-            var model = await query.GetData<T>(yid);
-            model.Roles = await query.GetRoles(yid);
-            model.Enrollment = await query.GetEnrollment(yid);
-            model.Users = await query.GetObjects<User>(yid, "user");
-            model.Groups = await query.GetObjects<Group>(yid, "group");
-            return model;
-        }
-
-        protected virtual string BuildName(T model)
-        {
-            return model.Name;
         }
     }
 }

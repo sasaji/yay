@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Xml.Linq;
 
@@ -8,8 +9,13 @@ namespace Jbs.Yukari.Core.Models
     public abstract class BasicInfo : BasicInfoOutline
     {
         public XDocument Properties { get; set; }
+
+        [DisplayName("所属 / 役職")]
         public IEnumerable<Dictionary<string, Relation>> Roles { get; set; }
-        public Guid Enrollment { get; set; }
+
+        [DisplayName("雇用区分")]
+        public Guid? Enrollment { get; set; }
+
         public IEnumerable<User> Users { get; set; }
         public IEnumerable<Group> Groups { get; set; }
 

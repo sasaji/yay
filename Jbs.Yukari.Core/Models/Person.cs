@@ -1,4 +1,5 @@
-﻿using System.Xml.Linq;
+﻿using System.ComponentModel;
+using System.Xml.Linq;
 
 namespace Jbs.Yukari.Core.Models
 {
@@ -13,6 +14,8 @@ namespace Jbs.Yukari.Core.Models
         public string RomanSurname { get; set; }
         public string RomanGivenName { get; set; }
         public string RomanMiddleName { get; set; }
+
+        [DisplayName("電話番号")]
         public string TelephoneNumber { get; set; }
 
         public override void DeserializeProperties()

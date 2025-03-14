@@ -7,18 +7,11 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Jbs.Yukari.Web.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController(ILogger<HomeController> logger, IQuery query, IJsonSerializer jsonSerializer) : Controller
     {
-        private readonly ILogger<HomeController> logger;
-        private readonly IQuery query;
-        private readonly IJsonSerializer jsonSerializer;
-
-        public HomeController(ILogger<HomeController> logger, IQuery query, IJsonSerializer jsonSerializer)
-        {
-            this.logger = logger;
-            this.query = query;
-            this.jsonSerializer = jsonSerializer;
-        }
+        private readonly ILogger<HomeController> logger = logger;
+        private readonly IQuery query = query;
+        private readonly IJsonSerializer jsonSerializer = jsonSerializer;
 
         [HttpGet]
         public async Task<ActionResult> Index()
@@ -27,7 +20,7 @@ namespace Jbs.Yukari.Web.Controllers
             {
                 TreeJson = $"[{jsonSerializer.Serialize(await query.GetTree("organization"))}]"
             };
-            return View(model);
+            return await Index(model);
         }
 
         /// <summary>

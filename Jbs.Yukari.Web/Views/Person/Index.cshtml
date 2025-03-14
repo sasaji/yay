@@ -3,114 +3,101 @@
     Layout = "_EditLayout";
 }
 @section basic {
-    <div class="container">
-        <div class="row">
-            <label class="col-sm-2 col-form-label">ID</label>
-            <div class="col-sm-10">
-                <input class="form-control" asp-for="Id" required />
-            </div>
-        </div>
-        <div class="row">
-            <label class="col-sm-2 col-form-label">漢字</label>
-            <div class="col-sm-10">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-sm-4">
-                            <input class="form-control" asp-for="Surname" />
-                        </div>
-                        <div class="col-sm-4">
-                            <input class="form-control" asp-for="GivenName" />
-                        </div>
-                        <div class="col-sm-4">
-                            <input class="form-control" asp-for="MiddleName" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <label class="col-sm-2 col-form-label">カナ</label>
-            <div class="col-sm-10">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-sm-4">
-                            <input class="form-control" asp-for="KanaSurname" />
-                        </div>
-                        <div class="col-sm-4">
-                            <input class="form-control" asp-for="KanaGivenName" />
-                        </div>
-                        <div class="col-sm-4">
-                            <input class="form-control" asp-for="KanaMiddleName" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <label class="col-sm-2 col-form-label">
-                <span>英字</span>
-                <button id="romanize" class="btn btn-secondary" type="button">Romanize</button>
-            </label>
-            <div class="col-sm-10">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-sm-4">
-                            <input class="form-control" asp-for="RomanSurname" />
-                        </div>
-                        <div class="col-sm-4">
-                            <input class="form-control" asp-for="RomanGivenName" />
-                        </div>
-                        <div class="col-sm-4">
-                            <input class="form-control" asp-for="RomanMiddleName" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <label class="col-sm-2 col-form-label">電話番号</label>
-            <div class="col-sm-10">
-                <input class="form-control" asp-for="TelephoneNumber" />
-            </div>
-        </div>
-        <div class="row">
-            <label class="col-sm-2 col-form-label">所属 / 役職</label>
-            <div class="col-sm-6">
-                <select id="roles" class="form-control" size="4"></select>
-            </div>
-            <div class="col-sm-4">
-                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#addRoleDialog">追加</button>
-                <button id="removeRole" type="button" class="btn btn-secondary">削除</button>
-                <button id="upRole" type="button" class="btn btn-secondary">↑</button>
-                <button id="downRole" type="button" class="btn btn-secondary">↓</button>
-            </div>
-        </div>
-        <div class="row">
-            <label class="col-sm-2 col-form-label">雇用区分</label>
-            <div class="col-sm-10">
-                <select class="form-control" asp-for="Enrollment" asp-items="Model.Enrollments.Select(e => new SelectListItem(e.Name, e.Yid.ToString()))"></select>
-            </div>
-        </div>
+  <div class="mb-2">
+    <label class="form-label" asp-for="Id"></label>
+    <input class="form-control" asp-for="Id" required />
+  </div>
+
+  <fieldset class="mb-2">
+    <legend>名前</legend>
+    <div class="row">
+      <div class="col">
+      </div>
+      <div class="col">姓</div>
+      <div class="col">名</div>
+      <div class="col">ミドルネーム</div>
     </div>
-    <!-- Modal -->
-    <div class="modal fade" id="addRoleDialog" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addRoleLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addRoleLabel">Modal title</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <select id="organizations"></select>
-                    <select id="titles"></select>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button id="addRole" type="button" class="btn btn-primary">OK</button>
-                </div>
-            </div>
-        </div>
+    <div class="row">
+      <div class="col">漢字</div>
+      <div class="col">
+        <input class="form-control" asp-for="Surname" />
+      </div>
+      <div class="col">
+        <input class="form-control" asp-for="GivenName" />
+      </div>
+      <div class="col">
+        <input class="form-control" asp-for="MiddleName" />
+      </div>
     </div>
+    <div class="row align-items-center">
+      <div class="col">カナ</div>
+      <div class="col">
+        <input class="form-control" asp-for="KanaSurname" />
+      </div>
+      <div class="col">
+        <input class="form-control" asp-for="KanaGivenName" />
+      </div>
+      <div class="col">
+        <input class="form-control" asp-for="KanaMiddleName" />
+      </div>
+    </div>
+    <div class="row align-items-center">
+      <div class="col d-inline-block align-middle">
+        <label>英字</label>
+        <button id="romanize" class="btn btn-secondary btn-sm btm-sm-ex ms-2" type="button">変換</button>
+      </div>
+      <div class="col">
+        <input class="form-control" asp-for="RomanSurname" />
+      </div>
+      <div class="col">
+        <input class="form-control" asp-for="RomanGivenName" />
+      </div>
+      <div class="col">
+        <input class="form-control" asp-for="RomanMiddleName" />
+      </div>
+    </div>
+  </fieldset>
+
+  <div class="mb-2">
+    <label class="form-label" asp-for="Roles"></label>
+    <button type="button" class="btn btn-secondary btn-sm btm-sm-ex ms-2" data-bs-toggle="modal" data-bs-target="#addRoleDialog">追加</button>
+    <button id="removeRole" type="button" class="btn btn-secondary btn-sm btm-sm-ex">削除</button>
+    <button id="upRole" type="button" class="btn btn-secondary btn-sm btm-sm-ex">↑</button>
+    <button id="downRole" type="button" class="btn btn-secondary btn-sm btm-sm-ex">↓</button>
+    <select id="roles" class="form-select mt-2" size="4"></select>
+  </div>
+
+  <div class="mb-2">
+    <label class="form-label" asp-for="Enrollment"></label>
+    <select class="form-select" asp-for="Enrollment" asp-items="Model.Enrollments.Select(e => new SelectListItem(e.Name, e.Yid.ToString()))"></select>
+  </div>
+
+  <div class="mb-2">
+    <label class="form-label" asp-for="TelephoneNumber"></label>
+    <input class="form-control" asp-for="TelephoneNumber" />
+  </div>
+
+  <!-- 所属/役職モーダル -->
+  <div class="modal fade" id="addRoleDialog" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addRoleLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addRoleLabel">Modal title</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <label class="form-label">所属</label>
+          <select id="organizations" class="form-select mb-3"></select>
+          <label class="form-label">役職</label>
+          <select id="titles" class="form-select mb-3"></select>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
+          <button id="addRole" type="button" class="btn btn-primary">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
 }
 @section objects {
     <div class="container">
@@ -149,16 +136,18 @@
     <script>
         $(function () {
             var rolesJson = JSON.parse($('#@nameof(Model.RolesJson)').val());
-            //console.log(rolesJson);
-            rolesJson.forEach(function (v) {
-                //console.log(v);
-                var option = $('<option>').val(JSON.stringify(v)).text(`${v.organization.name}${v.title ? `/ ${v.title.name}` : ``}`);
-                $('#roles').append(option);
-            });
+            console.log(rolesJson);
+            if (rolesJson) {
+              rolesJson.forEach(function (v) {
+                  console.log(v);
+                  var option = $('<option>').val(JSON.stringify(v)).text(`${v.organization.name}${v.title ? `/ ${v.title.name}` : ``}`);
+                  $('#roles').append(option);
+              });
+            }
             roleButtonSetup();
             roleTextSetup();
             var organizationsJson = JSON.parse($('#@nameof(Model.OrganizationsJson)').val());
-            //console.log(organizationsJson);
+            console.log(organizationsJson);
             organizationsJson.forEach(function (v) {
                 var option = $('<option>').val(v.key).text(v.value);
                 $('#organizations').append(option);

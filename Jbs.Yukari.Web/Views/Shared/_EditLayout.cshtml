@@ -1,17 +1,18 @@
 ﻿@model Jbs.Yukari.Core.Models.BasicInfo
 @{
-    Layout = "_Layout";
+  Layout = "_Layout";
 }
 <form id="the-form" method="post">
-  <div class="container">
+  <div class="container pb-4">
     @{
       var result = ViewData["Result"]?.ToString();
+      var action = ViewData["Action"]?.ToString();
       var tabSource = Model.TabIndex != "objects" ? "active" : string.Empty;
       var tabObjects = Model.TabIndex == "objects" ? "active" : string.Empty;
       if (result == "0")
       {
         <div class="alert alert-success alert-dismissible fade show" role="alert">
-          Done.
+          @ViewData["Action"]しました。
           <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
       }
@@ -32,54 +33,42 @@
       </ul>
       <div class="tab-content">
         <div id="basic" class="tab-pane @tabSource">
-          <div class="container">
-            <div class="row">
-              <div class="col col-12">
-                @RenderSection("basic")
-              </div>
-            </div>
-          </div>
+          @RenderSection("basic")
         </div>
         <div id="objects" class="tab-pane @tabObjects">
-          <div class="container">
-            <div class="row">
-              <div class="col col-12">
-                @RenderSection("objects")
-              </div>
-            </div>
-          </div>
+          @RenderSection("objects")
         </div>
       </div>
-      if (Model.Phase == 0)
-      {
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#confirm" data-action="Save">保存</button>
-      }
-      else if (Model.Phase == 1)
-      {
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#confirm" data-action="CheckIn">承認</button>
-      }
-      else if (Model.Phase == 2)
-      {
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#confirm" data-action="Publish">即時反映</button>
-        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#confirm" data-action="PublishData">データのみ反映</button>
-        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#confirm" data-action="CheckOut">再編集</button>
-      }
+      <div class="pt-2">
+        @if (Model.Phase == 0 || Model.Phase == 1)
+        {
+          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#confirm" data-action="CheckIn">チェックイン</button>
+          <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#confirm" data-action="Save">一時保存</button>
+          if (Model.Phase == 1)
+          {
+            <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#confirm" data-action="Revert">編集取消</button>
+          }
+        }
+        else if (Model.Phase == 2)
+        {
+          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#confirm" data-action="Publish">即時反映</button>
+          <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#confirm" data-action="PublishData">データのみ反映</button>
+          <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#confirm" data-action="CheckOut">チェックアウト</button>
+        }
+      </div>
     }
-    <!-- 確認モーダル -->
-    <div class="modal fade" id="confirm" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="saveLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="saveLabel">Modal title</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-                        ...
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            <button id="ok-button" type="button" class="btn btn-primary">OK</button>
-          </div>
+  </div>
+  <!-- 確認モーダル -->
+  <div class="modal fade" id="confirm" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="saveLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="saveLabel">Modal title</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
+          <button id="ok-button" type="button" class="btn btn-primary">OK</button>
         </div>
       </div>
     </div>
@@ -95,41 +84,42 @@
     $(function () {
       $('#tabs a').click(function () {
         $('#TabIndex').val($(this).attr('href').replace('#', ''));
-          console.log($('#TabIndex').val());
-        });
-        $('#object-tabs a').click(function () {
-          $('#ObjectTabIndex').val($(this).attr('href').replace('#', ''));
-        });
+        console.log($('#TabIndex').val());
+      });
+      
+      $('#object-tabs a').click(function () {
+        $('#ObjectTabIndex').val($(this).attr('href').replace('#', ''));
+      });
 
-        // 確認モーダルのタイトルを各ボタンのテキストから取得して変更する。
-        $('#confirm').on('show.bs.modal', function(event) {
-          var button = $(event.relatedTarget);
-          var action = button.text();
-          var modal = $(this);
-          modal.find('.modal-title').text(action + 'しますか ?');
-          modal.data('action', button.data('action')); // モーダルにパラメーターを渡す。
-        });
+      // 確認モーダルのタイトルを各ボタンのテキストから取得して変更する。
+      $('#confirm').on('show.bs.modal', function(event) {
+        var button = $(event.relatedTarget);
+        var action = button.text();
+        var modal = $(this);
+        modal.find('.modal-title').text(action + 'しますか ?');
+        modal.data('action', button.data('action')); // モーダルにパラメーターを渡す。
+      });
 
-        // OK ボタンが押されたらフォームを送信する。
-        $('#ok-button').click(function (event) {
-          $('#confirm').modal('hide');
-          if ($('#the-form').get(0).checkValidity() === true) {
-            var type = $('#Type').val();
-            var action = $('#confirm').data('action');
-            $('#the-form').get(0).action = `/${type}/${action}`;
-            $('#the-form').submit();
-          } else {
-            $('#the-form').addClass('was-validated');
-          }
-        });
+      // 確認モーダルの OK ボタンが押されたらフォームを送信する。
+      $('#ok-button').click(function (event) {
+        $('#confirm').modal('hide');
+        if ($('#the-form').get(0).checkValidity() === true) {
+          var type = $('#Type').val();
+          var action = $('#confirm').data('action');
+          $('#the-form').get(0).action = `/${type}/${action}`;
+          $('#the-form').submit();
+        } else {
+          $('#the-form').addClass('was-validated');
+        }
+      });
 
-    @if (Model.Phase == 2)
-    {
-      @:$('#the-form input').attr('readonly', 'readonly');
-      @:$('#the-form select').attr('readonly', 'readonly');
-      @:$('.tab-content button').attr('disabled', true);
-    }
-  });
+      @if (Model.Phase == 2)
+      {
+        @:$('#the-form input').attr('readonly', 'readonly');
+        @:$('#the-form select').attr('readonly', 'readonly');
+        @:$('.tab-content button').attr('disabled', true);
+      }
+    });
   </script>
   @await RenderSectionAsync("Scripts", required: false)
 }
