@@ -59,7 +59,7 @@
   </fieldset>
 
   <div class="mb-2">
-    <label class="form-label" asp-for="Roles"></label>
+    <label class="form-label" asp-for="RolesViewModel"></label>
     <button type="button" class="btn btn-secondary btn-sm btm-sm-ex ms-2" data-bs-toggle="modal" data-bs-target="#addRoleDialog">追加</button>
     <button id="removeRole" type="button" class="btn btn-secondary btn-sm btm-sm-ex">削除</button>
     <button id="upRole" type="button" class="btn btn-secondary btn-sm btm-sm-ex">↑</button>
@@ -68,8 +68,8 @@
   </div>
 
   <div class="mb-2">
-    <label class="form-label" asp-for="Enrollment"></label>
-    <select class="form-select" asp-for="Enrollment" asp-items="Model.Enrollments.Select(e => new SelectListItem(e.Name, e.Yid.ToString()))"></select>
+    <label class="form-label" asp-for="EmploymentStatus"></label>
+    <select class="form-select" asp-for="EmploymentStatus" asp-items="Model.Enrollments.Select(e => new SelectListItem(e.Name, e.Yid.ToString()))"></select>
   </div>
 
   <div class="mb-2">
@@ -87,7 +87,10 @@
         </div>
         <div class="modal-body">
           <label class="form-label">所属</label>
-          <select id="organizations" class="form-select mb-3"></select>
+          <div class="dropdown">
+            <button id="organization-button" type="button" class="btn btn-outline-secondary dropdown-toggle w-100 text-start" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside"></button>
+            <div id="tree" class="dropdown-menu pe-3"></div>
+          </div>
           <label class="form-label">役職</label>
           <select id="titles" class="form-select mb-3"></select>
         </div>
@@ -100,181 +103,200 @@
   </div>
 }
 @section objects {
-    <div class="container">
-        <button class="btn btn-secondary" asp-action="Policy">ポリシー適用</button>
-        <div class="row">
-            <div class="col col-sm-12">
-                <ul id="object-tabs" class="nav">
-                    <li class="nav-item">
-                        <a href="#user" class="nav-link" data-bs-toggle="tab">ユーザー</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#group" class="nav-link" data-bs-toggle="tab">グループ</a>
-                    </li>
-                </ul>
-                <div class="tab-content">
-                    <div id="user" class="tab-pane active">
-                        @await Html.PartialAsync("_Users", Model.Users)
-                    </div>
-                    <div id="group" class="tab-pane">
-                        @await Html.PartialAsync("_Groups", Model.Groups)
-                    </div>
-                </div>
-            </div>
+  <button class="btn btn-secondary" asp-action="Policy">ポリシー適用</button>
+  <div class="row">
+    <div class="col col-sm-12">
+      <ul id="object-tabs" class="nav">
+        <li class="nav-item">
+          <a href="#user" class="nav-link" data-bs-toggle="tab">ユーザー</a>
+        </li>
+        <li class="nav-item">
+          <a href="#group" class="nav-link" data-bs-toggle="tab">グループ</a>
+        </li>
+      </ul>
+      <div class="tab-content">
+        <div id="user" class="tab-pane active">
+          @await Html.PartialAsync("_Users", Model.Users)
         </div>
+        <div id="group" class="tab-pane">
+          @await Html.PartialAsync("_Groups", Model.Groups)
+        </div>
+      </div>
     </div>
-    @Html.HiddenFor(model => model.RolesJson)
-    @Html.HiddenFor(model => model.OrganizationsJson)
-    @Html.HiddenFor(model => model.TitlesJson)
-    @for (int i = 0; i < Model.Enrollments.Count(); i++ )
-    {
-        @Html.Hidden("Enrollments[" + i + "].Yid", Model.Enrollments[i].Yid)
-        @Html.Hidden("Enrollments[" + i + "].Name", Model.Enrollments[i].Name)
-    }
+  </div>
+  <input type="hidden" id="selected-organization-yid" />
+  <input type="hidden" id="selected-organization-name" />
+  @Html.HiddenFor(model => model.RolesViewModel)
+  @Html.HiddenFor(model => model.TreeJson)
+  @Html.HiddenFor(model => model.TitlesJson)
+  @for (int i = 0; i < Model.Enrollments.Count(); i++ )
+  {
+    @Html.Hidden("Enrollments[" + i + "].Yid", Model.Enrollments[i].Yid)
+    @Html.Hidden("Enrollments[" + i + "].Name", Model.Enrollments[i].Name)
+  }
 }
 @section Scripts {
-    <script>
-        $(function () {
-            var rolesJson = JSON.parse($('#@nameof(Model.RolesJson)').val());
-            console.log(rolesJson);
-            if (rolesJson) {
-              rolesJson.forEach(function (v) {
-                  console.log(v);
-                  var option = $('<option>').val(JSON.stringify(v)).text(`${v.organization.name}${v.title ? `/ ${v.title.name}` : ``}`);
-                  $('#roles').append(option);
-              });
-            }
-            roleButtonSetup();
-            roleTextSetup();
-            var organizationsJson = JSON.parse($('#@nameof(Model.OrganizationsJson)').val());
-            console.log(organizationsJson);
-            organizationsJson.forEach(function (v) {
-                var option = $('<option>').val(v.key).text(v.value);
-                $('#organizations').append(option);
-            });
-            var titlesJson = JSON.parse($('#@nameof(Model.TitlesJson)').val());
-            titlesJson.forEach(function (v) {
-                var option = $('<option>').val(v.key).text(v.value);
-                $('#titles').append(option);
-            });
+  <script>
+    $(function () {
+      var data = '@Model.TreeJson';
+      var tree = JSON.parse(data.replace(/&quot;/g, '"'));
+      $('#organization-button').text(tree[0].nodes[0].text);
+      $('#selected-organization-yid').val(tree[0].nodes[0].yid);
+      $('#selected-organization-name').val(tree[0].nodes[0].text);
+      console.log(tree[0].nodes[0]);
+      $('#tree').treeview({
+        data: tree,
+        expandIcon: 'fa fa-plus',
+        collapseIcon: 'fa fa-minus'
+      });
 
-            $('#romanize').on('click', function () {
-                //console.log($('#Surname').val());
-                $.ajax('/person/romanize', {
-                    type: 'POST',
-                    dataType: 'json',
-                    data: {
-                        "names": [
-                            $('#@nameof(Model.Surname)').val(),
-                            $('#@nameof(Model.KanaSurname)').val(),
-                            $('#@nameof(Model.GivenName)').val(),
-                            $('#@nameof(Model.KanaGivenName)').val(),
-                            $('#@nameof(Model.MiddleName)').val(),
-                            $('#@nameof(Model.KanaMiddleName)').val()
-                        ]
-                    }
-                }).done(function (result) {
-                    console.log(result);
-                    $('#@nameof(Model.RomanSurname)').val(result.romanSurname);
-                    $('#@nameof(Model.RomanGivenName)').val(result.romanGivenName);
-                    $('#@nameof(Model.RomanMiddleName)').val(result.romanMiddleName);
-                });
-            });
+      $('#tree').on('nodeSelected', function (event, data) {
+        //console.log(data);
+        $('#organization-button').click(); // ドロップダウンリストを閉じる。
+        $('#organization-button').text(data.text); // ドロップダウンリストのボタンタイトルを選択した組織名にする。
+        $('#selected-organization-yid').val(data.yid);
+        $('#selected-organization-name').val(data.text);
+        //$('#SearchCriteria_SelectedNode').val(data.yid);
+        //$('#SelectedNodeId').val(data.nodeId);
+      });
 
-            $('#roles').on('change', function () {
-                roleButtonSetup();
-            });
-
-            $('#addRole').on('click', function () {
-                //console.log('addRole');
-                var value = {
-                    "organization": {
-                        "yid": $('#organizations option:selected').val(),
-                        "name": $('#organizations option:selected').text()
-                    }, "title": {
-                        "yid": $('#titles option:selected').val(),
-                        "name": $('#titles option:selected').text()
-                    }
-                };
-                var roles = JSON.parse($('#@nameof(Model.RolesJson)').val());
-                if (roles.some(r => r.organization.yid == value.organization.yid && r.title.yid == value.title.yid)) {
-                    alert('すでに追加されています。');
-                } else {
-                    $('#addRoleDialog').modal('hide');
-                    $('body').removeClass('modal-open');
-                    $('.modal-backdrop').remove();
-                    var option = $('<option>')
-                        .val(JSON.stringify(value))
-                        .text($('#organizations option:selected').text() + ' / ' + $('#titles option:selected').text());
-                    $('#roles').append(option);
-                    roleTextSetup();
-                    roleListSetup();
-                }
-            });
-
-            $('#removeRole').on('click', function () {
-                $('#roles option:selected').remove();
-                roleButtonSetup();
-                roleTextSetup();
-                roleListSetup();
-            });
-
-            $('#upRole').on('click', function () {
-                $op = $('#roles option:selected');
-                $op.first().prev().before($op);
-                roleButtonSetup();
-                roleTextSetup();
-                roleListSetup();
-            });
-
-            $('#downRole').on('click', function () {
-                $op = $('#roles option:selected');
-                $op.last().next().after($op);
-                roleButtonSetup();
-                roleTextSetup();
-                roleListSetup();
-            });
+      var rolesJson = JSON.parse($('#@nameof(Model.RolesViewModel)').val());
+      //console.log(rolesJson);
+      if (rolesJson) {
+        rolesJson.forEach(function (v) {
+          //console.log(v);
+          var option = $('<option>').val(JSON.stringify(v)).text(`${v.organization.name}${v.title ? `/ ${v.title.name}` : ``}`);
+          $('#roles').append(option);
         });
+      }
+      roleButtonSetup();
+      roleTextSetup();
+      var titlesJson = JSON.parse($('#@nameof(Model.TitlesJson)').val());
+      titlesJson.forEach(function (v) {
+        var option = $('<option>').val(v.key).text(v.value);
+        $('#titles').append(option);
+      });
 
-        function roleButtonSetup() {
-            var index = $("#roles").prop("selectedIndex");
-            if (index >= 0) {
-                $('#removeRole').attr('disabled', false);
-                if (index == 0)
-                    $('#upRole').attr('disabled', true);
-                else
-                    $('#upRole').attr('disabled', false);
-                if (index == $('#roles').children().length - 1)
-                    $('#downRole').attr('disabled', true);
-                else
-                    $('#downRole').attr('disabled', false);
-            } else {
-                $('#removeRole').attr('disabled', true);
-                $('#upRole').attr('disabled', true);
-                $('#downRole').attr('disabled', true);
-            }
-        }
+      $('#romanize').on('click', function () {
+        //console.log($('#Surname').val());
+        $.ajax('/person/romanize', {
+          type: 'POST',
+          dataType: 'json',
+          data: {
+            "names": [
+              $('#@nameof(Model.Surname)').val(),
+              $('#@nameof(Model.KanaSurname)').val(),
+              $('#@nameof(Model.GivenName)').val(),
+              $('#@nameof(Model.KanaGivenName)').val(),
+              $('#@nameof(Model.MiddleName)').val(),
+              $('#@nameof(Model.KanaMiddleName)').val()
+            ]
+          }
+        }).done(function (result) {
+          console.log(result);
+          $('#@nameof(Model.RomanSurname)').val(result.romanSurname);
+          $('#@nameof(Model.RomanGivenName)').val(result.romanGivenName);
+          $('#@nameof(Model.RomanMiddleName)').val(result.romanMiddleName);
+        });
+      });
 
-        function roleTextSetup() {
-            $("#roles option").each(function (i) {
-                //console.log(this.text);
-                if (i == 0 && this.text.startsWith('(兼) '))
-                    this.text = this.text.slice(4);
-                if (i > 0 && !this.text.startsWith('(兼) '))
-                    this.text = '(兼) ' + this.text;
-            });
-        }
+      $('#roles').on('change', function () {
+        roleButtonSetup();
+      });
 
-        function roleListSetup() {
-            var result = '[';
-            var comma = '';
-            $("#roles option").each(function (i, v) {
-                result += comma + v.value;
-                comma = ',';
-            });
-            result += ']';
-            console.log(result);
-            $('#@nameof(Model.RolesJson)').val(result);
+      // 所属/役職モーダルでOKボタンがクリックされた。
+      $('#addRole').on('click', function () {
+        var value = {
+          "organization": {
+            //"yid": $('#organizations option:selected').val(),
+            //"name": $('#organizations option:selected').text()
+            "yid": $('#selected-organization-yid').val(),
+            "name": $('#selected-organization-name').val()
+          }, "title": {
+            "yid": $('#titles option:selected').val(),
+            "name": $('#titles option:selected').text()
+          }
+        };
+        var roles = JSON.parse($('#@nameof(Model.RolesViewModel)').val());
+        if (roles.some(r => r.organization.yid == value.organization.yid && r.title.yid == value.title.yid)) {
+          alert('すでに追加されています。');
+        } else {
+          $('#addRoleDialog').modal('hide');
+          $('body').removeClass('modal-open');
+          $('.modal-backdrop').remove();
+          var option = $('<option>')
+            .val(JSON.stringify(value))
+            //.text($('#organizations option:selected').text() + ' / ' + $('#titles option:selected').text());
+            .text($('#selected-organization-name').val() + ' / ' + $('#titles option:selected').text());
+          $('#roles').append(option);
+          roleTextSetup();
+          roleListSetup();
         }
-    </script>
+      });
+
+      $('#removeRole').on('click', function () {
+        $('#roles option:selected').remove();
+        roleButtonSetup();
+        roleTextSetup();
+        roleListSetup();
+      });
+
+      $('#upRole').on('click', function () {
+        $op = $('#roles option:selected');
+        $op.first().prev().before($op);
+        roleButtonSetup();
+        roleTextSetup();
+        roleListSetup();
+      });
+
+      $('#downRole').on('click', function () {
+        $op = $('#roles option:selected');
+        $op.last().next().after($op);
+        roleButtonSetup();
+        roleTextSetup();
+        roleListSetup();
+      });
+    });
+
+    function roleButtonSetup() {
+      var index = $("#roles").prop("selectedIndex");
+      if (index >= 0) {
+        $('#removeRole').attr('disabled', false);
+        if (index == 0)
+          $('#upRole').attr('disabled', true);
+        else
+          $('#upRole').attr('disabled', false);
+        if (index == $('#roles').children().length - 1)
+          $('#downRole').attr('disabled', true);
+        else
+          $('#downRole').attr('disabled', false);
+      } else {
+        $('#removeRole').attr('disabled', true);
+        $('#upRole').attr('disabled', true);
+        $('#downRole').attr('disabled', true);
+      }
+    }
+
+    function roleTextSetup() {
+      $("#roles option").each(function (i) {
+        //console.log(this.text);
+        if (i == 0 && this.text.startsWith('(兼) '))
+          this.text = this.text.slice(4);
+        if (i > 0 && !this.text.startsWith('(兼) '))
+          this.text = '(兼) ' + this.text;
+      });
+    }
+
+    function roleListSetup() {
+      var result = '[';
+      var comma = '';
+      $("#roles option").each(function (i, v) {
+        result += comma + v.value;
+        comma = ',';
+      });
+      result += ']';
+      console.log(result);
+      $('#@nameof(Model.RolesViewModel)').val(result);
+    }
+  </script>
 }

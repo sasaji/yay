@@ -13,14 +13,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Services\Romanizer\Kakasi\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="Services\Romanizer\Kakasi\itaijidict">
+    <None Update="Services\Romanization\Kakasi\itaijidict">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Services\Romanizer\Kakasi\kanwadict">
+    <None Update="Services\Romanization\Kakasi\kanwadict">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

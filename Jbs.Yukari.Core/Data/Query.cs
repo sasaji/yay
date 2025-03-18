@@ -164,7 +164,7 @@ ORDER BY
             return await database.Connection.QueryAsync<T>(sql, new { yid, type }, null, commandTimeout);
         }
 
-        public async Task<IEnumerable<TreeNode>> GetHierarchy(string type)
+        public async Task<IEnumerable<TreeNode>> GetHierarchy(string type, string rootId = null)
         {
             var sql = @"WITH hierarchy (yid, id, name, parentYid, sort) AS (
 SELECT
@@ -179,10 +179,10 @@ LEFT OUTER JOIN Edit_BasicInfo BP ON BM.parent_basicinfo_id = BP.basicinfo_id
 WHERE
 	B.type_id = @type AND
     B.status <> 2
-), 
-CTE(yid, level, id, text, parentYid, sort) 
+),
+CTE(yid, level, id, text, parentYid, sort)
 AS (
-    SELECT 
+    SELECT
         yid,
 		1,
         id,
@@ -190,9 +190,9 @@ AS (
 		parentYid,
 		sort
     FROM hierarchy
-    WHERE parentYid is null 
+    WHERE parentYid is null
     UNION ALL
-    SELECT 
+    SELECT
         OC.yid,
 		level + 1,
         OC.id,
@@ -203,7 +203,7 @@ AS (
     FROM hierarchy OC
     INNER JOIN CTE ON OC.parentYid = CTE.yid
 )
-SELECT 
+SELECT
     *
 FROM
     CTE
@@ -212,13 +212,14 @@ ORDER BY
 	sort,
     id,
     text";
-            return await database.Connection.QueryAsync<TreeNode>(sql, new { type }, null, commandTimeout);
+            object param = string.IsNullOrEmpty(rootId) ? new { type } : new { type, rootId };
+            return await database.Connection.QueryAsync<TreeNode>(sql, param, null, commandTimeout);
         }
 
         public async Task<TreeNode> GetTree(string type)
         {
             var list = await GetHierarchy(type);
-            TreeNode root = new TreeNode { Yid = Guid.NewGuid(), Text = type, ParentYid = Guid.Empty, Level = 0 };
+            TreeNode root = new() { Yid = Guid.NewGuid(), Text = type, ParentYid = Guid.Empty, Level = 0 };
             foreach (TreeNode node in list)
             {
                 if (node.ParentYid != Guid.Empty)
@@ -288,17 +289,17 @@ VALUES
                     }
                 }
 
-                if (info.Enrollment != null)
+                if (info.EmploymentStatus != null)
                 {
                     sql = @"INSERT INTO Edit_BasicInfo_Membership
     (basicinfo_id, parent_basicinfo_id, sort_no, add_date)
 VALUES
     (@yid, @parentYid, @sort, GETDATE())";
                     var paramMember = new DynamicParameters();
-                    if (info.Enrollment != Guid.Empty)
+                    if (info.EmploymentStatus != Guid.Empty)
                     {
                         paramMember.Add("@yid", info.Yid);
-                        paramMember.Add("@parentYid", info.Enrollment);
+                        paramMember.Add("@parentYid", info.EmploymentStatus);
                         paramMember.Add("@sort", 0);
                         database.ExecuteInTransaction(sql, paramMember);
                     }

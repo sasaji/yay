@@ -1,4 +1,4 @@
-﻿namespace Jbs.Yukari.Core.Services
+﻿namespace Jbs.Yukari.Core.Services.Romanization
 {
     public enum LongVowelStyle
     {

@@ -1,7 +1,8 @@
 ﻿using Jbs.Yukari.Core;
 using Jbs.Yukari.Core.Data;
 using Jbs.Yukari.Core.Models;
-using Jbs.Yukari.Core.Services;
+using Jbs.Yukari.Core.Services.Romanization;
+using Jbs.Yukari.Core.Services.Serialization;
 using Jbs.Yukari.Domain;
 using Jbs.Yukari.Web.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -13,10 +14,9 @@ namespace Jbs.Yukari.Web.Controllers
         public async Task<IActionResult> Index(string yid)
         {
             var model = !string.IsNullOrEmpty(yid) ? await Get(Guid.Parse(yid)) : new PersonViewModel();
-            model.RolesJson = jsonSerializer.Serialize(model.Roles);
-            model.OrganizationsJson = jsonSerializer.Serialize(
-                (await query.GetHierarchy("organization"))
-                    .Select(x => new KeyValuePair<string, string>(x.Yid.ToString(), x.Text)));
+            model.EmploymentStatus = await query.GetEnrollment(model.Yid);
+            model.RolesViewModel = jsonSerializer.Serialize(model.Roles);
+            model.TreeJson = $"[{jsonSerializer.Serialize(await query.GetTree("organization"))}]";
             model.TitlesJson = jsonSerializer.Serialize(
                 (await query.GetHierarchy("title"))
                     .Select(x => new KeyValuePair<string, string>(x.Yid.ToString(), x.Text)));
@@ -51,7 +51,7 @@ namespace Jbs.Yukari.Web.Controllers
         [HttpPost]
         public override IActionResult Save(PersonViewModel model)
         {
-           model.Roles = jsonSerializer.Deserialize<List<Dictionary<string, Relation>>>(model.RolesJson);
+            model.Roles = jsonSerializer.Deserialize<List<Dictionary<string, Relation>>>(model.RolesViewModel);
             return base.Save(model);
         }
 

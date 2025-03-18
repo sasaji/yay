@@ -12,10 +12,10 @@ namespace Jbs.Yukari.Core.Data
         Task<IEnumerable<Dictionary<string, Relation>>> GetRoles(Guid yid);
         Task<Guid> GetEnrollment(Guid yid);
         Task<IEnumerable<T>> GetObjects<T>(Guid yid, string type);
-        Task<IEnumerable<TreeNode>> GetHierarchy(string type);
+        Task<IEnumerable<TreeNode>> GetHierarchy(string type, string rootId = null);
         Task<TreeNode> GetTree(string type);
         Task<IEnumerable<Relation>> GetEnrollments();
-        void Save(BasicInfo model);
+        void Save(BasicInfo info);
         void Publish(Guid yid);
     }
 }

@@ -238,7 +238,6 @@
                 var data = '@Model.TreeJson';
                 var tree = JSON.parse(data.replace(/&quot;/g, '"'));
                 // bootstrap-treeviewによるツリー表示。
-                // ほかにjstree、jqTreeを試したがこれが一番とっつきやすかった。
                 $('#tree').treeview({
                     data: tree,
                     expandIcon: 'fa fa-plus',

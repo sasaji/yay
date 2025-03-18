@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jbs.Yukari.Web", "Jbs.Yukar
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jbs.Yukari.CoreTest", "Jbs.Yukari.CoreTest\Jbs.Yukari.CoreTest.csproj", "{C80895D6-6A80-4D58-93B0-46C2B87B50B3}"
 EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Database", "Database\Database.sqlproj", "{A14C1D61-D3B0-4BDC-8450-B17FA31483FF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,12 @@ Global
 		{C80895D6-6A80-4D58-93B0-46C2B87B50B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C80895D6-6A80-4D58-93B0-46C2B87B50B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C80895D6-6A80-4D58-93B0-46C2B87B50B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A14C1D61-D3B0-4BDC-8450-B17FA31483FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A14C1D61-D3B0-4BDC-8450-B17FA31483FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A14C1D61-D3B0-4BDC-8450-B17FA31483FF}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{A14C1D61-D3B0-4BDC-8450-B17FA31483FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A14C1D61-D3B0-4BDC-8450-B17FA31483FF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A14C1D61-D3B0-4BDC-8450-B17FA31483FF}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

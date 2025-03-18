@@ -14,7 +14,7 @@ namespace Jbs.Yukari.Core.Models
         public IEnumerable<Dictionary<string, Relation>> Roles { get; set; }
 
         [DisplayName("雇用区分")]
-        public Guid? Enrollment { get; set; }
+        public Guid? EmploymentStatus { get; set; }
 
         public IEnumerable<User> Users { get; set; }
         public IEnumerable<Group> Groups { get; set; }

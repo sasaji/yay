@@ -1,6 +1,7 @@
 ﻿using Jbs.Yukari.Core.Data;
 using Jbs.Yukari.Core.Models;
-using Jbs.Yukari.Core.Services;
+using Jbs.Yukari.Core.Services.Romanization;
+using Jbs.Yukari.Core.Services.Serialization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Jbs.Yukari.Web.Controllers

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace Jbs.Yukari.Core.Services
+namespace Jbs.Yukari.Core.Services.Romanization
 {
     public class Romanizer : IRomanizer
     {

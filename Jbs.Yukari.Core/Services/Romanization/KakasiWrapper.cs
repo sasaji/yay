@@ -3,7 +3,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using NKakasi;
 
-namespace Jbs.Yukari.Core.Services
+namespace Jbs.Yukari.Core.Services.Romanization
 {
     class KakasiWrapper
     {
