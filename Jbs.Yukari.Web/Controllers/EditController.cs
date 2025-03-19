@@ -6,17 +6,18 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Jbs.Yukari.Web.Controllers
 {
-    public abstract class EditController<T>(ILogger<EditController<T>> logger, IQuery query, IRomanizer romanizer, IJsonSerializer jsonSerializer) : Controller where T : BasicInfo
+    public abstract class EditController<T> : Controller where T : BasicInfo
     {
-        protected readonly ILogger<EditController<T>> logger = logger;
-        protected readonly IQuery query = query;
-        protected readonly IRomanizer romanizer = romanizer;
-        protected readonly IJsonSerializer jsonSerializer = jsonSerializer;
+        private readonly IQuery query;
+
+        public EditController(IQuery query)
+        {
+            this.query = query;
+        }
 
         protected async Task<T> Get(Guid yid)
         {
             var model = await query.GetData<T>(yid);
-            model.Membership = await query.GetMembership(yid);
             model.Users = await query.GetObjects<User>(yid, "user");
             model.Groups = await query.GetObjects<Group>(yid, "group");
             return model;

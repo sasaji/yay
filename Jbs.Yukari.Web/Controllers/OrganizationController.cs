@@ -8,7 +8,7 @@ namespace Jbs.Yukari.Web.Controllers
 {
     public class OrganizationController : EditController<Organization>
     {
-        public OrganizationController(ILogger<OrganizationController> logger, IQuery query, IRomanizer romanizer, IJsonSerializer jsonSerializer) : base(logger, query, romanizer, jsonSerializer) { }
+        public OrganizationController(ILogger<OrganizationController> logger, IQuery query, IRomanizer romanizer, IJsonSerializer jsonSerializer) : base(query) { }
 
         public async Task<IActionResult> Index(string yid)
         {

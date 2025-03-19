@@ -9,8 +9,8 @@ namespace Jbs.Yukari.Core.Data
 {
     public class Query(IDatabase database) : IQuery
     {
-        private readonly IDatabase database = database;
-        const int commandTimeout = 600;
+        protected readonly IDatabase database = database;
+        protected const int commandTimeout = 600;
 
         public async Task<IEnumerable<BasicInfoOutline>> Search(SearchCriteria searchCriteria)
         {
@@ -79,7 +79,7 @@ basicinfo_id IN (
             return await records;
         }
 
-        public async Task<T> GetData<T>(Guid yid)
+        public async Task<T> GetData<T>(Guid yid) where T : BasicInfo
         {
             var sql = @"SELECT
     basicinfo_id AS Yid,
@@ -90,6 +90,7 @@ basicinfo_id IN (
     basicinfo_data AS Properties
 FROM Edit_BasicInfo WHERE basicinfo_id = @yid";
             var data = await database.Connection.QuerySingleAsync<T>(sql, new { yid }, null, commandTimeout);
+            data.Membership = await GetMembership(yid);
             return data;
         }
 
@@ -107,19 +108,6 @@ WHERE
 ";
             var grp = (await database.Connection.QueryAsync<Membership>(sql, new { yid }, null, commandTimeout));
             return grp;
-        }
-
-        public async Task<Guid> GetEnrollment(Guid yid)
-        {
-            var sql = @"SELECT
-    m.parent_basicinfo_id AS Yid
-FROM Edit_BasicInfo_Membership m
-INNER JOIN Edit_BasicInfo b ON m.parent_basicinfo_id = b.basicinfo_id
-WHERE
-    m.basicinfo_id = @yid AND
-    b.type_id = 'jobmode'
-";
-            return (await database.Connection.QuerySingleOrDefaultAsync<Guid>(sql, new { yid }, null, commandTimeout));
         }
 
         public async Task<IEnumerable<Relation>> GetEnrollments()

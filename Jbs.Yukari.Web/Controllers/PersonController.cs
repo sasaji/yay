@@ -9,24 +9,29 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Jbs.Yukari.Web.Controllers
 {
-    public class PersonController(ILogger<PersonController> logger, IQuery query, IRomanizer romanizer, IJsonSerializer jsonSerializer) : EditController<PersonViewModel>(logger, query, romanizer, jsonSerializer)
+    public class PersonController : EditController<PersonViewModel>
     {
+        private readonly IPersonQuery query;
+        private readonly IRomanizer romanizer;
+        private readonly IJsonSerializer jsonSerializer;
+
+        public PersonController(IPersonQuery query, IRomanizer romanizer, IJsonSerializer jsonSerializer) : base(query)
+        {
+            this.query = query;
+            this.romanizer = romanizer;
+            this.jsonSerializer = jsonSerializer;
+        }
+
         public async Task<IActionResult> Index(string yid)
         {
-            var model = !string.IsNullOrEmpty(yid) ? await Get(Guid.Parse(yid)) : new PersonViewModel();
-            model.Roles = model.Membership
-                .Where(x => (new[] { "organization", "title" }).Contains(x.Type))
-                .GroupBy(x => x.Key)
-                .Select(x => x.ToDictionary(y => y.Type, a => new Relation { Yid = model.Yid, Name = a.Name }));
+            var model = !string.IsNullOrEmpty(yid) ? await query.GetPerson<PersonViewModel>(Guid.Parse(yid)) : new PersonViewModel();
 
-            model.EmploymentStatus = await query.GetEnrollment(model.Yid);
             model.RolesViewModel = jsonSerializer.Serialize(model.Roles);
             model.TreeJson = $"[{jsonSerializer.Serialize(await query.GetTree("organization"))}]";
             model.TitlesJson = jsonSerializer.Serialize(
                 (await query.GetHierarchy("title"))
                     .Select(x => new KeyValuePair<string, string>(x.Yid.ToString(), x.Text)));
             model.Enrollments = [.. (await query.GetEnrollments())];
-            model.DeserializeProperties();
             return View("Index", model);
         }
 
