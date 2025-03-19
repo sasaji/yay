@@ -16,7 +16,7 @@ namespace Jbs.Yukari.Web.Controllers
         protected async Task<T> Get(Guid yid)
         {
             var model = await query.GetData<T>(yid);
-            model.Roles = await query.GetRoles(yid);
+            model.Membership = await query.GetMembership(yid);
             model.Users = await query.GetObjects<User>(yid, "user");
             model.Groups = await query.GetObjects<Group>(yid, "group");
             return model;

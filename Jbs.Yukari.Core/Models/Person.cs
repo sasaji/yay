@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Xml.Linq;
 
 namespace Jbs.Yukari.Core.Models
@@ -17,6 +18,9 @@ namespace Jbs.Yukari.Core.Models
 
         [DisplayName("電話番号")]
         public string TelephoneNumber { get; set; }
+
+        [DisplayName("雇用区分")]
+        public Guid? EmploymentStatus { get; set; }
 
         public override void DeserializeProperties()
         {

@@ -14,6 +14,11 @@ namespace Jbs.Yukari.Web.Controllers
         public async Task<IActionResult> Index(string yid)
         {
             var model = !string.IsNullOrEmpty(yid) ? await Get(Guid.Parse(yid)) : new PersonViewModel();
+            model.Roles = model.Membership
+                .Where(x => (new[] { "organization", "title" }).Contains(x.Type))
+                .GroupBy(x => x.Key)
+                .Select(x => x.ToDictionary(y => y.Type, a => new Relation { Yid = model.Yid, Name = a.Name }));
+
             model.EmploymentStatus = await query.GetEnrollment(model.Yid);
             model.RolesViewModel = jsonSerializer.Serialize(model.Roles);
             model.TreeJson = $"[{jsonSerializer.Serialize(await query.GetTree("organization"))}]";

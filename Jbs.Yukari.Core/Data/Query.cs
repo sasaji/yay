@@ -7,15 +7,10 @@ using Jbs.Yukari.Core.Models;
 
 namespace Jbs.Yukari.Core.Data
 {
-    public class Query : IQuery
+    public class Query(IDatabase database) : IQuery
     {
-        private readonly IDatabase database;
+        private readonly IDatabase database = database;
         const int commandTimeout = 600;
-
-        public Query(IDatabase database)
-        {
-            this.database = database;
-        }
 
         public async Task<IEnumerable<BasicInfoOutline>> Search(SearchCriteria searchCriteria)
         {
@@ -94,27 +89,23 @@ basicinfo_id IN (
     phase_flag AS Phase,
     basicinfo_data AS Properties
 FROM Edit_BasicInfo WHERE basicinfo_id = @yid";
-            return await database.Connection.QuerySingleAsync<T>(sql, new { yid }, null, commandTimeout);
+            var data = await database.Connection.QuerySingleAsync<T>(sql, new { yid }, null, commandTimeout);
+            return data;
         }
 
-        public async Task<IEnumerable<Dictionary<string, Relation>>> GetRoles(Guid yid)
+        public async Task<IEnumerable<Membership>> GetMembership(Guid yid)
         {
             var sql = @"SELECT
     m.sort_no AS [Key],
-    m.parent_basicinfo_id AS Yid,
+    m.parent_basicinfo_id AS ParentYid,
     b.name AS Name,
     b.type_id AS Type
 FROM Edit_BasicInfo_Membership m
 INNER JOIN Edit_BasicInfo b ON m.parent_basicinfo_id = b.basicinfo_id
 WHERE
-    m.basicinfo_id = @yid AND
-    b.type_id IN ('organization', 'title')
-ORDER BY
-    m.sort_no
+    m.basicinfo_id = @yid
 ";
-            var grp = (await database.Connection.QueryAsync(sql, new { yid }, null, commandTimeout))
-                .GroupBy(x => x.Key)
-                .Select(y => y.ToDictionary(z => (string)z.Type, a => new Relation { Yid = a.Yid, Name = a.Name }));
+            var grp = (await database.Connection.QueryAsync<Membership>(sql, new { yid }, null, commandTimeout));
             return grp;
         }
 
@@ -262,7 +253,7 @@ WHERE
                 sql = @"DELETE FROM Edit_BasicInfo_Membership WHERE basicinfo_id = @yid";
                 database.ExecuteInTransaction(sql, new { info.Yid });
 
-                if (info.Roles != null && info.Roles.Count() > 0)
+                if (info.Roles != null && info.Roles.Any())
                 {
                     int index = 0;
                     sql = @"INSERT INTO Edit_BasicInfo_Membership
@@ -289,8 +280,30 @@ VALUES
                     }
                 }
 
-                if (info.EmploymentStatus != null)
+                /*
+                if (info.Membership != null && info.Membership.Any())
                 {
+                    int index = 0;
+                    foreach (var membership in info.Membership)
+                    {
+                        bool inserted = false;
+                        foreach (var item in membership)
+                        {
+                            sql = @"INSERT INTO Edit_BasicInfo_Membership
+    (basicinfo_id, parent_basicinfo_id, sort_no, add_date)
+    VALUES (@yid, @parentYid, @sort, GETDATE())";
+                            var param = new DynamicParameters();
+                            if (item.Value.Yid != Guid.Empty)
+                            {
+                                param.Add("@yid", info.Yid);
+                                param.Add("@parentYid", item.Value.Yid);
+                                param.Add("@sort", index);
+                                database.ExecuteInTransaction(sql, param);
+                                inserted = true;
+                            }
+                        }
+                        if (inserted) index++;
+                    }
                     sql = @"INSERT INTO Edit_BasicInfo_Membership
     (basicinfo_id, parent_basicinfo_id, sort_no, add_date)
 VALUES
@@ -304,6 +317,7 @@ VALUES
                         database.ExecuteInTransaction(sql, paramMember);
                     }
                 }
+                */
 
                 sql = $@"UPDATE Edit_ObjectInfo
 ";
