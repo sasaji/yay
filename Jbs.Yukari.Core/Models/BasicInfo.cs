@@ -9,11 +9,7 @@ namespace Jbs.Yukari.Core.Models
     public abstract class BasicInfo : BasicInfoOutline
     {
         public XDocument Properties { get; set; }
-
-        [DisplayName("所属 / 役職")]
-        public IEnumerable<Dictionary<string, Relation>> Roles { get; set; }
         public IEnumerable<Membership> Membership { get; set; }
-
         public IEnumerable<User> Users { get; set; }
         public IEnumerable<Group> Groups { get; set; }
 

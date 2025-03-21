@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Xml.Linq;
 
@@ -18,6 +19,9 @@ namespace Jbs.Yukari.Core.Models
 
         [DisplayName("電話番号")]
         public string TelephoneNumber { get; set; }
+
+        [DisplayName("所属 / 役職")]
+        public IEnumerable<Dictionary<string, Relation>> Roles { get; set; }
 
         [DisplayName("雇用区分")]
         public Guid? EmploymentStatus { get; set; }

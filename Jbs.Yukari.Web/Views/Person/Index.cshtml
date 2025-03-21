@@ -218,6 +218,7 @@
           }
         };
         var roles = JSON.parse($('#@nameof(Model.RolesViewModel)').val());
+        console.log(roles);
         if (roles.some(r => r.organization.yid == value.organization.yid && r.title.yid == value.title.yid)) {
           alert('すでに追加されています。');
         } else {

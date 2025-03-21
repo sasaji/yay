@@ -241,71 +241,20 @@ WHERE
                 sql = @"DELETE FROM Edit_BasicInfo_Membership WHERE basicinfo_id = @yid";
                 database.ExecuteInTransaction(sql, new { info.Yid });
 
-                if (info.Roles != null && info.Roles.Any())
-                {
-                    int index = 0;
-                    sql = @"INSERT INTO Edit_BasicInfo_Membership
-    (basicinfo_id, parent_basicinfo_id, sort_no, add_date)
-VALUES
-    (@yid, @parentYid, @sort, GETDATE())";
-                    foreach (var role in info.Roles)
-                    {
-                        bool inserted = false;
-                        foreach (var roleItem in role)
-                        {
-                            var paramMember = new DynamicParameters();
-                            if (roleItem.Value.Yid != Guid.Empty)
-                            {
-                                paramMember.Add("@yid", info.Yid);
-                                paramMember.Add("@parentYid", roleItem.Value.Yid);
-                                paramMember.Add("@sort", index);
-                                database.ExecuteInTransaction(sql, paramMember);
-                                //await _database.Connection.ExecuteAsync(sql, paramMember, transaction);
-                                inserted = true;
-                            }
-                        }
-                        if (inserted) index++;
-                    }
-                }
-
-                /*
                 if (info.Membership != null && info.Membership.Any())
                 {
-                    int index = 0;
                     foreach (var membership in info.Membership)
                     {
-                        bool inserted = false;
-                        foreach (var item in membership)
-                        {
-                            sql = @"INSERT INTO Edit_BasicInfo_Membership
+                        sql = @"INSERT INTO Edit_BasicInfo_Membership
     (basicinfo_id, parent_basicinfo_id, sort_no, add_date)
     VALUES (@yid, @parentYid, @sort, GETDATE())";
-                            var param = new DynamicParameters();
-                            if (item.Value.Yid != Guid.Empty)
-                            {
-                                param.Add("@yid", info.Yid);
-                                param.Add("@parentYid", item.Value.Yid);
-                                param.Add("@sort", index);
-                                database.ExecuteInTransaction(sql, param);
-                                inserted = true;
-                            }
-                        }
-                        if (inserted) index++;
-                    }
-                    sql = @"INSERT INTO Edit_BasicInfo_Membership
-    (basicinfo_id, parent_basicinfo_id, sort_no, add_date)
-VALUES
-    (@yid, @parentYid, @sort, GETDATE())";
-                    var paramMember = new DynamicParameters();
-                    if (info.EmploymentStatus != Guid.Empty)
-                    {
-                        paramMember.Add("@yid", info.Yid);
-                        paramMember.Add("@parentYid", info.EmploymentStatus);
-                        paramMember.Add("@sort", 0);
-                        database.ExecuteInTransaction(sql, paramMember);
+                        var param = new DynamicParameters();
+                        param.Add("@yid", info.Yid);
+                        param.Add("@parentYid", membership.ParentYid);
+                        param.Add("@sort", membership.Key);
+                        database.ExecuteInTransaction(sql, param);
                     }
                 }
-                */
 
                 sql = $@"UPDATE Edit_ObjectInfo
 ";

@@ -61,8 +61,19 @@ namespace Jbs.Yukari.Web.Controllers
         [HttpPost]
         public override IActionResult Save(PersonViewModel model)
         {
-            model.Roles = jsonSerializer.Deserialize<List<Dictionary<string, Relation>>>(model.RolesViewModel);
-            return base.Save(model);
+            try
+            {
+                ViewData["Action"] = "一時保存";
+                model.Roles = jsonSerializer.Deserialize<List<Dictionary<string, Relation>>>(model.RolesViewModel);
+                query.Save(model);
+                ViewData["Result"] = "0";
+            }
+            catch (Exception ex)
+            {
+                ViewData["Result"] = "1";
+                ViewData["ErrorMessage"] = ex.Message;
+            }
+            return View("Index", model);
         }
 
         protected override string BuildName(PersonViewModel model)

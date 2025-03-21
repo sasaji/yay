@@ -10,5 +10,6 @@ namespace Jbs.Yukari.Core.Data
     public interface IPersonQuery : IQuery
     {
         Task<T> GetPerson<T>(Guid yid) where T : Person;
+        void Save(Person person);
     }
 }
