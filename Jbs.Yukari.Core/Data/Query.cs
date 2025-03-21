@@ -91,6 +91,7 @@ basicinfo_id IN (
 FROM Edit_BasicInfo WHERE basicinfo_id = @yid";
             var data = await database.Connection.QuerySingleAsync<T>(sql, new { yid }, null, commandTimeout);
             data.Membership = await GetMembership(yid);
+            data.DeserializeProperties();
             return data;
         }
 
@@ -216,6 +217,7 @@ ORDER BY
 
         public void Save(BasicInfo info)
         {
+            info.SerializeProperties();
             database.GetOrBeginTransaction();
             try
             {

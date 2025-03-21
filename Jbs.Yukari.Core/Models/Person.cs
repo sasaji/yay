@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Xml.Linq;
 
 namespace Jbs.Yukari.Core.Models
 {
     public class Person : BasicInfo
     {
+        private static readonly string[] sourceArray = ["organization", "title"];
+
         public string Surname { get; set; }
         public string GivenName { get; set; }
         public string MiddleName { get; set; }
@@ -38,10 +41,18 @@ namespace Jbs.Yukari.Core.Models
             RomanGivenName = GetPropertyValue("given_name_roman");
             RomanMiddleName = GetPropertyValue("middle_name_roman");
             TelephoneNumber = GetPropertyValue("phone_no");
+            Roles = Membership
+                .Where(x => (sourceArray).Contains(x.Type))
+                .GroupBy(x => x.Key)
+                .Select(x => x.ToDictionary(y => y.Type, a => new Relation { Yid = a.ParentYid, Name = a.Name }));
+            EmploymentStatus = Membership
+                .Where(x => x.Type == "jobmode")
+                .FirstOrDefault()?.ParentYid;
         }
 
         public override void SerializeProperties()
         {
+            Name = $"{Surname} {GivenName}".Trim();
             Properties = new XDocument(
                 new XElement("properties",
                     new XElement("surname", Surname),
@@ -56,6 +67,31 @@ namespace Jbs.Yukari.Core.Models
                     new XElement("phone_no", TelephoneNumber)
                 )
             );
+            Membership = [];
+            int key = 0;
+            foreach (var role in Roles)
+            {
+                foreach (var item in role)
+                {
+                    Membership = Membership.Append(new Membership
+                    {
+                        Key = key,
+                        ParentYid = item.Value.Yid,
+                        Name = item.Value.Name,
+                        Type = item.Key
+                    });
+                }
+                key++;
+            }
+            if (EmploymentStatus != Guid.Empty)
+            {
+
+                Membership = Membership.Append(new Membership
+                {
+                    Key = 0,
+                    ParentYid = (Guid)EmploymentStatus
+                });
+            }
         }
     }
 }

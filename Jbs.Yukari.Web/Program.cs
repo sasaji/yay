@@ -21,7 +21,6 @@ builder.Services.AddRazorPages();
 // プロジェクトのサービスを追加
 builder.Services.AddSingleton<IDatabase, Database>();
 builder.Services.AddScoped<IQuery, Query>();
-builder.Services.AddScoped<IPersonQuery, PersonQuery>();
 builder.Services.AddScoped<IRomanizer, Romanizer>();
 builder.Services.AddScoped<IJsonSerializer, JsonSerializer>();
 

@@ -6,10 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Jbs.Yukari.Web.Controllers
 {
-    public class OrganizationController : EditController<Organization>
+    public class OrganizationController(IQuery query, IRomanizer romanizer, IJsonSerializer jsonSerializer) : EditController<Organization>(query, romanizer, jsonSerializer)
     {
-        public OrganizationController(ILogger<OrganizationController> logger, IQuery query, IRomanizer romanizer, IJsonSerializer jsonSerializer) : base(query) { }
-
         public async Task<IActionResult> Index(string yid)
         {
             var model = await Get(Guid.Parse(yid));

@@ -9,22 +9,11 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Jbs.Yukari.Web.Controllers
 {
-    public class PersonController : EditController<PersonViewModel>
+    public class PersonController(IQuery query, IRomanizer romanizer, IJsonSerializer jsonSerializer) : EditController<PersonViewModel>(query, romanizer, jsonSerializer)
     {
-        private readonly IPersonQuery query;
-        private readonly IRomanizer romanizer;
-        private readonly IJsonSerializer jsonSerializer;
-
-        public PersonController(IPersonQuery query, IRomanizer romanizer, IJsonSerializer jsonSerializer) : base(query)
-        {
-            this.query = query;
-            this.romanizer = romanizer;
-            this.jsonSerializer = jsonSerializer;
-        }
-
         public async Task<IActionResult> Index(string yid)
         {
-            var model = !string.IsNullOrEmpty(yid) ? await query.GetPerson<PersonViewModel>(Guid.Parse(yid)) : new PersonViewModel();
+            var model = !string.IsNullOrEmpty(yid) ? await query.GetData<PersonViewModel>(Guid.Parse(yid)) : new PersonViewModel();
 
             model.RolesViewModel = jsonSerializer.Serialize(model.Roles);
             model.TreeJson = $"[{jsonSerializer.Serialize(await query.GetTree("organization"))}]";
@@ -74,11 +63,6 @@ namespace Jbs.Yukari.Web.Controllers
                 ViewData["ErrorMessage"] = ex.Message;
             }
             return View("Index", model);
-        }
-
-        protected override string BuildName(PersonViewModel model)
-        {
-            return $"{model.Surname} {model.GivenName}".Trim();
         }
     }
 }
