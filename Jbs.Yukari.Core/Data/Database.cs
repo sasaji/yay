@@ -2,26 +2,22 @@
 using System.Data;
 using System.Data.SqlClient;
 using Dapper;
+using Microsoft.Extensions.Configuration;
 
 namespace Jbs.Yukari.Core.Data
 {
-    public class Database : IDatabase
+    public class Database(IConfiguration configuration) : IDatabase
     {
-        private readonly Lazy<IDbConnection> connection;
+        private readonly Lazy<IDbConnection> connection = new(() =>
+        {
+            var conn = new SqlConnection(configuration["ConnectionStrings:Default"]);
+            conn.Open();
+            return conn;
+        });
+
         private IDbTransaction transaction;
 
         public IDbConnection Connection => connection.Value;
-
-        public Database()
-        {
-            connection = new Lazy<IDbConnection>(() =>
-            {
-                // MultipleActiveResultSets=true前提
-                var conn = new SqlConnection("Data Source=localhost;Initial Catalog=YUKARI_MAL;Integrated Security=True;MultipleActiveResultSets=True");
-                conn.Open();
-                return conn;
-            });
-        }
 
         public void BeginTransaction()
         {
