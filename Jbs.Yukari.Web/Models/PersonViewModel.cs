@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using Jbs.Yukari.Core.Models;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Jbs.Yukari.Web.Models
 {
@@ -9,7 +10,7 @@ namespace Jbs.Yukari.Web.Models
         [DisplayName("所属/役職")]
         public string RolesViewModel { get; set; } = string.Empty;
         public string TreeJson { get; set; } = string.Empty;
-        public string TitlesJson { get; set; } = string.Empty;
-        public IList<Relation> Enrollments { get; set; } = [];
+        public IList<SelectListItem> Titles { get; set; } = [];
+        public IList<SelectListItem> EmploymentStatuses { get; set; } = [];
     }
 }

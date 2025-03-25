@@ -12,7 +12,7 @@ namespace Jbs.Yukari.Core.Data
         Task<IEnumerable<T>> GetObjects<T>(Guid yid, string type);
         Task<IEnumerable<TreeNode>> GetHierarchy(string type, string rootId = null);
         Task<TreeNode> GetTree(string type);
-        Task<IEnumerable<Relation>> GetEnrollments();
+        Task<IEnumerable<Relation>> GetList(string type, bool prependBlank);
         void Save(BasicInfo info);
         Task<IEnumerable<Membership>> GetMembership(Guid yid);
         void Publish(Guid yid);

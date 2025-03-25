@@ -12,6 +12,11 @@ namespace Jbs.Yukari.Core.Data
         protected readonly IDatabase database = database;
         protected const int commandTimeout = 600;
 
+        /// <summary>
+        /// 検索
+        /// </summary>
+        /// <param name="searchCriteria"></param>
+        /// <returns></returns>
         public async Task<IEnumerable<BasicInfoOutline>> Search(SearchCriteria searchCriteria)
         {
             var rowsSelect = @"SELECT 
@@ -79,6 +84,12 @@ basicinfo_id IN (
             return await records;
         }
 
+        /// <summary>
+        /// データ取得
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="yid"></param>
+        /// <returns></returns>
         public async Task<T> GetData<T>(Guid yid) where T : BasicInfo
         {
             var sql = @"SELECT
@@ -95,6 +106,11 @@ FROM Edit_BasicInfo WHERE basicinfo_id = @yid";
             return data;
         }
 
+        /// <summary>
+        /// メンバーシップ取得
+        /// </summary>
+        /// <param name="yid"></param>
+        /// <returns></returns>
         public async Task<IEnumerable<Membership>> GetMembership(Guid yid)
         {
             var sql = @"SELECT
@@ -111,20 +127,34 @@ WHERE
             return grp;
         }
 
-        public async Task<IEnumerable<Relation>> GetEnrollments()
+        /// <summary>
+        /// リスト取得
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IEnumerable<Relation>> GetList(string type, bool prependBlank)
         {
             var sql = @"SELECT
     basicinfo_id AS Yid,
     name AS Name
 FROM Edit_BasicInfo
 WHERE
-    type_id = 'jobmode'
+    type_id = @type
 ";
-            var roles = await database.Connection.QueryAsync<Relation>(sql, new { }, null, commandTimeout);
-            roles = roles.Prepend(new Relation());
+            var roles = await database.Connection.QueryAsync<Relation>(sql, new { type }, null, commandTimeout);
+            if (prependBlank)
+            {
+                roles = roles.Prepend(new Relation()); // 先頭に空の要素を追加する。
+            }
             return roles;
         }
 
+        /// <summary>
+        /// オブジェクト情報取得
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="yid"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public async Task<IEnumerable<T>> GetObjects<T>(Guid yid, string type)
         {
             var sql = @"SELECT
@@ -144,6 +174,12 @@ ORDER BY
             return await database.Connection.QueryAsync<T>(sql, new { yid, type }, null, commandTimeout);
         }
 
+        /// <summary>
+        /// 階層構造取得
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="rootId"></param>
+        /// <returns></returns>
         public async Task<IEnumerable<TreeNode>> GetHierarchy(string type, string rootId = null)
         {
             var sql = @"WITH hierarchy (yid, id, name, parentYid, sort) AS (
@@ -196,6 +232,11 @@ ORDER BY
             return await database.Connection.QueryAsync<TreeNode>(sql, param, null, commandTimeout);
         }
 
+        /// <summary>
+        /// ツリー取得
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public async Task<TreeNode> GetTree(string type)
         {
             var list = await GetHierarchy(type);
@@ -215,6 +256,10 @@ ORDER BY
             return root;
         }
 
+        /// <summary>
+        /// 保存
+        /// </summary>
+        /// <param name="info"></param>
         public void Save(BasicInfo info)
         {
             info.SerializeProperties();
@@ -284,6 +329,10 @@ WHERE
             }
         }
 
+        /// <summary>
+        /// 反映
+        /// </summary>
+        /// <param name="yid"></param>
         public async void Publish(Guid yid)
         {
             var sql = $@"UPDATE Edit_BasicInfo SET

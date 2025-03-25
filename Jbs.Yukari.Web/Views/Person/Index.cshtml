@@ -69,7 +69,7 @@
 
   <div class="mb-2">
     <label class="form-label" asp-for="EmploymentStatus"></label>
-    <select class="form-select" asp-for="EmploymentStatus" asp-items="Model.Enrollments.Select(e => new SelectListItem(e.Name, e.Yid.ToString()))"></select>
+    <select class="form-select" asp-for="EmploymentStatus" asp-items="Model.EmploymentStatuses"></select>
   </div>
 
   <div class="mb-2">
@@ -92,7 +92,7 @@
             <div id="tree" class="dropdown-menu pe-3"></div>
           </div>
           <label class="form-label">役職</label>
-          <select id="titles" class="form-select mb-3"></select>
+          <select id="titles" class="form-select mb-3" asp-items="Model.Titles"></select>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
@@ -128,11 +128,15 @@
   <input type="hidden" id="selected-organization-name" />
   @Html.HiddenFor(model => model.RolesViewModel)
   @Html.HiddenFor(model => model.TreeJson)
-  @Html.HiddenFor(model => model.TitlesJson)
-  @for (int i = 0; i < Model.Enrollments.Count(); i++ )
+  @for (int i = 0; i < Model.Titles.Count(); i++)
   {
-    @Html.Hidden("Enrollments[" + i + "].Yid", Model.Enrollments[i].Yid)
-    @Html.Hidden("Enrollments[" + i + "].Name", Model.Enrollments[i].Name)
+    @Html.Hidden("Titles[" + i + "].Text", Model.Titles[i].Text)
+    @Html.Hidden("Titles[" + i + "].Value", Model.Titles[i].Value)
+  }
+  @for (int i = 0; i < Model.EmploymentStatuses.Count(); i++)
+  {
+    @Html.Hidden("EmploymentStatuses[" + i + "].Text", Model.EmploymentStatuses[i].Text)
+    @Html.Hidden("EmploymentStatuses[" + i + "].Value", Model.EmploymentStatuses[i].Value)
   }
 }
 @section Scripts {
@@ -171,11 +175,6 @@
       }
       roleButtonSetup();
       roleTextSetup();
-      var titlesJson = JSON.parse($('#@nameof(Model.TitlesJson)').val());
-      titlesJson.forEach(function (v) {
-        var option = $('<option>').val(v.key).text(v.value);
-        $('#titles').append(option);
-      });
 
       $('#romanize').on('click', function () {
         //console.log($('#Surname').val());

@@ -6,6 +6,7 @@ using Jbs.Yukari.Core.Services.Serialization;
 using Jbs.Yukari.Domain;
 using Jbs.Yukari.Web.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Jbs.Yukari.Web.Controllers
 {
@@ -17,10 +18,8 @@ namespace Jbs.Yukari.Web.Controllers
 
             model.RolesViewModel = jsonSerializer.Serialize(model.Roles);
             model.TreeJson = $"[{jsonSerializer.Serialize(await query.GetTree("organization"))}]";
-            model.TitlesJson = jsonSerializer.Serialize(
-                (await query.GetHierarchy("title"))
-                    .Select(x => new KeyValuePair<string, string>(x.Yid.ToString(), x.Text)));
-            model.Enrollments = [.. (await query.GetEnrollments())];
+            model.Titles = [.. (await query.GetList("title", false)).Select(x => new SelectListItem(x.Name, x.Yid.ToString()))];
+            model.EmploymentStatuses = [.. (await query.GetList("jobmode", true)).Select(x => new SelectListItem(x.Name, x.Yid.ToString()))];
             return View("Index", model);
         }
 
