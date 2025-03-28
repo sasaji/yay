@@ -1,21 +1,31 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace Jbs.Yukari.Core.Models
 {
     public class SearchCriteria
     {
         public string SelectedNode { get; set; }
+
+        [DisplayName("ID")]
         public string Id { get; set; }
+
+        [DisplayName("種別")]
         public string Type { get; set; }
+
+        [DisplayName("名前")]
         public string Name { get; set; }
+
+        [DisplayName("状態")]
         public int? Phase { get; set; }
-        public List<KeyValuePair<int?, string>> PhaseList = new List<KeyValuePair<int?, string>>
-        {
-            new KeyValuePair<int?, string>(null, ""),
-            new KeyValuePair<int?, string>(0, "反映済み"),
-            new KeyValuePair<int?, string>(1,"編集中"),
-            new KeyValuePair<int?, string>(2, "反映待ち")
-        };
+
+        public List<KeyValuePair<int?, string>> PhaseList =
+        [
+            new(null, ""),
+            new(0, "反映済み"),
+            new(1,"編集中"),
+            new(2, "反映待ち")
+        ];
         public string RegisterDateFrom { get; set; }
         public string RegisterDateTo { get; set; }
     }

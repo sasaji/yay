@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Jbs.Yukari.Web.Controllers
 {
-    public class OrganizationController(IQuery query, IRomanizer romanizer, IJsonSerializer jsonSerializer) : EditController<Organization>(query, romanizer, jsonSerializer)
+    public class OrganizationController(ILogger<OrganizationController> logger, IQuery query, IRomanizer romanizer, IJsonSerializer jsonSerializer) : EditController<Organization>(logger, query, romanizer, jsonSerializer)
     {
         public async Task<IActionResult> Index(string yid)
         {

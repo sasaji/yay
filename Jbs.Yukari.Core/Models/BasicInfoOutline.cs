@@ -3,21 +3,18 @@ using System.ComponentModel;
 
 namespace Jbs.Yukari.Core.Models
 {
-    public class BasicInfoOutline
+    public class BasicInfoOutline : BasicInfoBase
     {
-        public Guid Yid { get; set; }
+        [DisplayName("有効")]
+        public int Status { get; set; }
 
-        [DisplayName("ID")]
-        public string Id { get; set; }
-
-        public string Type { get; set; }
-        public string Name { get; set; }
-        public string Status { get; set; }
+        [DisplayName("状態")]
         public int Phase { get; set; }
 
-        [DisplayName("When Changed")]
+        [DisplayName("更新日時")]
         public DateTime WhenChanged { get; set; }
 
+        [DisplayName("オブジェクト")]
         public string Objects { get; set; }
     }
 }

@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Jbs.Yukari.Web.Controllers
 {
-    public class PersonController(IQuery query, IRomanizer romanizer, IJsonSerializer jsonSerializer) : EditController<PersonViewModel>(query, romanizer, jsonSerializer)
+    public class PersonController(ILogger<PersonController> logger, IQuery query, IRomanizer romanizer, IJsonSerializer jsonSerializer) : EditController<PersonViewModel>(logger,query, romanizer, jsonSerializer)
     {
         public async Task<IActionResult> Index(string yid)
         {
@@ -52,7 +52,7 @@ namespace Jbs.Yukari.Web.Controllers
             try
             {
                 ViewData["Action"] = "一時保存";
-                model.Roles = jsonSerializer.Deserialize<List<Dictionary<string, Relation>>>(model.RolesViewModel);
+                model.Roles = jsonSerializer.Deserialize<List<Dictionary<string, BasicInfoBase>>>(model.RolesViewModel);
                 query.Save(model);
                 ViewData["Result"] = "0";
             }

@@ -6,8 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Jbs.Yukari.Web.Controllers
 {
-    public abstract class EditController<T>(IQuery query, IRomanizer romanizer, IJsonSerializer jsonSerializer) : Controller where T : BasicInfo
+    public abstract class EditController<T>(ILogger<EditController<T>> logger, IQuery query, IRomanizer romanizer, IJsonSerializer jsonSerializer) : Controller where T : BasicInfo
     {
+        protected readonly ILogger<EditController<T>> logger = logger;
         protected readonly IQuery query = query;
         protected readonly IRomanizer romanizer = romanizer;
         protected readonly IJsonSerializer jsonSerializer = jsonSerializer;

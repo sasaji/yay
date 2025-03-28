@@ -14,12 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Services\Romanization\Kakasi\itaijidict">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Services\Romanization\Kakasi\kanwadict">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <ProjectReference Include="..\NKakasi\NKakasi.csproj" />
   </ItemGroup>
 
 </Project>

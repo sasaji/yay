@@ -264,7 +264,7 @@ namespace NKakasi
             }
             else if (characterSet.Equals(CharacterSet.HIRAGANA))
             {
-                return new DelegateConverter(hiraganaConverterImpl.ToHiragana);
+                return new DelegateConverter(HiraganaConverter.ToHiragana);
             }
             else if (characterSet.Equals(CharacterSet.KATAKANA))
             {

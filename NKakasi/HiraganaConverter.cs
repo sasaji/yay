@@ -50,7 +50,7 @@ namespace NKakasi
             return ToKatakana(input, output, VbStrConv.Katakana | VbStrConv.Narrow);
         }
 
-        private bool ToKatakana(KakasiReader input, TextWriter output, VbStrConv conv)
+        private static bool ToKatakana(KakasiReader input, TextWriter output, VbStrConv conv)
         {
             if (!IsHiragana(input.Get()))
             {
@@ -75,7 +75,7 @@ namespace NKakasi
             return true;
         }
 
-        internal bool ToHiragana(KakasiReader input, TextWriter output)
+        internal static bool ToHiragana(KakasiReader input, TextWriter output)
         {
             int ch = input.Get();
             if (!IsHiragana(ch))
