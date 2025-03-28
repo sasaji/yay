@@ -42,7 +42,7 @@ namespace Jbs.Yukari.Web.Controllers
         {
             var trans = new PersonTransformer();
             var x = trans.Transform(model);
-            User u = (User)x[0];
+            //User u = (User)x[0];
             return View("Index", model);
         }
 

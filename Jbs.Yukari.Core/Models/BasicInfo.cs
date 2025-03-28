@@ -11,9 +11,6 @@ namespace Jbs.Yukari.Core.Models
         public IEnumerable<User> Users { get; set; }
         public IEnumerable<Group> Groups { get; set; }
 
-        public string TabIndex { get; set; } = string.Empty;
-        public string ObjectTabIndex { get; set; } = string.Empty;
-
         public string GetPropertyValue(string key)
         {
             if (string.IsNullOrEmpty(key)) return null;
