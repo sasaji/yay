@@ -67,3 +67,7 @@ legend {
 .modal-footer {
     border: none;
 }
+
+.btn-paging {
+    width: 4.5rem;
+}

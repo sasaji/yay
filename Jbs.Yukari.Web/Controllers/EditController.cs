@@ -21,17 +21,17 @@ namespace Jbs.Yukari.Web.Controllers
             return model;
         }
 
-        public virtual IActionResult CheckIn(T model)
-        {
-            DoSave(model, 2);
-            ViewData["Action"] = "チェックイン";
-            return View("Index", model);
-        }
-
         public virtual IActionResult Save(T model)
         {
             DoSave(model, 1);
             ViewData["Action"] = "一時保存";
+            return View("Index", model);
+        }
+
+        public virtual IActionResult CheckIn(T model)
+        {
+            DoSave(model, 2);
+            ViewData["Action"] = "チェックイン";
             return View("Index", model);
         }
 

@@ -1,331 +1,351 @@
 ﻿@model Jbs.Yukari.Web.Models.HomeViewModel
 @{
-  Layout = "_Layout";
-  ViewData["Title"] = "Home Page";
+	Layout = "_Layout";
+	ViewData["Title"] = "Home Page";
 }
 <form id="search-form" method="post">
-  <div id="main" class="container">
-    <div class="row">
-      <div class="col col-4">
-        <ul id="tabs" class="nav">
-          <li class="nav-item">
-            <a href="#tree-view" class="nav-link" data-bs-toggle="tab">ツリービュー</a>
-          </li>
-          <li class="nav-item">
-            <a href="#search" class="nav-link" data-bs-toggle="tab">検索</a>
-          </li>
-        </ul>
-        <div class="tab-content">
-          <div id="tree-view" class="tab-pane active">
-            <div id="tree"></div>
-          </div>
-          <div id="search" class="tab-pane">
-            <div class="container">
-              <div class="row search-row">
-                <div class="col col-3">
-                  @Html.LabelFor(model => model.SearchCriteria.Type)
-                </div>
-                <div class="col col-9">
-                  <select asp-for="SearchCriteria.Type" class="form-select">
-                    <option value=""></option>
-                    <option value="person">個人</option>
-                    <option value="organization">組織</option>
-                  </select>
-                </div>
-              </div>
-              <div class="row search-row">
-                <div class="col col-3">
-                  @Html.LabelFor(model => model.SearchCriteria.Id)
-                </div>
-                <div class="col col-9">
-                  @Html.EditorFor(model => model.SearchCriteria.Id, new { htmlAttributes = new { @class = "form-control" } })
-                </div>
-              </div>
-              <div class="row search-row">
-                <div class="col col-3">
-                  @Html.LabelFor(model => model.SearchCriteria.Name)
-                </div>
-                <div class="col col-9">
-                  @Html.EditorFor(model => model.SearchCriteria.Name, new { htmlAttributes = new { @class = "form-control" } })
-                </div>
-              </div>
-              <div class="row search-row">
-                <div class="col col-3">
-                  @Html.LabelFor(model => model.SearchCriteria.Phase)
-                </div>
-                <div class="col col-9">
-                  @Html.DropDownListFor(model => model.SearchCriteria.Phase, Model.SearchCriteria.PhaseList.Select(_ => new SelectListItem(_.Value.ToString(), _.Key?.ToString())), new { @class = "form-select" })
-                </div>
-              </div>
-              <div class="row search-row">
-                <div class="col col-3">登録日</div>
-                <div class="col col-9">
-                  <div class="row">
-                    <div class="col col-5 pe-0">
-                      @Html.EditorFor(model => model.SearchCriteria.RegisterDateFrom, new { htmlAttributes = new { @class = "form-control" } })
-                    </div>
-                    <div class="col col-2 p-0 text-center">～</div>
-                    <div class="col col-5 ps-0">
-                      @Html.EditorFor(model => model.SearchCriteria.RegisterDateTo, new { htmlAttributes = new { @class = "form-control" } })
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="text-center">
-              <input id="search-button" class="btn btn-primary" type="submit" value="検索" />
-            </div>
-          </div>
-        </div>
-        @Html.HiddenFor(model => model.TreeJson)
-        @Html.HiddenFor(model => model.SearchCriteria.SelectedNode)
-        @Html.HiddenFor(model => model.SelectedNodeId)
-        @Html.HiddenFor(model => model.TabIndex)
-        @Html.HiddenFor(model => model.FirstPage)
-      </div>
-      <div class="col col-8">
-        <div role="main" class="pb-3">
-          @if (this.Model != null)
-          {
-            <div class="result-area">
-              @if (Model.SearchResult.Items != null)
-              {
-                <div>
-                  @{
-                    var start = (Model.SearchResult.Items.PageIndex - 1) * Model.PageSize + 1;
-                    var end = Model.SearchResult.Items.PageIndex * Model.PageSize;
-                    if (end > Model.TotalCount)
-                    {
-                      end = Model.TotalCount;
-                    }
-                  }
-                  <span>@Model.TotalCount 件中 @start ～ @end 件のレコードを表示しています。</span>
-                </div>
-                <table id="search-result" class="table">
-                  <thead>
-                    <tr class="common-table-header result-list-header">
-                      <th><label asp-for="SearchResult.ListItemTemplate.Type" class="control-label"></label></th>
-                      <th><label asp-for="SearchResult.ListItemTemplate.Id" class="control-label"></label></th>
-                      <th><label asp-for="SearchResult.ListItemTemplate.Name" class="control-label"></label></th>
-                      <th><label asp-for="SearchResult.ListItemTemplate.Status" class="control-label"></label></th>
-                      <th><label asp-for="SearchResult.ListItemTemplate.Phase" class="control-label"></label></th>
-                      <th><label asp-for="SearchResult.ListItemTemplate.WhenChanged" class="control-label"></label></th>
-                      <th><label asp-for="SearchResult.ListItemTemplate.Objects" class="control-label"></label></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    @foreach (var entity in this.Model.SearchResult.Items)
-                    {
-                      <tr class="row-data">
-                        <td class="text-left">@entity.Type</td>
-                        <td class="text-left">@entity.Id</td>
-                        @{
-                          var @url = string.Empty;
-                          switch (entity.Type)
-                          {
-                            case "organization":
-                              url = "/organization";
-                              break;
-                            case "person":
-                              url = "/person";
-                              break;
-                          }
-                        }
-                        <td class="text-left">
-                          @if (!string.IsNullOrEmpty(url))
-                          {
-                            <a href="@url?yid=@entity.Yid" target="_blank">@entity.Name</a>
-                          }
-                          else
-                          {
-                            <span>@entity.Name</span>
-                          }
-                        </td>
-                        <td class="text-left">
-                          @if (entity.Status == 0)
-                          {
-                            <i class="fa fa-check"></i>
-                          }
-                        </td>
-                        <td class="text-left">
-                          @if (entity.Phase == 1)
-                          {
-                            <i class="fa fa-edit" title="編集中"></i>
-                          }
-                          else if (entity.Phase == 2)
-                          {
-                            <i class="fa fa-clock" title="反映待ち"></i>
-                          }
-                        </td>
-                        <td class="text-left">@entity.WhenChanged</td>
-                        <td class="text-left">
-                          @if (!string.IsNullOrEmpty(entity.Objects))
-                          {
-                            foreach (var obj in entity.Objects.Split(','))
-                            {
-                              if (obj.IndexOf("user") >= 0)
-                              {
-                                <i class="fa fa-user" title="@obj"></i>
-                              }
-                              else if (obj.IndexOf("group") >= 0)
-                              {
-                                <i class="fa fa-users" title="@obj"></i>
-                              }
-                            }
-                          }
-                        </td>
-                      </tr>
-                    }
-                  </tbody>
-                </table>
-                <div id="paging-area" class="paging-area-custom">
-                  @{
-                    var prevDisabled = !Model.SearchResult.Items.HasPreviousPage ? "disabled" : "";
-                    var nextDisabled = !Model.SearchResult.Items.HasNextPage ? "disabled" : "";
-                  }
-                  <div id="paging-info">
-                    <span>ページ @Model.SearchResult.Items.PageIndex / @Model.SearchResult.Items.TotalPages</span>
-                  </div>
-                  <button asp-action="Index"
-                          asp-route-sortOrder="@ViewData["CurrentSort"]"
-                          asp-route-pageNumber="1"
-                          asp-route-currentFilter="@ViewData["CurrentFilter"]"
-                          class="btn btn-secondary @prevDisabled">
-                    First
-                  </button>
-                  <button asp-action="Index"
-                          asp-route-sortOrder="@ViewData["CurrentSort"]"
-                          asp-route-pageNumber="@(Model.SearchResult.Items.PageIndex - 1)"
-                          asp-route-currentFilter="@ViewData["CurrentFilter"]"
-                          class="btn btn-secondary @prevDisabled">
-                    Prev
-                  </button>
-                  @{
-                    if (Model.SearchResult.Items.TotalPages > 5)
-                    {
-                      if (Model.SearchResult.Items.PageIndex <= 3)
-                      {
-                        for (int i = 1; i <= 5; i++)
-                        {
-                          var disabled = (Model.SearchResult.Items.PageIndex == i) ? "disabled" : "";
-                          <button asp-action="Index"
-                                  asp-route-sortOrder="@ViewData["CurrentSort"]"
-                                  asp-route-pageNumber="@i"
-                                  asp-route-currentFilter="@ViewData["CurrentFilter"]"
-                                  class="btn btn-secondary @disabled">
-                            @i
-                          </button>
-                        }
-                      }
-                      else if (Model.SearchResult.Items.PageIndex < (Model.SearchResult.Items.TotalPages - 2))
-                      {
-                        for (int i = Model.SearchResult.Items.PageIndex - 2; i <= Model.SearchResult.Items.PageIndex + 2; i++)
-                        {
-                          var disabled = (Model.SearchResult.Items.PageIndex == i) ? "disabled" : "";
-                          <button asp-action="Index"
-                                  asp-route-sortOrder="@ViewData["CurrentSort"]"
-                                  asp-route-pageNumber="@i"
-                                  asp-route-currentFilter="@ViewData["CurrentFilter"]"
-                                  class="btn btn-secondary @disabled">
-                            @i
-                          </button>
-                        }
-                      }
-                      else
-                      {
-                        for (int i = Model.SearchResult.Items.TotalPages - 4; i <= Model.SearchResult.Items.TotalPages; i++)
-                        {
-                          var disabled = (Model.SearchResult.Items.PageIndex == i) ? "disabled" : "";
-                          <button asp-action="Index"
-                                  asp-route-sortOrder="@ViewData["CurrentSort"]"
-                                  asp-route-pageNumber="@i"
-                                  asp-route-currentFilter="@ViewData["CurrentFilter"]"
-                                  class="btn btn-secondary @disabled">
-                            @i
-                          </button>
-                        }
-                      }
-                    }
-                  }
-                  <button asp-action="Index"
-                          asp-route-sortOrder="@ViewData["CurrentSort"]"
-                          asp-route-pageNumber="@(Model.SearchResult.Items.PageIndex + 1)"
-                          asp-route-currentFilter="@ViewData["CurrentFilter"]"
-                          class="btn btn-secondary @nextDisabled">
-                    Next
-                  </button>
-                  <button asp-action="Index"
-                          asp-route-sortOrder="@ViewData["CurrentSort"]"
-                          asp-route-pageNumber="@(Model.SearchResult.Items.TotalPages)"
-                          asp-route-currentFilter="@ViewData["CurrentFilter"]"
-                          class="btn btn-secondary @nextDisabled">
-                    Last
-                  </button>
-                </div>
-              }
-            </div>
-          }
-        </div>
-      </div>
-    </div>
-  </div>
+	<div id="main" class="container">
+		<div class="row">
+			<div class="col col-4">
+				<ul id="tabs" class="nav">
+					<li class="nav-item">
+						<a href="#tree-view" class="nav-link" data-bs-toggle="tab">ツリービュー</a>
+					</li>
+					<li class="nav-item">
+						<a href="#search" class="nav-link" data-bs-toggle="tab">検索</a>
+					</li>
+				</ul>
+				<div class="tab-content pt-2">
+					<div id="tree-view" class="tab-pane active">
+						<div id="tree"></div>
+					</div>
+					<div id="search" class="tab-pane">
+						<div class="container">
+							<div class="row search-row">
+								<div class="col col-3">
+									@Html.LabelFor(model => model.SearchCriteria.Type)
+								</div>
+								<div class="col col-9">
+									<select asp-for="SearchCriteria.Type" class="form-select">
+										<option value=""></option>
+										<option value="person">個人</option>
+										<option value="organization">組織</option>
+									</select>
+								</div>
+							</div>
+							<div class="row search-row">
+								<div class="col col-3">
+									@Html.LabelFor(model => model.SearchCriteria.Id)
+								</div>
+								<div class="col col-9">
+									@Html.EditorFor(model => model.SearchCriteria.Id, new { htmlAttributes = new { @class = "form-control" } })
+								</div>
+							</div>
+							<div class="row search-row">
+								<div class="col col-3">
+									@Html.LabelFor(model => model.SearchCriteria.Name)
+								</div>
+								<div class="col col-9">
+									@Html.EditorFor(model => model.SearchCriteria.Name, new { htmlAttributes = new { @class = "form-control" } })
+								</div>
+							</div>
+							<div class="row search-row">
+								<div class="col col-3">
+									@Html.LabelFor(model => model.SearchCriteria.Phase)
+								</div>
+								<div class="col col-9">
+									@Html.DropDownListFor(model => model.SearchCriteria.Phase, Model.SearchCriteria.PhaseList.Select(_ => new SelectListItem(_.Value.ToString(), _.Key?.ToString())), new { @class = "form-select" })
+								</div>
+							</div>
+							<div class="row search-row">
+								<div class="col col-3">登録日</div>
+								<div class="col col-9">
+									<div class="row">
+										<div class="col col-5 pe-0">
+											@Html.EditorFor(model => model.SearchCriteria.RegisterDateFrom, new { htmlAttributes = new { @class = "form-control" } })
+										</div>
+										<div class="col col-2 p-0 text-center">～</div>
+										<div class="col col-5 ps-0">
+											@Html.EditorFor(model => model.SearchCriteria.RegisterDateTo, new { htmlAttributes = new { @class = "form-control" } })
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="text-center mt-3">
+							<input id="search-button" class="btn btn-primary" type="submit" value="検索" />
+							<input id="clear-button" class="btn btn-secondary" type="button" value="クリア" />
+						</div>
+					</div>
+				</div>
+				@Html.HiddenFor(model => model.TreeJson)
+				@Html.HiddenFor(model => model.SearchCriteria.SelectedNode)
+				@Html.HiddenFor(model => model.SelectedNodeId)
+				@Html.HiddenFor(model => model.TabIndex)
+				@Html.HiddenFor(model => model.FirstPage)
+			</div>
+			<div class="col col-8">
+				<div role="main" class="pb-3">
+					@if (this.Model != null)
+					{
+						<div class="result-area">
+							<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+								<li class="nav-item dropdown">
+									<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+										新規作成
+									</a>
+									<ul class="dropdown-menu">
+										<li><a class="dropdown-item" href="/Person/Index" target="_blank">個人</a></li>
+										<li><a class="dropdown-item" href="/Organization/Index" target="_blank">組織</a></li>
+										<li><a class="dropdown-item" href="#">役職</a></li>
+										<li><a class="dropdown-item" href="#">雇用区分</a></li>
+									</ul>
+								</li>
+							</ul>
+							@if (Model.SearchResult.Items != null)
+							{
+								<div>
+									@{
+										var start = (Model.SearchResult.Items.PageIndex - 1) * Model.PageSize + 1;
+										var end = Model.SearchResult.Items.PageIndex * Model.PageSize;
+										if (end > Model.TotalCount)
+										{
+											end = Model.TotalCount;
+										}
+									}
+									@if (Model.TotalCount > 0)
+									{
+										<span>@Model.TotalCount 件中 @start ～ @end 件のレコードを表示しています。</span>
+									}
+								</div>
+								<table id="search-result" class="table">
+									<thead>
+										<tr class="common-table-header result-list-header">
+											<th><label asp-for="SearchResult.ListItemTemplate.Type" class="control-label"></label></th>
+											<th><label asp-for="SearchResult.ListItemTemplate.Id" class="control-label"></label></th>
+											<th><label asp-for="SearchResult.ListItemTemplate.Name" class="control-label"></label></th>
+											<th><label asp-for="SearchResult.ListItemTemplate.Status" class="control-label"></label></th>
+											<th><label asp-for="SearchResult.ListItemTemplate.Phase" class="control-label"></label></th>
+											<th><label asp-for="SearchResult.ListItemTemplate.WhenChanged" class="control-label"></label></th>
+											<th><label asp-for="SearchResult.ListItemTemplate.Objects" class="control-label"></label></th>
+										</tr>
+									</thead>
+									<tbody>
+										@foreach (var entity in this.Model.SearchResult.Items)
+										{
+											<tr class="row-data">
+												<td class="text-left">@entity.Type</td>
+												<td class="text-left">@entity.Id</td>
+												@{
+													var @url = string.Empty;
+													switch (entity.Type)
+													{
+														case "organization":
+															url = "/organization";
+															break;
+														case "person":
+															url = "/person";
+															break;
+													}
+												}
+												<td class="text-left">
+													@if (!string.IsNullOrEmpty(url))
+													{
+														<a href="@url?yid=@entity.Yid" target="_blank">@entity.Name</a>
+													}
+													else
+													{
+														<span>@entity.Name</span>
+													}
+												</td>
+												<td class="text-left">
+													@if (entity.Status == 0)
+													{
+														<i class="fa fa-check"></i>
+													}
+												</td>
+												<td class="text-left">
+													@if (entity.Phase == 1)
+													{
+														<i class="fa fa-edit" title="編集中"></i>
+													}
+													else if (entity.Phase == 2)
+													{
+														<i class="fa fa-clock" title="反映待ち"></i>
+													}
+												</td>
+												<td class="text-left">@entity.WhenChanged</td>
+												<td class="text-left">
+													@if (!string.IsNullOrEmpty(entity.Objects))
+													{
+														foreach (var obj in entity.Objects.Split(','))
+														{
+															if (obj.IndexOf("user") >= 0)
+															{
+																<i class="fa fa-user" title="@obj"></i>
+															}
+															else if (obj.IndexOf("group") >= 0)
+															{
+																<i class="fa fa-users" title="@obj"></i>
+															}
+														}
+													}
+												</td>
+											</tr>
+										}
+									</tbody>
+								</table>
+								<div id="paging-area" class="paging-area-custom">
+									@{
+										var prevDisabled = !Model.SearchResult.Items.HasPreviousPage ? "disabled" : "";
+										var nextDisabled = !Model.SearchResult.Items.HasNextPage ? "disabled" : "";
+									}
+									@if (Model.TotalCount > 0)
+									{
+										<div id="paging-info">
+											<span>ページ @Model.SearchResult.Items.PageIndex / @Model.SearchResult.Items.TotalPages</span>
+										</div>
+									}
+									<button asp-action="Index"
+													asp-route-sortOrder="@ViewData["CurrentSort"]"
+													asp-route-pageNumber="1"
+													asp-route-currentFilter="@ViewData["CurrentFilter"]"
+													class="btn btn-secondary btn-paging @prevDisabled">
+										先頭へ
+									</button>
+									<button asp-action="Index"
+													asp-route-sortOrder="@ViewData["CurrentSort"]"
+													asp-route-pageNumber="@(Model.SearchResult.Items.PageIndex - 1)"
+													asp-route-currentFilter="@ViewData["CurrentFilter"]"
+													class="btn btn-secondary btn-paging @prevDisabled">
+										前へ
+									</button>
+									@{
+										if (Model.SearchResult.Items.TotalPages > 5)
+										{
+											if (Model.SearchResult.Items.PageIndex <= 3)
+											{
+												for (int i = 1; i <= 5; i++)
+												{
+													var disabled = (Model.SearchResult.Items.PageIndex == i) ? "disabled" : "";
+													<button asp-action="Index"
+																	asp-route-sortOrder="@ViewData["CurrentSort"]"
+																	asp-route-pageNumber="@i"
+																	asp-route-currentFilter="@ViewData["CurrentFilter"]"
+																	class="btn btn-secondary @disabled">
+														@i
+													</button>
+												}
+											}
+											else if (Model.SearchResult.Items.PageIndex < (Model.SearchResult.Items.TotalPages - 2))
+											{
+												for (int i = Model.SearchResult.Items.PageIndex - 2; i <= Model.SearchResult.Items.PageIndex + 2; i++)
+												{
+													var disabled = (Model.SearchResult.Items.PageIndex == i) ? "disabled" : "";
+													<button asp-action="Index"
+																	asp-route-sortOrder="@ViewData["CurrentSort"]"
+																	asp-route-pageNumber="@i"
+																	asp-route-currentFilter="@ViewData["CurrentFilter"]"
+																	class="btn btn-secondary @disabled">
+														@i
+													</button>
+												}
+											}
+											else
+											{
+												for (int i = Model.SearchResult.Items.TotalPages - 4; i <= Model.SearchResult.Items.TotalPages; i++)
+												{
+													var disabled = (Model.SearchResult.Items.PageIndex == i) ? "disabled" : "";
+													<button asp-action="Index"
+																	asp-route-sortOrder="@ViewData["CurrentSort"]"
+																	asp-route-pageNumber="@i"
+																	asp-route-currentFilter="@ViewData["CurrentFilter"]"
+																	class="btn btn-secondary @disabled">
+														@i
+													</button>
+												}
+											}
+										}
+									}
+									<button asp-action="Index"
+													asp-route-sortOrder="@ViewData["CurrentSort"]"
+													asp-route-pageNumber="@(Model.SearchResult.Items.PageIndex + 1)"
+													asp-route-currentFilter="@ViewData["CurrentFilter"]"
+													class="btn btn-secondary btn-paging @nextDisabled">
+										次へ
+									</button>
+									<button asp-action="Index"
+													asp-route-sortOrder="@ViewData["CurrentSort"]"
+													asp-route-pageNumber="@(Model.SearchResult.Items.TotalPages)"
+													asp-route-currentFilter="@ViewData["CurrentFilter"]"
+													class="btn btn-secondary btn-paging @nextDisabled">
+										末尾へ
+									</button>
+								</div>
+							}
+						</div>
+					}
+				</div>
+			</div>
+		</div>
+	</div>
 </form>
 @if (Model != null)
 {
-  @section Scripts {
-  <script type="text/javascript">
-    $(function () {
-        var data = '@Model.TreeJson';
-        var tree = JSON.parse(data.replace(/&quot;/g, '"'));
-        // bootstrap-treeviewによるツリー表示。
-        $('#tree').treeview({
-            data: tree,
-            expandIcon: 'fa fa-plus',
-            collapseIcon: 'fa fa-minus'
-        });
+	@section Scripts {
+	<script type="text/javascript">
+		$(function () {
+				var data = '@Model.TreeJson';
+				var tree = JSON.parse(data.replace(/&quot;/g, '"'));
+				// bootstrap-treeviewによるツリー表示。
+				$('#tree').treeview({
+						data: tree,
+						expandIcon: 'fa fa-plus',
+						collapseIcon: 'fa fa-minus'
+				});
 
-        $('#SearchCriteria_RegisterDateFrom').datepicker({
-            format: 'yyyy/mm/dd',
-            todayBtn: "linked",
-            autoclose: true
-        });
-        $('#SearchCriteria_RegisterDateTo').datepicker({
-            format: 'yyyy/mm/dd',
-            todayBtn: "linked",
-            autoclose: true
-        });
+				$('#SearchCriteria_RegisterDateFrom').datepicker({
+						format: 'yyyy/mm/dd',
+						todayBtn: "linked",
+						autoclose: true
+				});
+				$('#SearchCriteria_RegisterDateTo').datepicker({
+						format: 'yyyy/mm/dd',
+						todayBtn: "linked",
+						autoclose: true
+				});
 
-        // ポストバック前に選択していたノードを復元。
-        $('#tree').treeview('revealNode', @Model.SelectedNodeId);
+				// ポストバック前に選択していたノードを復元。
+				$('#tree').treeview('revealNode', @Model.SelectedNodeId);
 
-        // ポストバック前に選択されていたタブを復元。
-        var tabName = $('#TabIndex').val() != '' ? $('#TabIndex').val() : 'tree-view';
-        $('#tabs a[href="#' + tabName + '"]').tab('show');
+				// ポストバック前に選択されていたタブを復元。
+				var tabName = $('#TabIndex').val() != '' ? $('#TabIndex').val() : 'tree-view';
+				$('#tabs a[href="#' + tabName + '"]').tab('show');
 
-        // 検索ボタン押下時に1ページ目からの表示にさせるための変数を初期化。
-        $('#FirstPage').val(false);
+				// 検索ボタン押下時に1ページ目からの表示にさせるための変数を初期化。
+				$('#FirstPage').val(false);
 
-        $('#tabs a').click(function () {
-            $('#TabIndex').val($(this).attr('href').replace('#', ''));
-        });
+				$('#tabs a').click(function () {
+						$('#TabIndex').val($(this).attr('href').replace('#', ''));
+				});
 
-        $('#tree').on('nodeSelected', function (event, data) {
-            //console.log(data.yid);
-            //console.log(data.nodeId);
-            $('#SearchCriteria_SelectedNode').val(data.yid);
-            $('#SelectedNodeId').val(data.nodeId);
-            // 階層選択時は1ページ目からの表示にしたいので以下の変数にtrueをセットする。
-            $('#FirstPage').val(true);
-            $('#search-form').submit();
-        });
+				$('#tree').on('nodeSelected', function (event, data) {
+						//console.log(data.yid);
+						//console.log(data.nodeId);
+						$('#SearchCriteria_SelectedNode').val(data.yid);
+						$('#SelectedNodeId').val(data.nodeId);
+						// 階層選択時は1ページ目からの表示にしたいので以下の変数にtrueをセットする。
+						$('#FirstPage').val(true);
+						$('#search-form').submit();
+				});
 
-        $('#search-button').click(function () {
-            // 検索ボタン押下時は1ページ目からの表示にしたいので以下の変数にtrueをセットする。
-            $('#FirstPage').val(true);
-            // 検索ボタン押下時はツリーノードが選択されていない状態にする。
-            $('#SearchCriteria_SelectedNode').val(null);
-        });
-    });
-  </script>
+				$('#search-button').click(function () {
+						// 検索ボタン押下時は1ページ目からの表示にしたいので以下の変数にtrueをセットする。
+						$('#FirstPage').val(true);
+						// 検索ボタン押下時はツリーノードが選択されていない状態にする。
+						$('#SearchCriteria_SelectedNode').val(null);
+				});
+		});
+	</script>
   }
 }

@@ -2,6 +2,7 @@
 using Jbs.Yukari.Core.Models;
 using Jbs.Yukari.Core.Services.Romanization;
 using Jbs.Yukari.Core.Services.Serialization;
+using Jbs.Yukari.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Jbs.Yukari.Web.Controllers
@@ -10,8 +11,7 @@ namespace Jbs.Yukari.Web.Controllers
     {
         public async Task<IActionResult> Index(string yid)
         {
-            var model = await Get(Guid.Parse(yid));
-            model.DeserializeProperties();
+            var model = !string.IsNullOrEmpty(yid) ? await query.GetData<OrganizationViewModel>(Guid.Parse(yid)) : new OrganizationViewModel { Yid = Guid.NewGuid(), Type = "organization" };
             return View("Index", model);
         }
 

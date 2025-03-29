@@ -14,8 +14,7 @@ namespace Jbs.Yukari.Web.Controllers
     {
         public async Task<IActionResult> Index(string yid)
         {
-            var model = !string.IsNullOrEmpty(yid) ? await query.GetData<PersonViewModel>(Guid.Parse(yid)) : new PersonViewModel();
-
+            var model = !string.IsNullOrEmpty(yid) ? await query.GetData<PersonViewModel>(Guid.Parse(yid)) : new PersonViewModel { Yid = Guid.NewGuid(), Type = "person" };
             model.RolesViewModel = jsonSerializer.Serialize(model.Roles);
             model.TreeJson = $"[{jsonSerializer.Serialize(await query.GetTree("organization"))}]";
             model.Titles = [.. (await query.GetList("title", false)).Select(x => new SelectListItem(x.Name, x.Yid.ToString()))];
@@ -49,19 +48,8 @@ namespace Jbs.Yukari.Web.Controllers
         [HttpPost]
         public override IActionResult Save(PersonViewModel model)
         {
-            try
-            {
-                ViewData["Action"] = "一時保存";
-                model.Roles = jsonSerializer.Deserialize<List<Dictionary<string, BasicInfoBase>>>(model.RolesViewModel);
-                query.Save(model);
-                ViewData["Result"] = "0";
-            }
-            catch (Exception ex)
-            {
-                ViewData["Result"] = "1";
-                ViewData["ErrorMessage"] = ex.Message;
-            }
-            return View("Index", model);
+            model.Roles = jsonSerializer.Deserialize<List<Dictionary<string, BasicInfoBase>>>(model.RolesViewModel);
+            return base.Save(model);
         }
     }
 }

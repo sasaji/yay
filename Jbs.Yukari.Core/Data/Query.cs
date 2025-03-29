@@ -266,19 +266,28 @@ ORDER BY
             database.GetOrBeginTransaction();
             try
             {
-                var sql = $@"UPDATE Edit_BasicInfo
-SET
-    identity_no = @{nameof(info.Id)},
-    name = @{nameof(info.Name)},
-    basicinfo_data = @{nameof(info.Properties)},
-    phase_flag = @{nameof(info.Phase)},
-    update_date = GETDATE(),
-    commit_date = GETDATE()
-WHERE
-    basicinfo_id = @{nameof(info.Yid)}
+                var sql = $@"MERGE INTO Edit_BasicInfo target
+USING (SELECT @{nameof(info.Yid)}) source(basicinfo_id)
+    ON (target.basicinfo_id = source.basicinfo_id)
+WHEN MATCHED
+    THEN
+        UPDATE SET
+            identity_no = @{nameof(info.Id)},
+            name = @{nameof(info.Name)},
+            basicinfo_data = @{nameof(info.Properties)},
+            phase_flag = @{nameof(info.Phase)},
+            update_date = GETDATE(),
+            commit_date = GETDATE()
+WHEN NOT MATCHED
+    THEN
+        INSERT (basicinfo_id, type_id, identity_no, name, inputter_id, commit_date, phase_flag, reflect_expected_date, regist_date, update_date, basicinfo_data)
+        VALUES (@{nameof(info.Yid)}, @{nameof(info.Type)}, @{nameof(info.Id)}, @{nameof(info.Name)}, '{Guid.Empty.ToString()}', GETDATE(), @{nameof(info.Phase)}, GETDATE(), GETDATE(), GETDATE(), @{nameof(info.Properties)})
+;
 ";
                 var parameters = new DynamicParameters();
+                parameters.Add($"@{nameof(info.Yid)}", info.Yid);
                 parameters.Add($"@{nameof(info.Id)}", info.Id);
+                parameters.Add($"@{nameof(info.Type)}", info.Type);
                 parameters.Add($"@{nameof(info.Name)}", info.Name);
                 parameters.Add($"@{nameof(info.Properties)}", info.Properties);
                 parameters.Add($"@{nameof(info.Phase)}", info.Phase);

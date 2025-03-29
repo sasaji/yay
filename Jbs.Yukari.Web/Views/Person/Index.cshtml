@@ -17,7 +17,7 @@
       <div class="col">名</div>
       <div class="col">ミドルネーム</div>
     </div>
-    <div class="row">
+    <div class="row mb-1">
       <div class="col">漢字</div>
       <div class="col">
         <input class="form-control" asp-for="Surname" />
@@ -29,7 +29,7 @@
         <input class="form-control" asp-for="MiddleName" />
       </div>
     </div>
-    <div class="row align-items-center">
+    <div class="row align-items-center mb-1">
       <div class="col">カナ</div>
       <div class="col">
         <input class="form-control" asp-for="KanaSurname" />
@@ -101,7 +101,22 @@
       </div>
     </div>
   </div>
+  <input type="hidden" id="selected-organization-yid" />
+  <input type="hidden" id="selected-organization-name" />
+  @Html.HiddenFor(model => model.RolesViewModel)
+  @Html.HiddenFor(model => model.TreeJson)
+  @for (int i = 0; i < Model.Titles.Count(); i++)
+  {
+    @Html.Hidden("Titles[" + i + "].Text", Model.Titles[i].Text)
+    @Html.Hidden("Titles[" + i + "].Value", Model.Titles[i].Value)
+  }
+  @for (int i = 0; i < Model.EmploymentStatuses.Count(); i++)
+  {
+    @Html.Hidden("EmploymentStatuses[" + i + "].Text", Model.EmploymentStatuses[i].Text)
+    @Html.Hidden("EmploymentStatuses[" + i + "].Value", Model.EmploymentStatuses[i].Value)
+  }
 }
+
 @section objects {
   <button class="btn btn-secondary" asp-action="Policy">ポリシー適用</button>
   <div class="row">
@@ -124,21 +139,8 @@
       </div>
     </div>
   </div>
-  <input type="hidden" id="selected-organization-yid" />
-  <input type="hidden" id="selected-organization-name" />
-  @Html.HiddenFor(model => model.RolesViewModel)
-  @Html.HiddenFor(model => model.TreeJson)
-  @for (int i = 0; i < Model.Titles.Count(); i++)
-  {
-    @Html.Hidden("Titles[" + i + "].Text", Model.Titles[i].Text)
-    @Html.Hidden("Titles[" + i + "].Value", Model.Titles[i].Value)
-  }
-  @for (int i = 0; i < Model.EmploymentStatuses.Count(); i++)
-  {
-    @Html.Hidden("EmploymentStatuses[" + i + "].Text", Model.EmploymentStatuses[i].Text)
-    @Html.Hidden("EmploymentStatuses[" + i + "].Value", Model.EmploymentStatuses[i].Value)
-  }
 }
+
 @section Scripts {
   <script>
     $(function () {

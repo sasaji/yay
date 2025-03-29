@@ -39,6 +39,10 @@
           @RenderSection("objects")
         </div>
       </div>
+      <div class="mb-2">
+        <label class="form-label" asp-for="PublishDueDate"></label>
+        <input class="form-control" asp-for="PublishDueDate" required />
+      </div>
       <div class="pt-2">
         @if (Model.Phase == 0 || Model.Phase == 1)
         {

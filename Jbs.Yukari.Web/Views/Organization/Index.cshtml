@@ -1,45 +1,39 @@
-﻿@model Jbs.Yukari.Core.Models.Organization
+﻿@model Jbs.Yukari.Web.Models.OrganizationViewModel
 @{
-    Layout = "_EditLayout";
+	Layout = "_EditLayout";
 }
 @section basic {
-    <div class="container">
-        <div class="row">
-            <label class="col-sm-2 col-form-label">ID</label>
-            <div class="col-sm-10">
-                <input class="form-control" asp-for="Id" />
-            </div>
-        </div>
-        <div class="row">
-            <label class="col-sm-2 col-form-label">漢字</label>
-            <div class="col-sm-10">
-                <input class="form-control" asp-for="Name" />
-            </div>
-        </div>
-    </div>
+	<div class="mb-2">
+		<label class="form-label" asp-for="Id"></label>
+		<input class="form-control" asp-for="Id" required />
+	</div>
+	<div class="mb-2">
+		<label class="form-label" asp-for="Name"></label>
+		<input class="form-control" asp-for="Name" required />
+	</div>
 }
 @section objects {
-    <div class="container">
-        <button class="btn btn-secondary" asp-action="Policy">ポリシー適用</button>
-        <div class="row">
-            <div class="col col-sm-12">
-                <ul id="object-tabs" class="nav">
-                    <li class="nav-item">
-                        <a href="#user" class="nav-link" data-bs-toggle="tab">ユーザー</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#group" class="nav-link" data-bs-toggle="tab">グループ</a>
-                    </li>
-                </ul>
-                <div class="tab-content">
-                    <div id="user" class="tab-pane active">
-                        @await Html.PartialAsync("_Users", Model.Users)
-                    </div>
-                    <div id="group" class="tab-pane">
-                        @await Html.PartialAsync("_Groups", Model.Groups)
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+	<div class="container">
+		<button class="btn btn-secondary" asp-action="Policy">ポリシー適用</button>
+		<div class="row">
+			<div class="col col-sm-12">
+				<ul id="object-tabs" class="nav">
+					<li class="nav-item">
+						<a href="#user" class="nav-link" data-bs-toggle="tab">ユーザー</a>
+					</li>
+					<li class="nav-item">
+						<a href="#group" class="nav-link" data-bs-toggle="tab">グループ</a>
+					</li>
+				</ul>
+				<div class="tab-content">
+					<div id="user" class="tab-pane active">
+						@await Html.PartialAsync("_Users", Model.Users)
+					</div>
+					<div id="group" class="tab-pane">
+						@await Html.PartialAsync("_Groups", Model.Groups)
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 }

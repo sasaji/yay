@@ -3,7 +3,7 @@ using System.ComponentModel;
 
 namespace Jbs.Yukari.Core.Models
 {
-    public class BasicInfoBase
+    public class BasicInfoBase : IBasicInfoBase
     {
         public Guid Yid { get; set; }
 

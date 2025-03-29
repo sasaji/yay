@@ -69,19 +69,22 @@ namespace Jbs.Yukari.Core.Models
             );
             Membership = [];
             int key = 0;
-            foreach (var role in Roles)
+            if (Roles != null)
             {
-                foreach (var item in role)
+                foreach (var role in Roles)
                 {
-                    Membership = Membership.Append(new Membership
+                    foreach (var item in role)
                     {
-                        Key = key,
-                        ParentYid = item.Value.Yid,
-                        Name = item.Value.Name,
-                        Type = item.Key
-                    });
+                        Membership = Membership.Append(new Membership
+                        {
+                            Key = key,
+                            ParentYid = item.Value.Yid,
+                            Name = item.Value.Name,
+                            Type = item.Key
+                        });
+                    }
+                    key++;
                 }
-                key++;
             }
             if (EmploymentStatus != Guid.Empty)
             {
