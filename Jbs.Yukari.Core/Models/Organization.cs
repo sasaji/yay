@@ -11,7 +11,8 @@ namespace Jbs.Yukari.Core.Models
         public override void SerializeProperties()
         {
             Properties = new XDocument(
-                new XElement("properties"
+                new XElement("properties",
+                    new XElement("organization_name", Name)
                 )
             );
         }

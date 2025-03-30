@@ -17,7 +17,7 @@ namespace Jbs.Yukari.Core.Data
         /// </summary>
         /// <param name="searchCriteria"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<BasicInfoOutline>> Search(SearchCriteria searchCriteria)
+        public async Task<IEnumerable<BasicInfo>> Search(SearchCriteria searchCriteria)
         {
             var rowsSelect = @"SELECT 
     basicinfo_id AS Yid,
@@ -80,7 +80,7 @@ basicinfo_id IN (
                 }
             }
             var rowsSql = $"{rowsSelect}{(where.Any() ? " WHERE " + string.Join(" AND ", where) : null)} ORDER BY sort_no, identity_no";
-            var records = database.Connection.QueryAsync<BasicInfoOutline>(rowsSql, parameters, null, commandTimeout);
+            var records = database.Connection.QueryAsync<BasicInfo>(rowsSql, parameters, null, commandTimeout);
             return await records;
         }
 
@@ -131,7 +131,7 @@ WHERE
         /// リスト取得
         /// </summary>
         /// <returns></returns>
-        public async Task<IEnumerable<BasicInfoBase>> GetList(string type, bool prependBlank)
+        public async Task<IEnumerable<BasicInfo>> GetList(string type, bool prependBlank)
         {
             var sql = @"SELECT
     basicinfo_id AS Yid,
@@ -140,10 +140,10 @@ FROM Edit_BasicInfo
 WHERE
     type_id = @type
 ";
-            var roles = await database.Connection.QueryAsync<BasicInfoBase>(sql, new { type }, null, commandTimeout);
+            var roles = await database.Connection.QueryAsync<BasicInfo>(sql, new { type }, null, commandTimeout);
             if (prependBlank)
             {
-                roles = roles.Prepend(new BasicInfoBase()); // 先頭に空の要素を追加する。
+                roles = roles.Prepend(new BasicInfo()); // 先頭に空の要素を追加する。
             }
             return roles;
         }
@@ -280,8 +280,8 @@ WHEN MATCHED
             commit_date = GETDATE()
 WHEN NOT MATCHED
     THEN
-        INSERT (basicinfo_id, type_id, identity_no, name, inputter_id, commit_date, phase_flag, reflect_expected_date, regist_date, update_date, basicinfo_data)
-        VALUES (@{nameof(info.Yid)}, @{nameof(info.Type)}, @{nameof(info.Id)}, @{nameof(info.Name)}, '{Guid.Empty.ToString()}', GETDATE(), @{nameof(info.Phase)}, GETDATE(), GETDATE(), GETDATE(), @{nameof(info.Properties)})
+        INSERT (basicinfo_id, type_id, identity_no, name, status, inputter_id, commit_date, phase_flag, reflect_expected_date, regist_date, update_date, basicinfo_data)
+        VALUES (@{nameof(info.Yid)}, @{nameof(info.Type)}, @{nameof(info.Id)}, @{nameof(info.Name)}, 0, '{Guid.Empty.ToString()}', GETDATE(), @{nameof(info.Phase)}, GETDATE(), GETDATE(), GETDATE(), @{nameof(info.Properties)})
 ;
 ";
                 var parameters = new DynamicParameters();

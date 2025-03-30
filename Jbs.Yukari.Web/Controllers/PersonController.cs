@@ -48,7 +48,7 @@ namespace Jbs.Yukari.Web.Controllers
         [HttpPost]
         public override IActionResult Save(PersonViewModel model)
         {
-            model.Roles = jsonSerializer.Deserialize<List<Dictionary<string, BasicInfoBase>>>(model.RolesViewModel);
+            model.Roles = jsonSerializer.Deserialize<List<Dictionary<string, BasicInfo>>>(model.RolesViewModel);
             return base.Save(model);
         }
     }

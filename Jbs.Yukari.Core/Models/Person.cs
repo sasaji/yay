@@ -24,7 +24,7 @@ namespace Jbs.Yukari.Core.Models
         public string TelephoneNumber { get; set; }
 
         [DisplayName("所属 / 役職")]
-        public IEnumerable<Dictionary<string, BasicInfoBase>> Roles { get; set; }
+        public IEnumerable<Dictionary<string, BasicInfo>> Roles { get; set; }
 
         [DisplayName("雇用区分")]
         public Guid? EmploymentStatus { get; set; }
@@ -44,7 +44,7 @@ namespace Jbs.Yukari.Core.Models
             Roles = Membership
                 .Where(x => (sourceArray).Contains(x.Type))
                 .GroupBy(x => x.Key)
-                .Select(x => x.ToDictionary(y => y.Type, a => new BasicInfoBase { Yid = a.ParentYid, Name = a.Name }));
+                .Select(x => x.ToDictionary(y => y.Type, a => new BasicInfo { Yid = a.ParentYid, Name = a.Name }));
             EmploymentStatus = Membership
                 .Where(x => x.Type == "jobmode")
                 .FirstOrDefault()?.ParentYid;

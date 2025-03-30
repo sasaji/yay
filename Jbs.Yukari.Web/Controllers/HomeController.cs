@@ -33,7 +33,7 @@ namespace Jbs.Yukari.Web.Controllers
         {
             var entities = await query.Search(model.SearchCriteria);
             model.TotalCount = entities.Count();
-            model.SearchResult.Items = PaginatedList<BasicInfoOutline>.Create(entities, model.FirstPage ? 1 : model.PageNumber, model.PageSize);
+            model.SearchResult.Items = PaginatedList<BasicInfo>.Create(entities, model.FirstPage ? 1 : model.PageNumber, model.PageSize);
             model.FirstPage = false;
             return View(model);
         }

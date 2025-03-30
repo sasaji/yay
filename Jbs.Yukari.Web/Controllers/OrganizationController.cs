@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Jbs.Yukari.Web.Controllers
 {
-    public class OrganizationController(ILogger<OrganizationController> logger, IQuery query, IRomanizer romanizer, IJsonSerializer jsonSerializer) : EditController<Organization>(logger, query, romanizer, jsonSerializer)
+    public class OrganizationController(ILogger<OrganizationController> logger, IQuery query, IRomanizer romanizer, IJsonSerializer jsonSerializer) : EditController<OrganizationViewModel>(logger, query, romanizer, jsonSerializer)
     {
         public async Task<IActionResult> Index(string yid)
         {
@@ -15,12 +15,14 @@ namespace Jbs.Yukari.Web.Controllers
             return View("Index", model);
         }
 
+        [HttpPost]
         public IActionResult Policy(Organization model)
         {
             return View("Index", model);
         }
 
-        public override IActionResult Save(Organization model)
+        [HttpPost]
+        public override IActionResult Save(OrganizationViewModel model)
         {
             return base.Save(model);
         }

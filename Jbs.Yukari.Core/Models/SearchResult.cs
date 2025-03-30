@@ -2,7 +2,7 @@
 {
     public class SearchResult
     {
-        public BasicInfoOutline ListItemTemplate { get; } = new BasicInfoOutline();
-        public PaginatedList<BasicInfoOutline> Items { get; set; }
+        public BasicInfo ListItemTemplate { get; } = new BasicInfo();
+        public PaginatedList<BasicInfo> Items { get; set; }
     }
 }
