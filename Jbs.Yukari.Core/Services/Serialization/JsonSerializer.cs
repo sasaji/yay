@@ -7,7 +7,7 @@ namespace Jbs.Yukari.Core.Services.Serialization
 {
     public class JsonSerializer : IJsonSerializer
     {
-        private readonly JsonSerializerOptions options = new JsonSerializerOptions
+        private readonly JsonSerializerOptions options = new()
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         };

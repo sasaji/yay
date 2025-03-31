@@ -79,7 +79,7 @@ basicinfo_id IN (
                     }
                 }
             }
-            var rowsSql = $"{rowsSelect}{(where.Any() ? " WHERE " + string.Join(" AND ", where) : null)} ORDER BY sort_no, identity_no";
+            var rowsSql = $"{rowsSelect}{(where.Count != 0 ? " WHERE " + string.Join(" AND ", where) : null)} ORDER BY sort_no, identity_no";
             var records = database.Connection.QueryAsync<BasicInfo>(rowsSql, parameters, null, commandTimeout);
             return await records;
         }
