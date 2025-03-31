@@ -21,7 +21,7 @@ namespace Jbs.Yukari.Core.Data
         {
             var rowsSelect = @"SELECT 
     basicinfo_id AS Yid,
-    identity_no AS Id,
+    identity_no AS Code,
     type_id AS Type,
     name AS Name,
     status AS Status,
@@ -57,10 +57,10 @@ basicinfo_id IN (
                 // 条件検索された場合
                 else
                 {
-                    if (!string.IsNullOrWhiteSpace(searchCriteria.Id))
+                    if (!string.IsNullOrWhiteSpace(searchCriteria.Code))
                     {
-                        where.Add($"identity_no LIKE @{nameof(searchCriteria.Id)}");
-                        parameters.Add(nameof(searchCriteria.Id), $"{searchCriteria.Id.Replace("_", "[_]")}%");
+                        where.Add($"identity_no LIKE @{nameof(searchCriteria.Code)}");
+                        parameters.Add(nameof(searchCriteria.Code), $"{searchCriteria.Code.Replace("_", "[_]")}%");
                     }
                     if (!string.IsNullOrWhiteSpace(searchCriteria.Type))
                     {
@@ -94,7 +94,7 @@ basicinfo_id IN (
         {
             var sql = @"SELECT
     basicinfo_id AS Yid,
-    identity_no AS Id,
+    identity_no AS Code,
     type_id AS Type,
     name AS Name,
     phase_flag AS Phase,
@@ -233,14 +233,13 @@ ORDER BY
         }
 
         /// <summary>
-        /// ツリー取得
+        /// 組織ツリー取得
         /// </summary>
-        /// <param name="type"></param>
         /// <returns></returns>
-        public async Task<TreeNode> GetTree(string type)
+        public async Task<TreeNode> GetOrganizationTree()
         {
-            var list = await GetHierarchy(type);
-            TreeNode root = new() { Yid = Guid.NewGuid(), Text = type, ParentYid = Guid.Empty, Level = 0 };
+            var list = await GetHierarchy("organization");
+            TreeNode root = new() { Yid = Guid.NewGuid(), Text = "組織", ParentYid = Guid.Empty, Level = 0 };
             foreach (TreeNode node in list)
             {
                 if (node.ParentYid != Guid.Empty)
@@ -272,7 +271,7 @@ USING (SELECT @{nameof(info.Yid)}) source(basicinfo_id)
 WHEN MATCHED
     THEN
         UPDATE SET
-            identity_no = @{nameof(info.Id)},
+            identity_no = @{nameof(info.Code)},
             name = @{nameof(info.Name)},
             basicinfo_data = @{nameof(info.Properties)},
             phase_flag = @{nameof(info.Phase)},
@@ -281,12 +280,12 @@ WHEN MATCHED
 WHEN NOT MATCHED
     THEN
         INSERT (basicinfo_id, type_id, identity_no, name, status, inputter_id, commit_date, phase_flag, reflect_expected_date, regist_date, update_date, basicinfo_data)
-        VALUES (@{nameof(info.Yid)}, @{nameof(info.Type)}, @{nameof(info.Id)}, @{nameof(info.Name)}, 0, '{Guid.Empty.ToString()}', GETDATE(), @{nameof(info.Phase)}, GETDATE(), GETDATE(), GETDATE(), @{nameof(info.Properties)})
+        VALUES (@{nameof(info.Yid)}, @{nameof(info.Type)}, @{nameof(info.Code)}, @{nameof(info.Name)}, 0, '{Guid.Empty.ToString()}', GETDATE(), @{nameof(info.Phase)}, GETDATE(), GETDATE(), GETDATE(), @{nameof(info.Properties)})
 ;
 ";
                 var parameters = new DynamicParameters();
                 parameters.Add($"@{nameof(info.Yid)}", info.Yid);
-                parameters.Add($"@{nameof(info.Id)}", info.Id);
+                parameters.Add($"@{nameof(info.Code)}", info.Code);
                 parameters.Add($"@{nameof(info.Type)}", info.Type);
                 parameters.Add($"@{nameof(info.Name)}", info.Name);
                 parameters.Add($"@{nameof(info.Properties)}", info.Properties);

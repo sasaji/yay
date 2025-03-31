@@ -35,10 +35,10 @@
 							</div>
 							<div class="row search-row">
 								<div class="col col-3">
-									@Html.LabelFor(model => model.SearchCriteria.Id)
+									@Html.LabelFor(model => model.SearchCriteria.Code)
 								</div>
 								<div class="col col-9">
-									@Html.EditorFor(model => model.SearchCriteria.Id, new { htmlAttributes = new { @class = "form-control" } })
+									@Html.EditorFor(model => model.SearchCriteria.Code, new { htmlAttributes = new { @class = "form-control" } })
 								</div>
 							</div>
 							<div class="row search-row">
@@ -122,7 +122,7 @@
 									<thead>
 										<tr class="common-table-header result-list-header">
 											<th><label asp-for="SearchResult.ListItemTemplate.Type" class="control-label"></label></th>
-											<th><label asp-for="SearchResult.ListItemTemplate.Id" class="control-label"></label></th>
+											<th><label asp-for="SearchResult.ListItemTemplate.Code" class="control-label"></label></th>
 											<th><label asp-for="SearchResult.ListItemTemplate.Name" class="control-label"></label></th>
 											<th><label asp-for="SearchResult.ListItemTemplate.Status" class="control-label"></label></th>
 											<th><label asp-for="SearchResult.ListItemTemplate.Phase" class="control-label"></label></th>
@@ -135,7 +135,7 @@
 										{
 											<tr class="row-data">
 												<td class="text-left">@entity.Type</td>
-												<td class="text-left">@entity.Id</td>
+												<td class="text-left">@entity.Code</td>
 												@{
 													var @url = string.Empty;
 													switch (entity.Type)

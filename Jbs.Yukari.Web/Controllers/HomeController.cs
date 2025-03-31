@@ -18,7 +18,7 @@ namespace Jbs.Yukari.Web.Controllers
         {
             var model = new HomeViewModel
             {
-                TreeJson = $"[{jsonSerializer.Serialize(await query.GetTree("organization"))}]"
+                TreeJson = $"[{jsonSerializer.Serialize(await query.GetOrganizationTree())}]"
             };
             return await Index(model);
         }

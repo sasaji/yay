@@ -10,8 +10,8 @@ namespace Jbs.Yukari.Core.Models
     {
         public Guid Yid { get; set; }
 
-        [DisplayName("ID")]
-        public string Id { get; set; }
+        [DisplayName("コード")]
+        public string Code { get; set; }
 
         [DisplayName("種別")]
         public string Type { get; set; }
