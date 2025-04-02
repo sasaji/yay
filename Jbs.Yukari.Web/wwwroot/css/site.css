@@ -71,3 +71,7 @@ legend {
 .btn-paging {
     width: 4.5rem;
 }
+
+.organization-dropdownlist {
+    border-color: #ced4da;
+}

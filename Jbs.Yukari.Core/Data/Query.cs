@@ -236,10 +236,10 @@ ORDER BY
         /// 組織ツリー取得
         /// </summary>
         /// <returns></returns>
-        public async Task<TreeNode> GetOrganizationTree()
+        public async Task<TreeNode> GetOrganizationTree(string rootText)
         {
             var list = await GetHierarchy("organization");
-            TreeNode root = new() { Id = Guid.NewGuid(), Text = "組織", ParentId = Guid.Empty, Level = 0 };
+            TreeNode root = new() { Id = Guid.NewGuid(), Text = rootText, ParentId = Guid.Empty, Level = 0 };
             foreach (TreeNode node in list)
             {
                 if (node.ParentId != Guid.Empty)

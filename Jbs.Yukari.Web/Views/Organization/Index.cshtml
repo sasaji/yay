@@ -11,6 +11,15 @@
 		<label class="form-label" asp-for="Name"></label>
 		<input class="form-control" asp-for="Name" required />
 	</div>
+	<div class="mb-2">
+		<label class="form-label">所属</label>
+		<div class="dropdown">
+			<button id="organization-button" type="button" class="btn organization-dropdownlist dropdown-toggle w-100 text-start" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside"></button>
+			<div id="tree" class="dropdown-menu pe-3 w-100"></div>
+		</div>
+	</div>
+	@Html.HiddenFor(model => model.ParentId)
+	@Html.HiddenFor(model => model.TreeJson)
 }
 @section objects {
 	<div class="container">
@@ -36,4 +45,26 @@
 			</div>
 		</div>
 	</div>
+}
+
+@section Scripts {
+  <script>
+    $(function () {
+	  	var data = '@Model.TreeJson';
+			var tree = JSON.parse(data.replace(/&quot;/g, '"'));
+			$('#organization-button').text(tree[0].nodes[0].text);
+			$('#tree').treeview({
+				data: tree,
+				expandIcon: 'fa fa-plus',
+				collapseIcon: 'fa fa-minus'
+			});
+			$('#tree').treeview('expandNode', ['@Model.ParentId']);
+
+			$('#tree').on('nodeSelected', function (event, data) {
+				$('#organization-button').click(); // ドロップダウンリストを閉じる。
+				$('#organization-button').text(data.text); // ドロップダウンリストのボタンタイトルを選択した組織名にする。
+				$('#ParentId').val(data.id);
+			});
+		});
+	</script>
 }

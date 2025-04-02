@@ -16,7 +16,7 @@ namespace Jbs.Yukari.Web.Controllers
         {
             var model = !string.IsNullOrEmpty(id) ? await query.GetData<PersonViewModel>(Guid.Parse(id)) : new PersonViewModel { Id = Guid.NewGuid(), Type = "person" };
             model.RolesViewModel = jsonSerializer.Serialize(model.Roles);
-            model.TreeJson = $"[{jsonSerializer.Serialize(await query.GetOrganizationTree())}]";
+            model.TreeJson = $"[{jsonSerializer.Serialize(await query.GetOrganizationTree(string.Empty))}]";
             model.Titles = [.. (await query.GetList("title", false)).Select(x => new SelectListItem(x.Name, x.Id.ToString()))];
             model.EmploymentStatuses = [.. (await query.GetList("jobmode", true)).Select(x => new SelectListItem(x.Name, x.Id.ToString()))];
             return View("Index", model);

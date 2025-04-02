@@ -12,6 +12,7 @@ namespace Jbs.Yukari.Web.Controllers
         public async Task<IActionResult> Index(string id)
         {
             var model = !string.IsNullOrEmpty(id) ? await query.GetData<OrganizationViewModel>(Guid.Parse(id)) : new OrganizationViewModel { Id = Guid.NewGuid(), Type = "organization" };
+            model.TreeJson = $"[{jsonSerializer.Serialize(await query.GetOrganizationTree(string.Empty))}]";
             return View("Index", model);
         }
 
