@@ -13,14 +13,6 @@ namespace Jbs.Yukari.Web.Controllers
         protected readonly IRomanizer romanizer = romanizer;
         protected readonly IJsonSerializer jsonSerializer = jsonSerializer;
 
-        protected async Task<T> Get(Guid yid)
-        {
-            var model = await query.GetData<T>(yid);
-            model.Users = await query.GetObjects<User>(yid, "user");
-            model.Groups = await query.GetObjects<Group>(yid, "group");
-            return model;
-        }
-
         public virtual IActionResult Save(T model)
         {
             DoSave(model, 1);
