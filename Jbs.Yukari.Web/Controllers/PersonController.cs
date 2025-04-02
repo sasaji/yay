@@ -12,13 +12,13 @@ namespace Jbs.Yukari.Web.Controllers
 {
     public class PersonController(ILogger<PersonController> logger, IQuery query, IRomanizer romanizer, IJsonSerializer jsonSerializer) : EditController<PersonViewModel>(logger,query, romanizer, jsonSerializer)
     {
-        public async Task<IActionResult> Index(string yid)
+        public async Task<IActionResult> Index(string id)
         {
-            var model = !string.IsNullOrEmpty(yid) ? await query.GetData<PersonViewModel>(Guid.Parse(yid)) : new PersonViewModel { Yid = Guid.NewGuid(), Type = "person" };
+            var model = !string.IsNullOrEmpty(id) ? await query.GetData<PersonViewModel>(Guid.Parse(id)) : new PersonViewModel { Id = Guid.NewGuid(), Type = "person" };
             model.RolesViewModel = jsonSerializer.Serialize(model.Roles);
             model.TreeJson = $"[{jsonSerializer.Serialize(await query.GetOrganizationTree())}]";
-            model.Titles = [.. (await query.GetList("title", false)).Select(x => new SelectListItem(x.Name, x.Yid.ToString()))];
-            model.EmploymentStatuses = [.. (await query.GetList("jobmode", true)).Select(x => new SelectListItem(x.Name, x.Yid.ToString()))];
+            model.Titles = [.. (await query.GetList("title", false)).Select(x => new SelectListItem(x.Name, x.Id.ToString()))];
+            model.EmploymentStatuses = [.. (await query.GetList("jobmode", true)).Select(x => new SelectListItem(x.Name, x.Id.ToString()))];
             return View("Index", model);
         }
 

@@ -8,7 +8,7 @@ namespace Jbs.Yukari.Core.Models
 {
     public class BasicInfo : IBasicInfo
     {
-        public Guid Yid { get; set; }
+        public Guid Id { get; set; }
 
         [DisplayName("コード")]
         public string Code { get; set; }

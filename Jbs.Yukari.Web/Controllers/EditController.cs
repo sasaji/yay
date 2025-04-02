@@ -74,7 +74,7 @@ namespace Jbs.Yukari.Web.Controllers
         {
             try
             {
-                query.Publish(model.Yid);
+                query.Publish(model.Id);
                 model.Phase = 0;
                 ViewData["Result"] = "0";
             }

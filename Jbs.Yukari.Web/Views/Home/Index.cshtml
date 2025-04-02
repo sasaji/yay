@@ -151,7 +151,7 @@
 												<td class="text-left">
 													@if (!string.IsNullOrEmpty(url))
 													{
-														<a href="@url?yid=@entity.Yid" target="_blank">@entity.Name</a>
+														<a href="@url?id=@entity.Id" target="_blank">@entity.Name</a>
 													}
 													else
 													{
@@ -330,9 +330,9 @@
 				});
 
 				$('#tree').on('nodeSelected', function (event, data) {
-						//console.log(data.yid);
+						//console.log(data.id);
 						//console.log(data.nodeId);
-						$('#SearchCriteria_SelectedNode').val(data.yid);
+						$('#SearchCriteria_SelectedNode').val(data.id);
 						$('#SelectedNodeId').val(data.nodeId);
 						// 階層選択時は1ページ目からの表示にしたいので以下の変数にtrueをセットする。
 						$('#FirstPage').val(true);

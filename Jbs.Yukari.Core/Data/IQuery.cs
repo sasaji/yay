@@ -8,13 +8,13 @@ namespace Jbs.Yukari.Core.Data
     public interface IQuery
     {
         Task<IEnumerable<BasicInfo>> Search(SearchCriteria searchCriteria);
-        Task<T> GetData<T>(Guid yid) where T : BasicInfo;
-        Task<IEnumerable<T>> GetObjects<T>(Guid yid, string type);
+        Task<T> GetData<T>(Guid id) where T : BasicInfo;
+        Task<IEnumerable<T>> GetObjects<T>(Guid id, string type);
         Task<IEnumerable<TreeNode>> GetHierarchy(string type, string rootId = null);
         Task<TreeNode> GetOrganizationTree();
         Task<IEnumerable<BasicInfo>> GetList(string type, bool prependBlank);
         void Save(BasicInfo info);
-        Task<IEnumerable<Membership>> GetMembership(Guid yid);
-        void Publish(Guid yid);
+        Task<IEnumerable<Membership>> GetMembership(Guid id);
+        void Publish(Guid id);
     }
 }

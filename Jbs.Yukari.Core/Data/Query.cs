@@ -20,7 +20,7 @@ namespace Jbs.Yukari.Core.Data
         public async Task<IEnumerable<BasicInfo>> Search(SearchCriteria searchCriteria)
         {
             var rowsSelect = @"SELECT 
-    basicinfo_id AS Yid,
+    basicinfo_id AS Id,
     identity_no AS Code,
     type_id AS Type,
     name AS Name,
@@ -88,20 +88,20 @@ basicinfo_id IN (
         /// データ取得
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="yid"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<T> GetData<T>(Guid yid) where T : BasicInfo
+        public async Task<T> GetData<T>(Guid id) where T : BasicInfo
         {
             var sql = @"SELECT
-    basicinfo_id AS Yid,
+    basicinfo_id AS Id,
     identity_no AS Code,
     type_id AS Type,
     name AS Name,
     phase_flag AS Phase,
     basicinfo_data AS Properties
-FROM Edit_BasicInfo WHERE basicinfo_id = @yid";
-            var data = await database.Connection.QuerySingleAsync<T>(sql, new { yid }, null, commandTimeout);
-            data.Membership = await GetMembership(yid);
+FROM Edit_BasicInfo WHERE basicinfo_id = @id";
+            var data = await database.Connection.QuerySingleAsync<T>(sql, new { id }, null, commandTimeout);
+            data.Membership = await GetMembership(id);
             data.DeserializeProperties();
             return data;
         }
@@ -109,21 +109,21 @@ FROM Edit_BasicInfo WHERE basicinfo_id = @yid";
         /// <summary>
         /// メンバーシップ取得
         /// </summary>
-        /// <param name="yid"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<Membership>> GetMembership(Guid yid)
+        public async Task<IEnumerable<Membership>> GetMembership(Guid id)
         {
             var sql = @"SELECT
-    m.sort_no AS [Key],
-    m.parent_basicinfo_id AS ParentYid,
+    m.sort_no AS Rank,
+    m.parent_basicinfo_id AS ParentId,
     b.name AS Name,
     b.type_id AS Type
 FROM Edit_BasicInfo_Membership m
 INNER JOIN Edit_BasicInfo b ON m.parent_basicinfo_id = b.basicinfo_id
 WHERE
-    m.basicinfo_id = @yid
+    m.basicinfo_id = @id
 ";
-            var grp = (await database.Connection.QueryAsync<Membership>(sql, new { yid }, null, commandTimeout));
+            var grp = (await database.Connection.QueryAsync<Membership>(sql, new { id }, null, commandTimeout));
             return grp;
         }
 
@@ -134,7 +134,7 @@ WHERE
         public async Task<IEnumerable<BasicInfo>> GetList(string type, bool prependBlank)
         {
             var sql = @"SELECT
-    basicinfo_id AS Yid,
+    basicinfo_id AS Id,
     name AS Name
 FROM Edit_BasicInfo
 WHERE
@@ -152,13 +152,13 @@ WHERE
         /// オブジェクト情報取得
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="yid"></param>
+        /// <param name="id"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<T>> GetObjects<T>(Guid yid, string type)
+        public async Task<IEnumerable<T>> GetObjects<T>(Guid id, string type)
         {
             var sql = @"SELECT
-    O.basicinfo_id AS Yid,
+    O.basicinfo_id AS Id,
     O.object_type_id AS Type,
     M.object_type_name AS TypeName,
     O.logon_name AS SamAccountName,
@@ -167,11 +167,11 @@ WHERE
 FROM Edit_ObjectInfo AS O
 INNER JOIN Mst_ObjectType M ON O.object_type_id = M.object_type_id
 WHERE
-    O.basicinfo_id = @yid AND
+    O.basicinfo_id = @id AND
     M.object_class = @type
 ORDER BY
     O.object_type_id";
-            return await database.Connection.QueryAsync<T>(sql, new { yid, type }, null, commandTimeout);
+            return await database.Connection.QueryAsync<T>(sql, new { id, type }, null, commandTimeout);
         }
 
         /// <summary>
@@ -182,7 +182,7 @@ ORDER BY
         /// <returns></returns>
         public async Task<IEnumerable<TreeNode>> GetHierarchy(string type, string rootId = null)
         {
-            var sql = @"WITH hierarchy (yid, id, name, parentYid, sort) AS (
+            var sql = @"WITH hierarchy (id, code, name, parentId, sort) AS (
 SELECT
 	B.basicinfo_id,
     B.identity_no,
@@ -196,28 +196,28 @@ WHERE
 	B.type_id = @type AND
     B.status <> 2
 ),
-CTE(yid, level, id, text, parentYid, sort)
+CTE(id, level, code, text, parentId, sort)
 AS (
     SELECT
-        yid,
-		1,
         id,
+		1,
+        code,
         cast(name as nvarchar(max)),
-		parentYid,
+		parentId,
 		sort
     FROM hierarchy
-    WHERE parentYid is null
+    WHERE parentId is null
     UNION ALL
     SELECT
-        OC.yid,
-		level + 1,
         OC.id,
+		level + 1,
+        OC.code,
         --cast(CTE.text + '/' + OC.name as nvarchar(max)),
         cast(OC.name as nvarchar(max)),
-		OC.parentYid,
+		OC.parentId,
 		OC.sort
     FROM hierarchy OC
-    INNER JOIN CTE ON OC.parentYid = CTE.yid
+    INNER JOIN CTE ON OC.parentId = CTE.id
 )
 SELECT
     *
@@ -226,7 +226,7 @@ FROM
 ORDER BY
     level,
 	sort,
-    id,
+    code,
     text";
             object param = string.IsNullOrEmpty(rootId) ? new { type } : new { type, rootId };
             return await database.Connection.QueryAsync<TreeNode>(sql, param, null, commandTimeout);
@@ -239,16 +239,16 @@ ORDER BY
         public async Task<TreeNode> GetOrganizationTree()
         {
             var list = await GetHierarchy("organization");
-            TreeNode root = new() { Yid = Guid.NewGuid(), Text = "組織", ParentYid = Guid.Empty, Level = 0 };
+            TreeNode root = new() { Id = Guid.NewGuid(), Text = "組織", ParentId = Guid.Empty, Level = 0 };
             foreach (TreeNode node in list)
             {
-                if (node.ParentYid != Guid.Empty)
+                if (node.ParentId != Guid.Empty)
                 {
-                    list.Single(_ => _.Yid == node.ParentYid).Nodes.Add(node);
+                    list.Single(_ => _.Id == node.ParentId).Nodes.Add(node);
                 }
                 else
                 {
-                    node.ParentYid = root.Yid;
+                    node.ParentId = root.Id;
                     root.Nodes.Add(node);
                 }
             }
@@ -266,7 +266,7 @@ ORDER BY
             try
             {
                 var sql = $@"MERGE INTO Edit_BasicInfo target
-USING (SELECT @{nameof(info.Yid)}) source(basicinfo_id)
+USING (SELECT @{nameof(info.Id)}) source(basicinfo_id)
     ON (target.basicinfo_id = source.basicinfo_id)
 WHEN MATCHED
     THEN
@@ -280,21 +280,21 @@ WHEN MATCHED
 WHEN NOT MATCHED
     THEN
         INSERT (basicinfo_id, type_id, identity_no, name, status, inputter_id, commit_date, phase_flag, reflect_expected_date, regist_date, update_date, basicinfo_data)
-        VALUES (@{nameof(info.Yid)}, @{nameof(info.Type)}, @{nameof(info.Code)}, @{nameof(info.Name)}, 0, '{Guid.Empty.ToString()}', GETDATE(), @{nameof(info.Phase)}, GETDATE(), GETDATE(), GETDATE(), @{nameof(info.Properties)})
+        VALUES (@{nameof(info.Id)}, @{nameof(info.Type)}, @{nameof(info.Code)}, @{nameof(info.Name)}, 0, '{Guid.Empty.ToString()}', GETDATE(), @{nameof(info.Phase)}, GETDATE(), GETDATE(), GETDATE(), @{nameof(info.Properties)})
 ;
 ";
                 var parameters = new DynamicParameters();
-                parameters.Add($"@{nameof(info.Yid)}", info.Yid);
+                parameters.Add($"@{nameof(info.Id)}", info.Id);
                 parameters.Add($"@{nameof(info.Code)}", info.Code);
                 parameters.Add($"@{nameof(info.Type)}", info.Type);
                 parameters.Add($"@{nameof(info.Name)}", info.Name);
                 parameters.Add($"@{nameof(info.Properties)}", info.Properties);
                 parameters.Add($"@{nameof(info.Phase)}", info.Phase);
-                parameters.Add($"@{nameof(info.Yid)}", info.Yid);
+                parameters.Add($"@{nameof(info.Id)}", info.Id);
                 database.ExecuteInTransaction(sql, parameters);
 
-                sql = @"DELETE FROM Edit_BasicInfo_Membership WHERE basicinfo_id = @yid";
-                database.ExecuteInTransaction(sql, new { info.Yid });
+                sql = @"DELETE FROM Edit_BasicInfo_Membership WHERE basicinfo_id = @id";
+                database.ExecuteInTransaction(sql, new { info.Id });
 
                 if (info.Membership != null && info.Membership.Any())
                 {
@@ -302,11 +302,11 @@ WHEN NOT MATCHED
                     {
                         sql = @"INSERT INTO Edit_BasicInfo_Membership
     (basicinfo_id, parent_basicinfo_id, sort_no, add_date)
-    VALUES (@yid, @parentYid, @sort, GETDATE())";
+    VALUES (@id, @parentId, @sort, GETDATE())";
                         var param = new DynamicParameters();
-                        param.Add("@yid", info.Yid);
-                        param.Add("@parentYid", membership.ParentYid);
-                        param.Add("@sort", membership.Key);
+                        param.Add("@id", info.Id);
+                        param.Add("@parentId", membership.ParentId);
+                        param.Add("@sort", membership.Rank);
                         database.ExecuteInTransaction(sql, param);
                     }
                 }
@@ -340,16 +340,16 @@ WHEN NOT MATCHED
         /// <summary>
         /// 反映
         /// </summary>
-        /// <param name="yid"></param>
-        public async void Publish(Guid yid)
+        /// <param name="id"></param>
+        public async void Publish(Guid id)
         {
             var sql = $@"UPDATE Edit_BasicInfo SET
 phase_flag = 0,
 reflect_date = GETDATE()
 WHERE
-    basicinfo_id = @yid";
+    basicinfo_id = @id";
             var parameters = new DynamicParameters();
-            parameters.Add($"@yid", yid);
+            parameters.Add($"@id", id);
             await database.Connection.ExecuteAsync(sql, parameters);
         }
     }

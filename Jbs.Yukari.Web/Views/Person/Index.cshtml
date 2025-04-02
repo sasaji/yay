@@ -101,7 +101,7 @@
       </div>
     </div>
   </div>
-  <input type="hidden" id="selected-organization-yid" />
+  <input type="hidden" id="selected-organization-id" />
   <input type="hidden" id="selected-organization-name" />
   @Html.HiddenFor(model => model.RolesViewModel)
   @Html.HiddenFor(model => model.TreeJson)
@@ -147,7 +147,7 @@
       var data = '@Model.TreeJson';
       var tree = JSON.parse(data.replace(/&quot;/g, '"'));
       $('#organization-button').text(tree[0].nodes[0].text);
-      $('#selected-organization-yid').val(tree[0].nodes[0].yid);
+      $('#selected-organization-id').val(tree[0].nodes[0].id);
       $('#selected-organization-name').val(tree[0].nodes[0].text);
       console.log(tree[0].nodes[0]);
       $('#tree').treeview({
@@ -160,9 +160,9 @@
         //console.log(data);
         $('#organization-button').click(); // ドロップダウンリストを閉じる。
         $('#organization-button').text(data.text); // ドロップダウンリストのボタンタイトルを選択した組織名にする。
-        $('#selected-organization-yid').val(data.yid);
+        $('#selected-organization-id').val(data.id);
         $('#selected-organization-name').val(data.text);
-        //$('#SearchCriteria_SelectedNode').val(data.yid);
+        //$('#SearchCriteria_SelectedNode').val(data.id);
         //$('#SelectedNodeId').val(data.nodeId);
       });
 
@@ -209,18 +209,18 @@
       $('#addRole').on('click', function () {
         var value = {
           "organization": {
-            //"yid": $('#organizations option:selected').val(),
+            //"id": $('#organizations option:selected').val(),
             //"name": $('#organizations option:selected').text()
-            "yid": $('#selected-organization-yid').val(),
+            "id": $('#selected-organization-id').val(),
             "name": $('#selected-organization-name').val()
           }, "title": {
-            "yid": $('#titles option:selected').val(),
+            "id": $('#titles option:selected').val(),
             "name": $('#titles option:selected').text()
           }
         };
         var roles = JSON.parse($('#@nameof(Model.RolesViewModel)').val());
         console.log(roles);
-        if (roles.some(r => r.organization.yid == value.organization.yid && r.title.yid == value.title.yid)) {
+        if (roles.some(r => r.organization.id == value.organization.id && r.title.id == value.title.id)) {
           alert('すでに追加されています。');
         } else {
           $('#addRoleDialog').modal('hide');

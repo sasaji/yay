@@ -43,11 +43,11 @@ namespace Jbs.Yukari.Core.Models
             TelephoneNumber = GetPropertyValue("phone_no");
             Roles = Membership
                 .Where(x => (sourceArray).Contains(x.Type))
-                .GroupBy(x => x.Key)
-                .Select(x => x.ToDictionary(y => y.Type, a => new BasicInfo { Yid = a.ParentYid, Name = a.Name }));
+                .GroupBy(x => x.Rank)
+                .Select(x => x.ToDictionary(y => y.Type, a => new BasicInfo { Id = a.ParentId, Name = a.Name }));
             EmploymentStatus = Membership
                 .Where(x => x.Type == "jobmode")
-                .FirstOrDefault()?.ParentYid;
+                .FirstOrDefault()?.ParentId;
         }
 
         public override void SerializeProperties()
@@ -77,8 +77,8 @@ namespace Jbs.Yukari.Core.Models
                     {
                         Membership = Membership.Append(new Membership
                         {
-                            Key = key,
-                            ParentYid = item.Value.Yid,
+                            Rank = key,
+                            ParentId = item.Value.Id,
                             Name = item.Value.Name,
                             Type = item.Key
                         });
@@ -91,8 +91,8 @@ namespace Jbs.Yukari.Core.Models
 
                 Membership = Membership.Append(new Membership
                 {
-                    Key = 0,
-                    ParentYid = (Guid)EmploymentStatus
+                    Rank = 0,
+                    ParentId = (Guid)EmploymentStatus
                 });
             }
         }

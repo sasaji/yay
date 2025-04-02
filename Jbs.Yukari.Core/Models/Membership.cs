@@ -4,8 +4,8 @@ namespace Jbs.Yukari.Core.Models
 {
     public class Membership
     {
-        public int Key { get; set; }
-        public Guid ParentYid { get; set; }
+        public int Rank { get; set; }
+        public Guid ParentId { get; set; }
         public string Name { get; set; }
         public string Type { get; set; }
     }

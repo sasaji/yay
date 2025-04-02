@@ -9,9 +9,9 @@ namespace Jbs.Yukari.Web.Controllers
 {
     public class OrganizationController(ILogger<OrganizationController> logger, IQuery query, IRomanizer romanizer, IJsonSerializer jsonSerializer) : EditController<OrganizationViewModel>(logger, query, romanizer, jsonSerializer)
     {
-        public async Task<IActionResult> Index(string yid)
+        public async Task<IActionResult> Index(string id)
         {
-            var model = !string.IsNullOrEmpty(yid) ? await query.GetData<OrganizationViewModel>(Guid.Parse(yid)) : new OrganizationViewModel { Yid = Guid.NewGuid(), Type = "organization" };
+            var model = !string.IsNullOrEmpty(id) ? await query.GetData<OrganizationViewModel>(Guid.Parse(id)) : new OrganizationViewModel { Id = Guid.NewGuid(), Type = "organization" };
             return View("Index", model);
         }
 
