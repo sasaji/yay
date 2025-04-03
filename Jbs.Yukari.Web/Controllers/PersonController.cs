@@ -15,7 +15,7 @@ namespace Jbs.Yukari.Web.Controllers
         public async Task<IActionResult> Index(string id)
         {
             var model = !string.IsNullOrEmpty(id) ? await query.GetData<PersonViewModel>(Guid.Parse(id)) : new PersonViewModel { Id = Guid.NewGuid(), Type = "person" };
-            model.RolesViewModel = jsonSerializer.Serialize(model.Roles);
+            model.AffiliationsViewModel = [.. model.Affiliations.Select(x => new SelectListItem(x.Organization.Name + "/" + x.Title.Name, x.Organization.Id + "/" + x.Title.Id))];
             model.TreeJson = $"[{jsonSerializer.Serialize(await query.GetOrganizationTree(string.Empty))}]";
             model.Titles = [.. (await query.GetIdNamePairs("title", false)).Select(x => new SelectListItem(x.Name, x.Id.ToString()))];
             model.EmploymentStatuses = [.. (await query.GetIdNamePairs("jobmode", true)).Select(x => new SelectListItem(x.Name, x.Id.ToString()))];
@@ -48,7 +48,21 @@ namespace Jbs.Yukari.Web.Controllers
         [HttpPost]
         public override IActionResult Save(PersonViewModel model)
         {
-            model.Roles = jsonSerializer.Deserialize<List<Dictionary<string, IdNamePair>>>(model.RolesViewModel);
+            //model.Roles = jsonSerializer.Deserialize<List<Dictionary<string, IdNamePair>>>(model.RolesViewModel);
+            model.Affiliations = model.AffiliationsViewModel
+                .Select(x => new Affiliation
+                {
+                    Organization = new IdNamePair
+                    {
+                        Id = Guid.Parse(x.Value.Split('/')[0]),
+                        Name = x.Text.Split('/')[0]
+                    },
+                    Title = new IdNamePair
+                    {
+                        Id = Guid.Parse(x.Value.Split('/')[1]),
+                        Name = x.Text.Split('/')[1]
+                    }
+                });
             return base.Save(model);
         }
     }

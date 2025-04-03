@@ -59,13 +59,14 @@
     </div>
   </fieldset>
 
+  <!-- 所属/役職 -->
   <div class="mb-2">
-    <label class="form-label" asp-for="RolesViewModel"></label>
+    <label class="form-label" asp-for="AffiliationsViewModel"></label>
     <button type="button" class="btn btn-secondary btn-sm btm-sm-ex ms-2" data-bs-toggle="modal" data-bs-target="#addRoleDialog">追加</button>
     <button id="removeRole" type="button" class="btn btn-secondary btn-sm btm-sm-ex">削除</button>
     <button id="upRole" type="button" class="btn btn-secondary btn-sm btm-sm-ex">↑</button>
     <button id="downRole" type="button" class="btn btn-secondary btn-sm btm-sm-ex">↓</button>
-    <select id="roles" class="form-select mt-2" size="4"></select>
+    @Html.ListBoxFor(m => m.AffiliationsViewModel, null, new { @id = "AffiliationsViewModel", @class = "form-control mt-2", @size = "4" })
   </div>
 
   <!-- 雇用区分 -->
@@ -106,8 +107,9 @@
   </div>
   <input type="hidden" id="selected-organization-id" />
   <input type="hidden" id="selected-organization-name" />
-  @Html.HiddenFor(model => model.RolesViewModel)
   @Html.HiddenFor(model => model.TreeJson)
+
+  <!-- ポストバック時に項目が失われないようにhiddenで持たせる -->
   @for (int i = 0; i < Model.Titles.Count(); i++)
   {
     @Html.Hidden("Titles[" + i + "].Text", Model.Titles[i].Text)
@@ -169,17 +171,9 @@
         //$('#SelectedNodeId').val(data.nodeId);
       });
 
-      var rolesJson = JSON.parse($('#@nameof(Model.RolesViewModel)').val());
-      //console.log(rolesJson);
-      if (rolesJson) {
-        rolesJson.forEach(function (v) {
-          //console.log(v);
-          var option = $('<option>').val(JSON.stringify(v)).text(`${v.organization.name}${v.title ? `/ ${v.title.name}` : ``}`);
-          $('#roles').append(option);
-        });
-      }
       roleButtonSetup();
       roleTextSetup();
+
 
       $('#romanize').on('click', function () {
         //console.log($('#Surname').val());
@@ -204,74 +198,84 @@
         });
       });
 
-      $('#roles').on('change', function () {
+      $('#AffiliationsViewModel').on('change', function () {
         roleButtonSetup();
       });
 
       // 所属/役職モーダルでOKボタンがクリックされた。
       $('#addRole').on('click', function () {
-        var value = {
-          "organization": {
-            //"id": $('#organizations option:selected').val(),
-            //"name": $('#organizations option:selected').text()
-            "id": $('#selected-organization-id').val(),
-            "name": $('#selected-organization-name').val()
-          }, "title": {
-            "id": $('#titles option:selected').val(),
-            "name": $('#titles option:selected').text()
-          }
-        };
-        var roles = JSON.parse($('#@nameof(Model.RolesViewModel)').val());
-        console.log(roles);
-        if (roles.some(r => r.organization.id == value.organization.id && r.title.id == value.title.id)) {
+        var value = $('#selected-organization-id').val() + '/' + $('#titles option:selected').val();
+        //console.log(value);
+        var text = $('#selected-organization-name').val() + '/' + $('#titles option:selected').text();
+        //console.log($('#AffiliationsViewModel option').toArray());
+        if ($('#AffiliationsViewModel option').toArray().some(x => x.value == value)) {
           alert('すでに追加されています。');
         } else {
           $('#addRoleDialog').modal('hide');
           $('body').removeClass('modal-open');
           $('.modal-backdrop').remove();
-          var option = $('<option>')
-            .val(JSON.stringify(value))
-            //.text($('#organizations option:selected').text() + ' / ' + $('#titles option:selected').text());
-            .text($('#selected-organization-name').val() + ' / ' + $('#titles option:selected').text());
-          $('#roles').append(option);
+          var option = $('<option>').val(value).text(text);
+          $('#AffiliationsViewModel').append(option);
           roleTextSetup();
-          roleListSetup();
+          //roleListSetup();
         }
       });
 
       $('#removeRole').on('click', function () {
-        $('#roles option:selected').remove();
+        $('#AffiliationsViewModel option:selected').remove();
         roleButtonSetup();
         roleTextSetup();
-        roleListSetup();
+        //roleListSetup();
       });
 
       $('#upRole').on('click', function () {
-        $op = $('#roles option:selected');
+        $op = $('#AffiliationsViewModel option:selected');
         $op.first().prev().before($op);
         roleButtonSetup();
         roleTextSetup();
-        roleListSetup();
+        //roleListSetup();
       });
 
       $('#downRole').on('click', function () {
-        $op = $('#roles option:selected');
+        $op = $('#AffiliationsViewModel option:selected');
         $op.last().next().after($op);
         roleButtonSetup();
         roleTextSetup();
-        roleListSetup();
+        //roleListSetup();
+      });
+
+      // フォーム送信時に ListBox の選択項目が失われないよう hidden フィールドに持たせる。
+      $('form').on('submit', function() {
+          // ここで要素の値を空配列にしておかないと、リストの順番を入れ替えて保存するとリストアイテムが消えてしまう。
+        $('#AffiliationsViewModel').val([]); 
+        //console.log($('#AffiliationsViewModel').val());
+        $('#AffiliationsViewModel option').each(function (i) {
+          $('<input>').attr({
+            type: 'hidden',
+            name: 'AffiliationsViewModel[' + i + '].Value',
+            value: $(this).val()
+          }).appendTo('form');
+          //console.log(i);
+          //console.log($(this).val());
+          $('<input>').attr({
+            type: 'hidden',
+            name: 'AffiliationsViewModel[' + i + '].Text',
+            value: $(this).text()
+          }).appendTo('form');
+        });
       });
     });
 
     function roleButtonSetup() {
-      var index = $("#roles").prop("selectedIndex");
+      var index = $("#AffiliationsViewModel").prop("selectedIndex");
+      //console.log(index);
       if (index >= 0) {
         $('#removeRole').attr('disabled', false);
         if (index == 0)
           $('#upRole').attr('disabled', true);
         else
           $('#upRole').attr('disabled', false);
-        if (index == $('#roles').children().length - 1)
+        if (index == $('#AffiliationsViewModel').children().length - 1)
           $('#downRole').attr('disabled', true);
         else
           $('#downRole').attr('disabled', false);
@@ -283,7 +287,7 @@
     }
 
     function roleTextSetup() {
-      $("#roles option").each(function (i) {
+      $("#AffiliationsViewModel option").each(function (i) {
         //console.log(this.text);
         if (i == 0 && this.text.startsWith('(兼) '))
           this.text = this.text.slice(4);
@@ -292,16 +296,18 @@
       });
     }
 
+    /*
     function roleListSetup() {
       var result = '[';
       var comma = '';
-      $("#roles option").each(function (i, v) {
+      $("#AffiliationsViewModel option").each(function (i, v) {
         result += comma + v.value;
         comma = ',';
       });
       result += ']';
       console.log(result);
-      $('#@nameof(Model.RolesViewModel)').val(result);
+      $('#@nameof(Model.AffiliationsViewModel)').val(result);
     }
+    */
   </script>
 }

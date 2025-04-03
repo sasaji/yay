@@ -23,8 +23,8 @@ namespace Jbs.Yukari.Core.Models
         [DisplayName("電話番号")]
         public string TelephoneNumber { get; set; }
 
-        [DisplayName("所属 / 役職")]
-        public IEnumerable<Dictionary<string, IdNamePair>> Roles { get; set; }
+        [DisplayName("所属/役職")]
+        public IEnumerable<Affiliation> Affiliations { get; set; }
 
         [DisplayName("雇用区分")]
         public IdNamePair EmploymentStatus { get; set; }
@@ -41,10 +41,23 @@ namespace Jbs.Yukari.Core.Models
             RomanGivenName = GetPropertyValue("given_name_roman");
             RomanMiddleName = GetPropertyValue("middle_name_roman");
             TelephoneNumber = GetPropertyValue("phone_no");
-            Roles = Membership
-                .Where(x => (sourceArray).Contains(x.Type))
+            Affiliations = Membership
+                .Where(x => sourceArray.Contains(x.Type))
                 .GroupBy(x => x.Rank)
-                .Select(x => x.ToDictionary(y => y.Type, a => new IdNamePair { Id = a.ParentId, Name = a.Name }));
+                .OrderBy(x => x.Key)
+                .Select(x => new Affiliation
+                {
+                    Organization = new IdNamePair 
+                    {
+                        Id = x.Where(y => y.Type == "organization").FirstOrDefault()?.ParentId ?? Guid.Empty,
+                        Name = x.Where(y => y.Type == "organization").FirstOrDefault()?.Name
+                    },
+                    Title = new IdNamePair
+                    {
+                        Id = x.Where(y => y.Type == "title").FirstOrDefault()?.ParentId ?? Guid.Empty,
+                        Name = x.Where(y => y.Type == "title").FirstOrDefault()?.Name
+                    }
+                });
             EmploymentStatus = Membership
                 .Where(x => x.Type == "jobmode")
                 .Select(x => new IdNamePair { Id = x.ParentId, Name = x.Name })
@@ -70,20 +83,24 @@ namespace Jbs.Yukari.Core.Models
             );
             Membership = [];
             int key = 0;
-            if (Roles != null)
+            if (Affiliations != null)
             {
-                foreach (var role in Roles)
+                foreach (var role in Affiliations)
                 {
-                    foreach (var item in role)
+                    Membership = Membership.Append(new Membership
                     {
-                        Membership = Membership.Append(new Membership
-                        {
-                            Rank = key,
-                            ParentId = item.Value.Id,
-                            Name = item.Value.Name,
-                            Type = item.Key
-                        });
-                    }
+                        Rank = key,
+                        ParentId = role.Organization.Id,
+                        Name = role.Organization.Name,
+                        Type = "organization"
+                    });
+                    Membership = Membership.Append(new Membership
+                    {
+                        Rank = key,
+                        ParentId = role.Title.Id,
+                        Name = role.Title.Name,
+                        Type = "title"
+                    });
                     key++;
                 }
             }

@@ -8,7 +8,7 @@ namespace Jbs.Yukari.Web.Models
     {
         // ツリービューやドロップダウンリストをクライアント側で再現させるためのJSON文字列。
         [DisplayName("所属/役職")]
-        public string RolesViewModel { get; set; } = string.Empty;
+        public IList<SelectListItem> AffiliationsViewModel { get; set; } = [];
         public string TreeJson { get; set; } = string.Empty;
         public IList<SelectListItem> Titles { get; set; } = [];
         public IList<SelectListItem> EmploymentStatuses { get; set; } = [];
