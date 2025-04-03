@@ -2,10 +2,11 @@
 @{
     Layout = "_EditLayout";
 }
+
 @section basic {
   <div class="mb-2">
     <label class="form-label" asp-for="Code"></label>
-    <input class="form-control" asp-for="Code" required />
+    <input class="form-control" asp-for="Code" />
   </div>
 
   <fieldset class="mb-2">
@@ -67,11 +68,13 @@
     <select id="roles" class="form-select mt-2" size="4"></select>
   </div>
 
+  <!-- 雇用区分 -->
   <div class="mb-2">
     <label class="form-label" asp-for="EmploymentStatus"></label>
-    <select class="form-select" asp-for="EmploymentStatus" asp-items="Model.EmploymentStatuses"></select>
+    <select class="form-select" asp-for="EmploymentStatus.Id" asp-items="Model.EmploymentStatuses"></select>
   </div>
 
+  <!-- 電話番号 -->
   <div class="mb-2">
     <label class="form-label" asp-for="TelephoneNumber"></label>
     <input class="form-control" asp-for="TelephoneNumber" />

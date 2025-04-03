@@ -6,18 +6,13 @@ using System.Xml.Linq;
 
 namespace Jbs.Yukari.Core.Models
 {
-    public class BasicInfo : IBasicInfo
+    public class BasicInfo : IdNamePair, IBasicInfo
     {
-        public Guid Id { get; set; }
-
         [DisplayName("コード")]
         public string Code { get; set; }
 
         [DisplayName("種別")]
         public string Type { get; set; }
-
-        [DisplayName("名前")]
-        public string Name { get; set; }
 
         public XDocument Properties { get; set; }
         public IEnumerable<Membership> Membership { get; set; }

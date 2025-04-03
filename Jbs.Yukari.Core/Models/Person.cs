@@ -24,10 +24,10 @@ namespace Jbs.Yukari.Core.Models
         public string TelephoneNumber { get; set; }
 
         [DisplayName("所属 / 役職")]
-        public IEnumerable<Dictionary<string, BasicInfo>> Roles { get; set; }
+        public IEnumerable<Dictionary<string, IdNamePair>> Roles { get; set; }
 
         [DisplayName("雇用区分")]
-        public Guid? EmploymentStatus { get; set; }
+        public IdNamePair EmploymentStatus { get; set; }
 
         public override void DeserializeProperties()
         {
@@ -44,10 +44,11 @@ namespace Jbs.Yukari.Core.Models
             Roles = Membership
                 .Where(x => (sourceArray).Contains(x.Type))
                 .GroupBy(x => x.Rank)
-                .Select(x => x.ToDictionary(y => y.Type, a => new BasicInfo { Id = a.ParentId, Name = a.Name }));
+                .Select(x => x.ToDictionary(y => y.Type, a => new IdNamePair { Id = a.ParentId, Name = a.Name }));
             EmploymentStatus = Membership
                 .Where(x => x.Type == "jobmode")
-                .FirstOrDefault()?.ParentId;
+                .Select(x => new IdNamePair { Id = x.ParentId, Name = x.Name })
+                .FirstOrDefault();
         }
 
         public override void SerializeProperties()
@@ -86,13 +87,14 @@ namespace Jbs.Yukari.Core.Models
                     key++;
                 }
             }
-            if (EmploymentStatus != Guid.Empty)
+            if (EmploymentStatus != null)
             {
-
                 Membership = Membership.Append(new Membership
                 {
                     Rank = 0,
-                    ParentId = (Guid)EmploymentStatus
+                    ParentId = EmploymentStatus.Id,
+                    Name = EmploymentStatus.Name,
+                    Type = "jobmode"
                 });
             }
         }

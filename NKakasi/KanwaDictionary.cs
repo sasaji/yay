@@ -266,7 +266,7 @@ namespace NKakasi
 
         private void Initialize()
         {
-            string path = Path.Combine(new string[] { Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Services", "Romanizer", "Kakasi", "kanwadict" });
+            string path = Path.Combine(new string[] { Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "kanwadict" });
             if (!File.Exists(path))
                 path = Environment.GetEnvironmentVariable("KANWADICTPATH");
             file = new RandomAccessFile(path, "r");

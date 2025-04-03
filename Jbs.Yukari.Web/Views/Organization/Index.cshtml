@@ -2,6 +2,7 @@
 @{
 	Layout = "_EditLayout";
 }
+
 @section basic {
 	<div class="mb-2">
 		<label class="form-label" asp-for="Code"></label>
@@ -21,6 +22,7 @@
 	@Html.HiddenFor(model => model.ParentId)
 	@Html.HiddenFor(model => model.TreeJson)
 }
+
 @section objects {
 	<div class="container">
 		<button class="btn btn-secondary" asp-action="Policy">ポリシー適用</button>
@@ -58,7 +60,6 @@
 				expandIcon: 'fa fa-plus',
 				collapseIcon: 'fa fa-minus'
 			});
-			$('#tree').treeview('expandNode', ['@Model.ParentId']);
 
 			$('#tree').on('nodeSelected', function (event, data) {
 				$('#organization-button').click(); // ドロップダウンリストを閉じる。

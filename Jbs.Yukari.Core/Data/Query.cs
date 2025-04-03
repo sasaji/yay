@@ -131,7 +131,7 @@ WHERE
         /// リスト取得
         /// </summary>
         /// <returns></returns>
-        public async Task<IEnumerable<BasicInfo>> GetList(string type, bool prependBlank)
+        public async Task<IEnumerable<IdNamePair>> GetIdNamePairs(string type, bool prependBlank)
         {
             var sql = @"SELECT
     basicinfo_id AS Id,
@@ -140,7 +140,7 @@ FROM Edit_BasicInfo
 WHERE
     type_id = @type
 ";
-            var roles = await database.Connection.QueryAsync<BasicInfo>(sql, new { type }, null, commandTimeout);
+            var roles = await database.Connection.QueryAsync<IdNamePair>(sql, new { type }, null, commandTimeout);
             if (prependBlank)
             {
                 roles = roles.Prepend(new BasicInfo()); // 先頭に空の要素を追加する。
