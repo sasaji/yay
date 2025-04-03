@@ -6,11 +6,11 @@ namespace Jbs.Yukari.Core.Models
 {
     public class Organization : BasicInfo
     {
-        public Guid? ParentId { get; set; }
+        public IdNamePair Parent { get; set; }
 
         public override void DeserializeProperties()
         {
-            ParentId = Membership.FirstOrDefault()?.ParentId;
+            Parent = Membership.Select(x => new IdNamePair { Id = x.ParentId, Name = x.Name }).FirstOrDefault();
         }
 
         public override void SerializeProperties()
@@ -22,12 +22,13 @@ namespace Jbs.Yukari.Core.Models
             );
 
             Membership = [];
-            if (ParentId != null)
+            if (Parent != null)
             {
                 Membership = Membership.Append(new Membership
                 {
                     Rank = 0,
-                    ParentId = (Guid)ParentId,
+                    ParentId = Parent.Id,
+                    Name = Parent.Name,
                     Type = "organization"
                 });
             }

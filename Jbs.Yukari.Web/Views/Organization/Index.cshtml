@@ -19,7 +19,8 @@
 			<div id="tree" class="dropdown-menu pe-3 w-100"></div>
 		</div>
 	</div>
-	@Html.HiddenFor(model => model.ParentId)
+	@Html.HiddenFor(model => model.Parent.Id)
+	@Html.HiddenFor(model => model.Parent.Name)
 	@Html.HiddenFor(model => model.TreeJson)
 }
 
@@ -61,10 +62,19 @@
 				collapseIcon: 'fa fa-minus'
 			});
 
+			$('#organization-button').text($('#Parent_Name').val());
+
 			$('#tree').on('nodeSelected', function (event, data) {
 				$('#organization-button').click(); // ドロップダウンリストを閉じる。
 				$('#organization-button').text(data.text); // ドロップダウンリストのボタンタイトルを選択した組織名にする。
-				$('#ParentId').val(data.id);
+				$('#Parent_Id').val(data.id);
+				$('#Parent_Name').val(data.text);
+			});
+
+			$('#organization-button').on('click', function () {
+			  var results = $('#tree').treeview('search', [$('#Parent_Name').val(), {}]);
+			  console.log(results);
+			  $('#tree').treeview('expandNode', [results[0].nodeId, {}]);
 			});
 		});
 	</script>

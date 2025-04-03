@@ -174,7 +174,6 @@
       roleButtonSetup();
       roleTextSetup();
 
-
       $('#romanize').on('click', function () {
         //console.log($('#Surname').val());
         $.ajax('/person/romanize', {
@@ -217,7 +216,6 @@
           var option = $('<option>').val(value).text(text);
           $('#AffiliationsViewModel').append(option);
           roleTextSetup();
-          //roleListSetup();
         }
       });
 
@@ -225,7 +223,6 @@
         $('#AffiliationsViewModel option:selected').remove();
         roleButtonSetup();
         roleTextSetup();
-        //roleListSetup();
       });
 
       $('#upRole').on('click', function () {
@@ -233,7 +230,6 @@
         $op.first().prev().before($op);
         roleButtonSetup();
         roleTextSetup();
-        //roleListSetup();
       });
 
       $('#downRole').on('click', function () {
@@ -241,7 +237,6 @@
         $op.last().next().after($op);
         roleButtonSetup();
         roleTextSetup();
-        //roleListSetup();
       });
 
       // フォーム送信時に ListBox の選択項目が失われないよう hidden フィールドに持たせる。
@@ -295,19 +290,5 @@
           this.text = '(兼) ' + this.text;
       });
     }
-
-    /*
-    function roleListSetup() {
-      var result = '[';
-      var comma = '';
-      $("#AffiliationsViewModel option").each(function (i, v) {
-        result += comma + v.value;
-        comma = ',';
-      });
-      result += ']';
-      console.log(result);
-      $('#@nameof(Model.AffiliationsViewModel)').val(result);
-    }
-    */
   </script>
 }
