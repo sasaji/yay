@@ -1,0 +1,48 @@
+﻿@model Jbs.Yukari.Web.Models.TitleViewModel
+@{
+	Layout = "_EditLayout";
+}
+
+@section basic {
+	<div class="mb-2">
+		<label class="form-label" asp-for="Code"></label>
+		<input class="form-control" asp-for="Code" required />
+	</div>
+	<div class="mb-2">
+		<label class="form-label" asp-for="Name"></label>
+		<input class="form-control" asp-for="Name" required />
+	</div>
+}
+
+@section objects {
+	<div class="container">
+		<button class="btn btn-secondary" asp-action="Policy">ポリシー適用</button>
+		<div class="row">
+			<div class="col col-sm-12">
+				<ul id="object-tabs" class="nav">
+					<li class="nav-item">
+						<a href="#user" class="nav-link" data-bs-toggle="tab">ユーザー</a>
+					</li>
+					<li class="nav-item">
+						<a href="#group" class="nav-link" data-bs-toggle="tab">グループ</a>
+					</li>
+				</ul>
+				<div class="tab-content">
+					<div id="user" class="tab-pane active">
+						@await Html.PartialAsync("_Users", Model.Users)
+					</div>
+					<div id="group" class="tab-pane">
+						@await Html.PartialAsync("_Groups", Model.Groups)
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+}
+
+@section Scripts {
+	<script>
+		$(function () {
+		});
+	</script>
+}

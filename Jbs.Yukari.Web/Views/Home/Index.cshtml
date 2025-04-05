@@ -30,6 +30,8 @@
 										<option value=""></option>
 										<option value="person">個人</option>
 										<option value="organization">組織</option>
+										<option value="title">役職</option>
+										<option value="jobmode">雇用区分</option>
 									</select>
 								</div>
 							</div>
@@ -97,8 +99,8 @@
 									<ul class="dropdown-menu">
 										<li><a class="dropdown-item" href="/Person/Index" target="_blank">個人</a></li>
 										<li><a class="dropdown-item" href="/Organization/Index" target="_blank">組織</a></li>
-										<li><a class="dropdown-item" href="#">役職</a></li>
-										<li><a class="dropdown-item" href="#">雇用区分</a></li>
+										<li><a class="dropdown-item" href="/Title/Index" target="_blank">役職</a></li>
+										<li><a class="dropdown-item" href="/EmploymentStatus/Index" target="_blank">雇用区分</a></li>
 									</ul>
 								</li>
 							</ul>
@@ -140,11 +142,17 @@
 													var @url = string.Empty;
 													switch (entity.Type)
 													{
+														case "person":
+															url = "/person";
+															break;
 														case "organization":
 															url = "/organization";
 															break;
-														case "person":
-															url = "/person";
+														case "title":
+															url = "/title";
+															break;
+														case "jobmode":
+															url = "/employmentStatus";
 															break;
 													}
 												}

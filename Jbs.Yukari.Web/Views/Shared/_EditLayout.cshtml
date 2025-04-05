@@ -110,6 +110,10 @@
         $('#confirm').modal('hide');
         if ($('#the-form').get(0).checkValidity() === true) {
           var type = $('#Type').val();
+          if (type == "jobmode")
+          {
+              type = "employmentStatus";
+          }
           var action = $('#confirm').data('action');
           $('#the-form').get(0).action = `/${type}/${action}`;
           $('#the-form').submit();
