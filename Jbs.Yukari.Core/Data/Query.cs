@@ -77,6 +77,10 @@ basicinfo_id IN (
                         where.Add($"phase_flag = @{nameof(searchCriteria.Phase)}");
                         parameters.Add(nameof(searchCriteria.Phase), searchCriteria.Phase);
                     }
+                    if (!searchCriteria.IncludeDeleted)
+                    {
+                        where.Add($"status < 2 OR (status = 2 AND phase_flag <> 0)");
+                    }
                 }
             }
             var rowsSql = $"{rowsSelect}{(where.Count != 0 ? " WHERE " + string.Join(" AND ", where) : null)} ORDER BY sort_no, identity_no";
@@ -97,6 +101,7 @@ basicinfo_id IN (
     identity_no AS Code,
     type_id AS Type,
     name AS Name,
+    status AS Status,
     phase_flag AS Phase,
     basicinfo_data AS Properties
 FROM Edit_BasicInfo WHERE basicinfo_id = @id";

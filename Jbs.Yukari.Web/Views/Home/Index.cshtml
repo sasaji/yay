@@ -73,6 +73,14 @@
 									</div>
 								</div>
 							</div>
+							<div class="row search-row">
+								<div class="col col-12">
+									<div class="form-check">
+										@Html.CheckBoxFor(model => model.SearchCriteria.IncludeDeleted, new { @class = "form-check-input" })
+										<label class="form-check-label" asp-for="SearchCriteria.IncludeDeleted"></label>
+									</div>
+								</div>
+							</div>
 						</div>
 						<div class="text-center mt-3">
 							<input id="search-button" class="btn btn-primary" type="submit" value="検索" />
@@ -126,7 +134,6 @@
 											<th><label asp-for="SearchResult.ListItemTemplate.Type" class="control-label"></label></th>
 											<th><label asp-for="SearchResult.ListItemTemplate.Code" class="control-label"></label></th>
 											<th><label asp-for="SearchResult.ListItemTemplate.Name" class="control-label"></label></th>
-											<th><label asp-for="SearchResult.ListItemTemplate.Status" class="control-label"></label></th>
 											<th><label asp-for="SearchResult.ListItemTemplate.Phase" class="control-label"></label></th>
 											<th><label asp-for="SearchResult.ListItemTemplate.WhenChanged" class="control-label"></label></th>
 											<th><label asp-for="SearchResult.ListItemTemplate.Objects" class="control-label"></label></th>
@@ -135,7 +142,12 @@
 									<tbody>
 										@foreach (var entity in this.Model.SearchResult.Items)
 										{
-											<tr class="row-data">
+											var bg = "";
+											if (entity.Status == 2)
+											{
+												bg = "deleted";
+											}
+											<tr class="row-data @bg">
 												<td class="text-left">@entity.Type</td>
 												<td class="text-left">@entity.Code</td>
 												@{
@@ -164,12 +176,6 @@
 													else
 													{
 														<span>@entity.Name</span>
-													}
-												</td>
-												<td class="text-left">
-													@if (entity.Status == 0)
-													{
-														<i class="fa fa-check"></i>
 													}
 												</td>
 												<td class="text-left">

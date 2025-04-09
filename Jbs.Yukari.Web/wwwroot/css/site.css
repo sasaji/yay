@@ -75,3 +75,7 @@ legend {
 .organization-dropdownlist {
     border-color: #ced4da;
 }
+
+.deleted {
+    background-color: #ced4da;
+}

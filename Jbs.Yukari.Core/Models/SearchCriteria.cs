@@ -28,5 +28,8 @@ namespace Jbs.Yukari.Core.Models
         ];
         public string RegisterDateFrom { get; set; }
         public string RegisterDateTo { get; set; }
+
+        [DisplayName("削除済みを含める")]
+        public bool IncludeDeleted { get; set; }
     }
 }
