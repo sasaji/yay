@@ -19,7 +19,7 @@
           }
           <h2 class="accordion-header" id="@group.value.SamAccountName">
             <button class="accordion-button @collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_@group.value.SamAccountName" aria-expanded="@collapse" aria-controls="collapse_@group.value.SamAccountName">
-              [@group.value.TypeName] @group.value.SamAccountName
+              [@group.value.Type] @group.value.SamAccountName
             </button>
           </h2>
           <div id="collapse_@group.value.SamAccountName" class="accordion-collapse collapse @show" aria-labelledby="@group.value.SamAccountName" data-bs-parent="#accordion-group">
@@ -41,7 +41,7 @@
             </div>
           </div>
         </div>
-        <input type="hidden" name="Groups[@group.index].TypeName" asp-for="@group.value.TypeName" />
+        <input type="hidden" name="Groups[@group.index].TypeName" asp-for="@group.value.Type" />
       }
     </div>
   }

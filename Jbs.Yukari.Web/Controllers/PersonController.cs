@@ -14,9 +14,9 @@ namespace Jbs.Yukari.Web.Controllers
     {
         public async Task<IActionResult> Index(string id)
         {
-            var model = !string.IsNullOrEmpty(id) ? await query.GetData<PersonViewModel>(Guid.Parse(id)) : new PersonViewModel { Id = Guid.NewGuid(), Type = "person" };
-            model.AffiliationsViewModel = [.. model.Affiliations.Select(x => new SelectListItem(x.Organization.Name + "/" + x.Title.Name, x.Organization.Id + "/" + x.Title.Id))];
+            var model = await Get(id, PersonTransformer.GetUserTypes(), PersonTransformer.GetGroupTypes());
             model.TreeJson = $"[{jsonSerializer.Serialize(await query.GetOrganizationTree(string.Empty))}]";
+            model.AffiliationsViewModel = [.. model.Affiliations.Select(x => new SelectListItem(x.Organization.Name + "/" + x.Title.Name, x.Organization.Id + "/" + x.Title.Id))];
             model.Titles = [.. (await query.GetIdNamePairs("title", false)).Select(x => new SelectListItem(x.Name, x.Id.ToString()))];
             model.EmploymentStatuses = [.. (await query.GetIdNamePairs("jobmode", true)).Select(x => new SelectListItem(x.Name, x.Id.ToString()))];
             return View("Index", model);

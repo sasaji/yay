@@ -2,6 +2,7 @@
 using Jbs.Yukari.Core.Models;
 using Jbs.Yukari.Core.Services.Romanization;
 using Jbs.Yukari.Core.Services.Serialization;
+using Jbs.Yukari.Domain;
 using Jbs.Yukari.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,7 +12,7 @@ namespace Jbs.Yukari.Web.Controllers
     {
         public async Task<IActionResult> Index(string id)
         {
-            var model = !string.IsNullOrEmpty(id) ? await query.GetData<OrganizationViewModel>(Guid.Parse(id)) : new OrganizationViewModel { Id = Guid.NewGuid(), Type = "organization" };
+            var model = await Get(id, OrganizationTransformer.GetUserTypes(), OrganizationTransformer.GetGroupTypes());
             model.TreeJson = $"[{jsonSerializer.Serialize(await query.GetOrganizationTree(string.Empty))}]";
             return View("Index", model);
         }

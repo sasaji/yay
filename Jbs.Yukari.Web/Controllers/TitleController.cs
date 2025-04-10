@@ -11,7 +11,7 @@ namespace Jbs.Yukari.Web.Controllers
     {
         public async Task<IActionResult> Index(string id)
         {
-            var model = !string.IsNullOrEmpty(id) ? await query.GetData<TitleViewModel>(Guid.Parse(id)) : new TitleViewModel { Id = Guid.NewGuid(), Type = "title" };
+            var model = !string.IsNullOrEmpty(id) ? await query.GetData<TitleViewModel>(Guid.Parse(id), null, null) : new TitleViewModel { Id = Guid.NewGuid(), Type = "title" };
             return View("Index", model);
         }
 

@@ -35,6 +35,12 @@
       <div class="tab-content">
         <div id="basic" class="tab-pane @tabSource">
           @RenderSection("basic")
+          <div class="mb-2">
+            <input type="radio" class="form-check-input" asp-for="Status" required value="0" />
+            通常
+            <input type="radio" class="form-check-input check-delete" asp-for="Status" required value="2" />
+            削除
+          </div>
         </div>
         <div id="objects" class="tab-pane @tabObjects">
           @RenderSection("objects")
@@ -43,12 +49,6 @@
       <div class="mb-2">
         <label class="form-label" asp-for="PublishDueDate"></label>
         <input class="form-control" asp-for="PublishDueDate" required type="date" style="width:10rem" />
-      </div>
-      <div class="mb-2">
-        <input type="radio" class="form-check-input" asp-for="Status" required value="0" />
-        通常
-        <input type="radio" class="form-check-input check-delete" asp-for="Status" required value="2" />
-        削除
       </div>
       <div class="pt-2">
         @if (Model.Phase == 0)

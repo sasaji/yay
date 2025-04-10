@@ -18,8 +18,9 @@
             }
           }
           <h2 class="accordion-header" id="@user.value.SamAccountName">
+            <input type="hidden" name="Users[@user.index].Type" asp-for="@user.value.Type" />
             <button class="accordion-button @collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_@user.value.SamAccountName" aria-expanded="@collapse" aria-controls="collapse_@user.value.SamAccountName">
-              [@user.value.TypeName] @user.value.SamAccountName
+              [@Jbs.Yukari.Domain.Types.GetTypeName(user.value.Type)] @user.value.SamAccountName
             </button>
           </h2>
           <div id="collapse_@user.value.SamAccountName" class="accordion-collapse collapse @show" aria-labelledby="@user.value.SamAccountName" data-bs-parent="#accordion-group">

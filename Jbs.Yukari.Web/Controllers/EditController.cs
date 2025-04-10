@@ -2,16 +2,24 @@
 using Jbs.Yukari.Core.Models;
 using Jbs.Yukari.Core.Services.Romanization;
 using Jbs.Yukari.Core.Services.Serialization;
+using Jbs.Yukari.Domain;
+using Jbs.Yukari.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Jbs.Yukari.Web.Controllers
 {
-    public abstract class EditController<T>(ILogger<EditController<T>> logger, IQuery query, IRomanizer romanizer, IJsonSerializer jsonSerializer) : Controller where T : BasicInfo
+    public abstract class EditController<T>(ILogger<EditController<T>> logger, IQuery query, IRomanizer romanizer, IJsonSerializer jsonSerializer) : Controller where T : BasicInfo, IEditViewModel, new()
     {
         protected readonly ILogger<EditController<T>> logger = logger;
         protected readonly IQuery query = query;
         protected readonly IRomanizer romanizer = romanizer;
         protected readonly IJsonSerializer jsonSerializer = jsonSerializer;
+
+        protected async Task<T> Get(string id, string[]? users, string[]? groups)
+        {
+            var model = !string.IsNullOrEmpty(id) ? await query.GetData<T>(Guid.Parse(id), users, groups) : new T { Id = Guid.NewGuid(), Type = typeof(T).BaseType?.Name.ToLower() };
+            return model;
+        }
 
         public virtual IActionResult Save(T model)
         {

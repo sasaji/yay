@@ -8,8 +8,8 @@ namespace Jbs.Yukari.Core.Data
     public interface IQuery
     {
         Task<IEnumerable<BasicInfo>> Search(SearchCriteria searchCriteria);
-        Task<T> GetData<T>(Guid id) where T : BasicInfo;
-        Task<IEnumerable<T>> GetObjects<T>(Guid id, string type);
+        Task<T> GetData<T>(Guid id, string[] users, string[] groups) where T : BasicInfo;
+        Task<IEnumerable<T>> GetObjects<T>(Guid id, string[] types);
         Task<IEnumerable<TreeNode>> GetHierarchy(string type, string rootId = null);
         Task<TreeNode> GetOrganizationTree(string rootText);
         Task<IEnumerable<IdNamePair>> GetIdNamePairs(string type, bool prependBlank);

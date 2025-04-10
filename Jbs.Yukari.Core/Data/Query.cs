@@ -94,7 +94,7 @@ basicinfo_id IN (
         /// <typeparam name="T"></typeparam>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<T> GetData<T>(Guid id) where T : BasicInfo
+        public async Task<T> GetData<T>(Guid id, string[] users, string[] groups) where T : BasicInfo
         {
             var sql = @"SELECT
     basicinfo_id AS Id,
@@ -107,6 +107,14 @@ basicinfo_id IN (
 FROM Edit_BasicInfo WHERE basicinfo_id = @id";
             var data = await database.Connection.QuerySingleAsync<T>(sql, new { id }, null, commandTimeout);
             data.Membership = await GetMembership(id);
+            if (users != null)
+            {
+                data.Users = await GetObjects<User>(id, users);
+            }
+            else if (groups != null)
+            {
+                data.Groups = await GetObjects<Group>(id, groups);
+            }
             data.DeserializeProperties();
             return data;
         }
@@ -160,23 +168,21 @@ WHERE
         /// <param name="id"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<T>> GetObjects<T>(Guid id, string type)
+        public async Task<IEnumerable<T>> GetObjects<T>(Guid id, string[] types)
         {
             var sql = @"SELECT
     O.basicinfo_id AS Id,
     O.object_type_id AS Type,
-    M.object_type_name AS TypeName,
     O.logon_name AS SamAccountName,
     O.display_name AS DisplayName,
     O.objectinfo_data AS Properties
 FROM Edit_ObjectInfo AS O
-INNER JOIN Mst_ObjectType M ON O.object_type_id = M.object_type_id
 WHERE
     O.basicinfo_id = @id AND
-    M.object_class = @type
+    O.object_type_id IN @types
 ORDER BY
     O.object_type_id";
-            return await database.Connection.QueryAsync<T>(sql, new { id, type }, null, commandTimeout);
+            return await database.Connection.QueryAsync<T>(sql, new { id, types }, null, commandTimeout);
         }
 
         /// <summary>

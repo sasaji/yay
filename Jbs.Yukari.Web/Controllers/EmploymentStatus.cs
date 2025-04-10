@@ -1,4 +1,5 @@
-﻿using Jbs.Yukari.Core.Data;
+﻿using System.Text.RegularExpressions;
+using Jbs.Yukari.Core.Data;
 using Jbs.Yukari.Core.Models;
 using Jbs.Yukari.Core.Services.Romanization;
 using Jbs.Yukari.Core.Services.Serialization;
@@ -11,7 +12,7 @@ namespace Jbs.Yukari.Web.Controllers
     {
         public async Task<IActionResult> Index(string id)
         {
-            var model = !string.IsNullOrEmpty(id) ? await query.GetData<EmploymentStatusViewModel>(Guid.Parse(id)) : new EmploymentStatusViewModel { Id = Guid.NewGuid(), Type = "jobmode" };
+            var model = !string.IsNullOrEmpty(id) ? await query.GetData<EmploymentStatusViewModel>(Guid.Parse(id), null, null) : new EmploymentStatusViewModel { Id = Guid.NewGuid(), Type = "jobmode" };
             return View("Index", model);
         }
 
