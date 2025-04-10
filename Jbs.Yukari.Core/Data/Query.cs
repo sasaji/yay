@@ -279,6 +279,7 @@ WHEN MATCHED
             identity_no = @{nameof(info.Code)},
             name = @{nameof(info.Name)},
             basicinfo_data = @{nameof(info.Properties)},
+            status = @{nameof(info.Status)},
             phase_flag = @{nameof(info.Phase)},
             update_date = GETDATE(),
             commit_date = GETDATE()
@@ -294,6 +295,7 @@ WHEN NOT MATCHED
                 parameters.Add($"@{nameof(info.Type)}", info.Type);
                 parameters.Add($"@{nameof(info.Name)}", info.Name);
                 parameters.Add($"@{nameof(info.Properties)}", info.Properties);
+                parameters.Add($"@{nameof(info.Status)}", info.Status);
                 parameters.Add($"@{nameof(info.Phase)}", info.Phase);
                 parameters.Add($"@{nameof(info.Id)}", info.Id);
                 database.ExecuteInTransaction(sql, parameters);
