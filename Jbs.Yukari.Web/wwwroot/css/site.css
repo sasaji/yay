@@ -79,3 +79,8 @@ legend {
 .deleted {
     background-color: #ced4da;
 }
+
+.check-delete:checked {
+    background-color: #ff0000;
+    border-color: #ff0000;
+}

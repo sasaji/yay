@@ -11,7 +11,7 @@ namespace Jbs.Yukari.Web.Models
         public SearchResult SearchResult { get; set; } = new SearchResult();
         public int TotalCount { get; set; } = 0;
         public int PageNumber { get; set; } = 1;
-        public int PageSize { get; set; } = 15;
+        public int PageSize { get; set; } = 12;
         public bool FirstPage { get; set; }
     }
 }

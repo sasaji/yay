@@ -47,7 +47,7 @@
       <div class="mb-2">
         <input type="radio" class="form-check-input" asp-for="Status" required value="0" />
         通常
-        <input type="radio" class="form-check-input danger" asp-for="Status" required value="2" />
+        <input type="radio" class="form-check-input check-delete" asp-for="Status" required value="2" />
         削除
       </div>
       <div class="pt-2">
@@ -71,7 +71,7 @@
           <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#confirm" data-action="PublishData">データのみ反映</button>
           <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#confirm" data-action="CheckOut">チェックアウト</button>
         }
-        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirm" data-action="Cancel">キャンセル</button>
+        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#confirm" data-action="Cancel">キャンセル</button>
       </div>
     }
   </div>
@@ -137,10 +137,13 @@
         }
       });
 
+      // 反映待ちの場合要素を変更不可にする。
       @if (Model.Phase == 2)
       {
         @:$('#the-form input').attr('readonly', 'readonly');
-        @:$('#the-form select').attr('readonly', 'readonly');
+        @:$('#the-form input[type="checkbox"]').attr('disabled', true);
+        @:$('#the-form input[type="radio"]').attr('disabled', true);
+        @:$('#the-form select').attr('disabled', true);
         @:$('.tab-content button').attr('disabled', true);
       }
     });
