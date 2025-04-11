@@ -16,7 +16,10 @@ namespace Jbs.Yukari.Web.Controllers
         {
             var model = await Get(id, PersonTransformer.GetUserTypes(), PersonTransformer.GetGroupTypes());
             model.TreeJson = $"[{jsonSerializer.Serialize(await query.GetOrganizationTree(string.Empty))}]";
-            model.AffiliationsViewModel = [.. model.Affiliations.Select(x => new SelectListItem(x.Organization.Name + "/" + x.Title.Name, x.Organization.Id + "/" + x.Title.Id))];
+            if (model.Affiliations != null)
+            {
+                model.AffiliationsViewModel = [.. model.Affiliations.Select(x => new SelectListItem(x.Organization.Name + "/" + x.Title.Name, x.Organization.Id + "/" + x.Title.Id))];
+            }
             model.Titles = [.. (await query.GetIdNamePairs("title", false)).Select(x => new SelectListItem(x.Name, x.Id.ToString()))];
             model.EmploymentStatuses = [.. (await query.GetIdNamePairs("jobmode", true)).Select(x => new SelectListItem(x.Name, x.Id.ToString()))];
             return View("Index", model);
